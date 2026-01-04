@@ -29,6 +29,7 @@ const Navbar = () => {
                     <NavLink href="#services">Servicios</NavLink>
                     <NavLink href="#work">Portafolio</NavLink>
                     <NavLink href="#about">Sobre Mí</NavLink>
+                    <a href="/login" className="text-gray-300 hover:text-white transition-colors text-sm font-medium">Acceso Clientes</a>
                     <Button href="#contact" variant="primary" className="!py-2 !px-4 text-sm">Hablemos</Button>
                 </div>
 
