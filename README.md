@@ -1,16 +1,40 @@
-# React + Vite
+# WebArchitect | Digital Manager & Arquitecto UX
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+**Plataforma profesional de servicios digitales y desarrollo de software.**
 
-Currently, two official plugins are available:
+Este proyecto representa la identidad digital de **WebArchitect**, ofreciendo servicios de alta gama en:
+-   **Arquitectura UX/UI**: Diseño centrado en la conversión.
+-   **Desarrollo Full-Stack**: Aplicaciones web robustas (React, Node.js).
+-   **Gestión Digital**: Estrategias de crecimiento y SEO técnico.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## 🚀 Características del Proyecto
+-   **Diseño Premium**: Interfaz moderna con animaciones fluidas (Framer Motion).
+-   **Portafolio Inteligente**: Filtrado dinámico entre Sitios Web y Aplicaciones.
+-   **Contacto Directo**: Integración flotante con WhatsApp API.
+-   **Performance**: Construido con Vite para máxima velocidad y optimización.
 
-## React Compiler
+## 🛠️ Tecnologías Usadas
+-   **React 18**: Biblioteca principal de interfaz.
+-   **Tailwind CSS**: Estilizado moderno y responsivo.
+-   **Framer Motion**: Animaciones avanzadas.
+-   **Lucide React**: Iconografía profesional.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## 💻 Cómo Iniciar Localmente
 
-## Expanding the ESLint configuration
+1.  Clonar el repositorio:
+    ```bash
+    git clone https://github.com/salepayaso/Agencia_web.git
+    ```
+2.  Instalar dependencias:
+    ```bash
+    npm install
+    ```
+3.  Iniciar servidor de desarrollo:
+    ```bash
+    npm run dev
+    ```
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## 📞 Contacto
+**WebArchitect Chile**
+-   WhatsApp: [+56 9 5414 6176](https://wa.me/56954146176)
+-   Email: contacto@webarchitect.cl
