@@ -14,10 +14,10 @@ const LandingPage = () => {
     const [activeCategory, setActiveCategory] = useState('all');
 
     const services = [
-        { icon: Layout, title: "Arquitectura UX/UI", desc: "Diseño centrado en el usuario que convierte visitantes en clientes." },
-        { icon: Code, title: "Desarrollo Full-Stack", desc: "Aplicaciones web robustas y escalables con tecnologías modernas." },
-        { icon: Database, title: "Sistemas & Apps", desc: "Software a medida para automatizar y optimizar tu negocio." },
-        { icon: Zap, title: "Gestión Digital & SEO", desc: "Estrategias de crecimiento y optimización técnica continua." },
+        { icon: Layout, title: "Arquitectura UX/UI", desc: "Diseño premium que convierte. No usamos plantillas, creamos activos digitales únicos." },
+        { icon: Database, title: "Sistemas & Apps", desc: "Desarrollo de software a medida: Inventarios, CRMs y Dashboards inteligentes." },
+        { icon: Zap, title: "Marketing & Presencia 360", desc: "Google Ads, Meta, Redes Sociales y posicionamiento local en Google Maps (SEO)." },
+        { icon: Rocket, title: "E-Commerce", desc: "Tiendas online rápidas y seguras. Vende 24/7 con pagos automatizados." },
     ];
 
     const projects = [

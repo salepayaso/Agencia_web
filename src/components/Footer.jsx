@@ -6,7 +6,7 @@ const Footer = () => {
             <div className="max-w-7xl mx-auto grid md:grid-cols-4 gap-8 mb-8">
                 <div className="col-span-1 md:col-span-2">
                     <div className="flex items-center gap-2 mb-4">
-                        <img src="/logo.png" alt="Logo" className="h-8 w-8" />
+                        <img src="/logo.png" alt="Logo" className="h-16 w-16 rounded-full object-cover" />
                         <h2 className="text-2xl font-bold text-gradient">Interfaz 360</h2>
                     </div>
                     <p className="text-gray-400 max-w-xs">
