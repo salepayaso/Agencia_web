@@ -3,6 +3,7 @@ import Footer from '../components/Footer';
 import About from '../components/About';
 import Contact from '../components/Contact';
 import WhatsAppButton from '../components/WhatsAppButton';
+import Brands from '../components/Brands';
 import Section from '../components/ui/Section';
 import Button from '../components/ui/Button';
 import Card from '../components/ui/Card';
@@ -133,6 +134,8 @@ const LandingPage = () => {
                     </motion.div>
                 </div>
             </section>
+
+            <Brands />
 
             {/* Services Section - Unchanged */}
             <Section id="services" className="bg-dark-bg/50">

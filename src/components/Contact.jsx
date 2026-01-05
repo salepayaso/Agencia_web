@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import Section from './ui/Section';
 import Button from './ui/Button';
-import { Send, CheckCircle } from 'lucide-react';
+import { Send, CheckCircle, Instagram, Facebook, Linkedin } from 'lucide-react';
 
 const Contact = () => {
     const [formState, setFormState] = useState('idle'); // idle, submitting, success
@@ -35,6 +35,21 @@ const Contact = () => {
                             <div className="flex items-center gap-3 text-gray-300">
                                 <div className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center text-primary-500">#</div>
                                 <span>+56 9 5414 6176</span>
+                            </div>
+                        </div>
+
+                        <div className="mt-8">
+                            <h4 className="text-sm font-bold text-gray-400 uppercase tracking-wider mb-4">Síguenos en redes</h4>
+                            <div className="flex gap-4">
+                                <a href="https://instagram.com" target="_blank" rel="noreferrer" className="p-3 bg-white/5 rounded-lg hover:bg-gradient-to-br hover:from-purple-500 hover:to-pink-500 hover:text-white transition-all group">
+                                    <Instagram className="text-gray-400 group-hover:text-white" size={20} />
+                                </a>
+                                <a href="https://facebook.com" target="_blank" rel="noreferrer" className="p-3 bg-white/5 rounded-lg hover:bg-[#1877F2] hover:text-white transition-all group">
+                                    <Facebook className="text-gray-400 group-hover:text-white" size={20} />
+                                </a>
+                                <a href="https://linkedin.com" target="_blank" rel="noreferrer" className="p-3 bg-white/5 rounded-lg hover:bg-[#0A66C2] hover:text-white transition-all group">
+                                    <Linkedin className="text-gray-400 group-hover:text-white" size={20} />
+                                </a>
                             </div>
                         </div>
                     </div>
