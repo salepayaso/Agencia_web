@@ -23,7 +23,10 @@ const Navbar = () => {
                 }`}
         >
             <div className="max-w-7xl mx-auto px-4 md:px-8 flex items-center justify-between">
-                <a href="#" className="text-2xl font-bold text-gradient">WebArchitect</a>
+                <a href="#" className="flex items-center gap-2 text-2xl font-bold text-gradient">
+                    <img src="/logo.png" alt="Logo" className="h-8 w-8 object-contain" />
+                    Interfaz 360
+                </a>
 
                 <div className="hidden md:flex items-center gap-8">
                     <NavLink href="#services">Servicios</NavLink>

@@ -52,10 +52,10 @@ const LandingPage = () => {
                     >
                         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-sm text-primary-400 mb-6">
                             <Rocket className="w-4 h-4" />
-                            <span>Digital Manager & Fullstack Dev</span>
+                            <span>Agencia Digital & Software</span>
                         </div>
                         <h1 className="text-5xl md:text-7xl font-bold leading-tight mb-6">
-                            Arquitectura Web & <br /><span className="text-gradient">Experiencia UX.</span>
+                            Interfaz 360 <br /><span className="text-gradient">Visión Digital.</span>
                         </h1>
                         <p className="text-gray-400 text-lg mb-8 max-w-lg">
                             Transformo ideas complejas en ecosistemas digitales robustos. Desde sitios corporativos hasta aplicaciones de software a medida.
