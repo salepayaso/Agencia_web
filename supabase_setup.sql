@@ -36,9 +36,14 @@ alter table profiles enable row level security;
 -- 4. Crear políticas de seguridad (ACTUALIZADO: SOLO LECTURA PARA CLIENTES)
 do $$
 begin
-    -- Política de Lectura (El cliente PUEDE VER su perfil)
-    if not exists (select 1 from pg_policies where tablename = 'profiles' and policyname = 'Perfiles públicos son visibles por todos.') then
-        create policy "Perfiles públicos son visibles por todos." on profiles for select using (true);
+    -- Política de Lectura (SOLO el dueño puede ver su perfil)
+    if not exists (select 1 from pg_policies where tablename = 'profiles' and policyname = 'Usuarios solo pueden ver su propio perfil.') then
+        create policy "Usuarios solo pueden ver su propio perfil." on profiles for select using (auth.uid() = id);
+    end if;
+    
+    -- Eliminar politica antigua insegura si existe
+    if exists (select 1 from pg_policies where tablename = 'profiles' and policyname = 'Perfiles públicos son visibles por todos.') then
+        drop policy "Perfiles públicos son visibles por todos." on profiles;
     end if;
 
     -- Política de Inserción (El cliente PUEDE crear su perfil al inicio si no existe, o puedes restringirlo también)
