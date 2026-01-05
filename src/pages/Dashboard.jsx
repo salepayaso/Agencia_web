@@ -58,7 +58,7 @@ const Dashboard = () => {
             {/* Sidebar */}
             <aside className="w-64 bg-black/30 border-r border-white/5 p-6 flex flex-col">
                 <div className="mb-10 flex items-center gap-3">
-                    <img src="/logo.png" alt="Logo" className="h-8 w-8 object-contain" />
+                    <img src="/logo.png" alt="Logo" className="h-16 w-16 rounded-full object-cover" />
                     <div>
                         <span className="text-xl font-bold text-gradient block">Interfaz 360</span>
                         <span className="text-xs text-gray-400 block">Portal Cliente</span>
