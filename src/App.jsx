@@ -1,5 +1,9 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import LandingPage from './pages/LandingPage';
+import Home from './pages/Home';
+import Services from './pages/Services';
+import Portfolio from './pages/Portfolio';
+import AboutPage from './pages/AboutPage';
+import ContactPage from './pages/ContactPage';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import ProtectedRoute from './components/ProtectedRoute';
@@ -10,7 +14,11 @@ function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<LandingPage />} />
+        <Route path="/" element={<Home />} />
+        <Route path="/servicios" element={<Services />} />
+        <Route path="/portafolio" element={<Portfolio />} />
+        <Route path="/nosotros" element={<AboutPage />} />
+        <Route path="/contacto" element={<ContactPage />} />
         <Route path="/login" element={<Login />} />
         <Route path="/update-password" element={<UpdatePassword />} />
         <Route

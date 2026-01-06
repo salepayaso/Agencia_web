@@ -15,7 +15,7 @@ const LandingPage = () => {
     const [activeCategory, setActiveCategory] = useState('all');
 
     const services = [
-        { icon: Layout, title: "Arquitectura UX/UI", desc: "Diseño premium que convierte. No usamos plantillas, creamos activos digitales únicos." },
+        { icon: Layout, title: "Diseño de Páginas Web", desc: "Diseño profesional y único. Tu negocio merece una web que venda, no una plantilla genérica." },
         { icon: Database, title: "Sistemas & Apps", desc: "Desarrollo de software a medida: Inventarios, CRMs y Dashboards inteligentes." },
         { icon: Zap, title: "Marketing & Presencia 360", desc: "Google Ads, Meta, Redes Sociales y posicionamiento local en Google Maps (SEO)." },
         { icon: Rocket, title: "E-Commerce", desc: "Tiendas online rápidas y seguras. Vende 24/7 con pagos automatizados." },
@@ -89,13 +89,13 @@ const LandingPage = () => {
                     >
                         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-sm text-primary-400 mb-6">
                             <Rocket className="w-4 h-4" />
-                            <span>Agencia Digital & Software</span>
+                            <span>Potenciado con Tecnología React & IA</span>
                         </div>
                         <h1 className="text-5xl md:text-7xl font-bold leading-tight mb-6">
-                            Interfaz 360 <br /><span className="text-gradient">Visión Digital.</span>
+                            Webs de Alta Tecnología <br /><span className="text-gradient">para Negocios Modernos.</span>
                         </h1>
                         <p className="text-gray-400 text-lg mb-8 max-w-lg">
-                            Transformo ideas complejas en ecosistemas digitales robustos. Desde sitios corporativos hasta aplicaciones de software a medida.
+                            Desarrollamos sitios web a medida, rápidos y seguros. Deja atrás lo obsoleto y destaca frente a tu competencia con tecnología de punta.
                         </p>
                         <div className="flex gap-4">
                             <Button href="#contact" variant="primary" icon={ArrowRight}>Consultoría Gratuita</Button>
