@@ -1,9 +1,11 @@
+import { Link, useLocation } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import Button from './ui/Button';
 
 const Navbar = () => {
     const [scrolled, setScrolled] = useState(false);
+    const location = useLocation();
 
     useEffect(() => {
         const handleScroll = () => {
@@ -15,6 +17,9 @@ const Navbar = () => {
         return () => window.removeEventListener('scroll', handleScroll);
     }, []);
 
+    // Helper to determine if link is active
+    const isActive = (path) => location.pathname === path;
+
     return (
         <motion.nav
             initial={{ y: -100 }}
@@ -23,17 +28,21 @@ const Navbar = () => {
                 }`}
         >
             <div className="max-w-7xl mx-auto px-4 md:px-8 flex items-center justify-between">
-                <a href="#" className="flex items-center gap-3">
+                <Link to="/" className="flex items-center gap-3">
                     <img src="/logo.png" alt="Logo" className="h-16 w-16 rounded-full object-cover" />
-                    <img src="/brand-text-v2.png" alt="Interfaz 360" className="h-10 object-contain" />
-                </a>
+                    <img
+                        src="/brand-text-neon.png"
+                        alt="Interfaz 360"
+                        className="h-14 object-contain"
+                    />
+                </Link>
 
                 <div className="hidden md:flex items-center gap-8">
-                    <NavLink href="#services">Servicios</NavLink>
-                    <NavLink href="#work">Portafolio</NavLink>
-                    <NavLink href="#about">Sobre Mí</NavLink>
-                    <a href="/login" className="text-gray-300 hover:text-white transition-colors text-sm font-medium">Acceso Clientes</a>
-                    <Button href="#contact" variant="primary" className="!py-2 !px-4 text-sm">Hablemos</Button>
+                    <Link to="/servicios" className={`text-sm font-medium transition-colors ${isActive('/servicios') ? 'text-primary-400' : 'text-gray-300 hover:text-white'}`}>Servicios</Link>
+                    <Link to="/portafolio" className={`text-sm font-medium transition-colors ${isActive('/portafolio') ? 'text-primary-400' : 'text-gray-300 hover:text-white'}`}>Portafolio</Link>
+                    <Link to="/nosotros" className={`text-sm font-medium transition-colors ${isActive('/nosotros') ? 'text-primary-400' : 'text-gray-300 hover:text-white'}`}>Sobre Mí</Link>
+                    <Link to="/login" className="text-gray-300 hover:text-white transition-colors text-sm font-medium">Acceso Clientes</Link>
+                    <Button href="/contacto" variant="primary" className="!py-2 !px-4 text-sm">Hablemos</Button>
                 </div>
 
                 {/* Mobile Menu Button Placeholder */}
@@ -42,11 +51,5 @@ const Navbar = () => {
         </motion.nav>
     );
 };
-
-const NavLink = ({ href, children }) => (
-    <a href={href} className="text-gray-300 hover:text-white transition-colors text-sm font-medium">
-        {children}
-    </a>
-);
 
 export default Navbar;

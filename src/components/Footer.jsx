@@ -7,7 +7,11 @@ const Footer = () => {
                 <div className="col-span-1 md:col-span-2">
                     <div className="flex items-center gap-3 mb-4">
                         <img src="/logo.png" alt="Logo" className="h-16 w-16 rounded-full object-cover" />
-                        <img src="/brand-text-v2.png" alt="Interfaz 360" className="h-12 object-contain" />
+                        <img
+                            src="/brand-text-neon.png"
+                            alt="Interfaz 360"
+                            className="h-14 object-contain"
+                        />
                     </div>
                     <p className="text-gray-400 max-w-xs">
                         Transformando marcas con experiencias digitales premium.
