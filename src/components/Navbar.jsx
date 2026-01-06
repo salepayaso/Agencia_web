@@ -23,9 +23,9 @@ const Navbar = () => {
                 }`}
         >
             <div className="max-w-7xl mx-auto px-4 md:px-8 flex items-center justify-between">
-                <a href="#" className="flex items-center gap-2 text-2xl font-bold text-gradient">
+                <a href="#" className="flex items-center gap-3">
                     <img src="/logo.png" alt="Logo" className="h-16 w-16 rounded-full object-cover" />
-                    Interfaz 360
+                    <img src="/brand-text-v2.png" alt="Interfaz 360" className="h-10 object-contain" />
                 </a>
 
                 <div className="hidden md:flex items-center gap-8">
