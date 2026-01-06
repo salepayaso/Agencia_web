@@ -5,9 +5,9 @@ const Footer = () => {
         <footer className="bg-dark-card border-t border-white/5 py-12 px-4 md:px-8">
             <div className="max-w-7xl mx-auto grid md:grid-cols-4 gap-8 mb-8">
                 <div className="col-span-1 md:col-span-2">
-                    <div className="flex items-center gap-2 mb-4">
+                    <div className="flex items-center gap-3 mb-4">
                         <img src="/logo.png" alt="Logo" className="h-16 w-16 rounded-full object-cover" />
-                        <h2 className="text-2xl font-bold text-gradient">Interfaz 360</h2>
+                        <img src="/brand-text-v2.png" alt="Interfaz 360" className="h-12 object-contain" />
                     </div>
                     <p className="text-gray-400 max-w-xs">
                         Transformando marcas con experiencias digitales premium.

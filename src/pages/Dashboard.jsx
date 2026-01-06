@@ -60,8 +60,8 @@ const Dashboard = () => {
                 <div className="mb-10 flex items-center gap-3">
                     <img src="/logo.png" alt="Logo" className="h-16 w-16 rounded-full object-cover" />
                     <div>
-                        <span className="text-xl font-bold text-gradient block">Interfaz 360</span>
-                        <span className="text-xs text-gray-400 block">Portal Cliente</span>
+                        <img src="/brand-text-v2.png" alt="Interfaz 360" className="h-8 object-contain mb-1" />
+                        <span className="text-xs text-gray-400 block pl-1">Portal Cliente</span>
                     </div>
                 </div>
 
