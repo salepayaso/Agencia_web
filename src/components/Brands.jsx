@@ -79,11 +79,16 @@ const brands = [
     { name: "GitHub", component: LogoGitHub },
 ];
 
+import MagneticParticles from './MagneticParticles';
+
 const Brands = () => {
     return (
         <section className="py-12 bg-gradient-to-b from-black/20 via-primary-950/10 to-black/20 border-y border-white/10 overflow-hidden backdrop-blur-sm relative">
+            {/* Particles Effect */}
+            <MagneticParticles />
+
             {/* Subtle animated background gradient */}
-            <div className="absolute inset-0 bg-gradient-to-r from-primary-500/5 via-purple-500/5 to-primary-500/5 opacity-50"></div>
+            <div className="absolute inset-0 bg-gradient-to-r from-primary-500/5 via-purple-500/5 to-primary-500/5 opacity-30 pointer-events-none"></div>
 
             <div className="max-w-7xl mx-auto px-4 mb-6 text-center relative z-10">
                 <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/5 border border-white/10 text-xs text-primary-400 mb-3 shadow-lg shadow-primary-500/10 backdrop-blur-md">
@@ -99,7 +104,7 @@ const Brands = () => {
                 </p>
             </div>
 
-            <div className="relative flex w-full overflow-hidden">
+            <div className="relative flex w-full overflow-hidden z-20">
                 <div className="absolute left-0 top-0 bottom-0 w-32 z-10 bg-gradient-to-r from-gray-900 via-gray-900/50 to-transparent pointer-events-none"></div>
                 <div className="absolute right-0 top-0 bottom-0 w-32 z-10 bg-gradient-to-l from-gray-900 via-gray-900/50 to-transparent pointer-events-none"></div>
 
