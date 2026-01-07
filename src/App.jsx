@@ -7,12 +7,14 @@ import ContactPage from './pages/ContactPage';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import ProtectedRoute from './components/ProtectedRoute';
+import ScrollProgress from './components/ScrollProgress';
 
 import UpdatePassword from './pages/UpdatePassword';
 
 function App() {
   return (
     <Router>
+      <ScrollProgress />
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/servicios" element={<Services />} />

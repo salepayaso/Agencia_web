@@ -33,13 +33,13 @@ const LogoSupabase = () => (
 
 const LogoPostgreSQL = () => (
     <svg viewBox="0 0 24 24" fill="currentColor" className="w-full h-full">
-        <path d="M23.5594 14.7228a.5269.5269 0 0 0-.0563-.1191c-.139-.2632-.4768-.3418-.7632-.1664-.0422.0258-.0844.0539-.1281.0797a.5246.5246 0 0 0-.2578.3902 2.3491 2.3491 0 0 1-.062.4004c-.0234.1003-.0515.1996-.0797.2972-.0188.0656-.0422.1305-.0656.1961-.0469.1235-.0961.2462-.1485.3681a.5849.5849 0 0 1-.0469.0924c-.2695.5419-.6343 1.0314-1.0467 1.4751-.6109.6548-1.3306 1.1743-2.0996 1.6075-.3425.193-.6976.3596-1.0644.5004-.4004.1523-.8148.2774-1.2362.3831a9.0297 9.0297 0 0 1-2.9471.2011c-.3425-.0258-.6827-.0796-.9902-.1781-.2399-.0774-.4822-.1805-.7011-.3089a4.5154 4.5154 0 0 1-.9879-.6827c-.139-.1164-.2695-.2399-.3831-.3784a2.0658 2.0658 0 0 1-.1781-.225.9333.9333 0 0 1-.0984-.1453 2.004 2.004 0 0 1-.1242-.2399.2399.2399 0 0 0-.0422-.0774.5246.5246 0 0 0-.2813-.1664 1.0467 1.0467 0 0 0-.2399-.0188.5246.5246 0 0 0-.4004.1781.5246.5246 0 0 0-.1031.2399 2.7097 2.7097 0 0 0-.0328.2188c-.0047.0797-.0047.1617.0023.2399.0023.0656.0094.1289.0188.1945a2.004 2.004 0 0 0 .0539.2399c.0188.0844.0422.1688.0703.2532a3.8558 3.8558 0 0 0 .1945.5488c.139.3159.3066.6155.4963.9004.139.2086.2906.4075.4518.6016.0516.0609.1055.1219.1617.1828.0938.1078.1945.2133.2976.3159a6.3491 6.3491 0 0 0 1.3986 1.1235 7.0237 7.0237 0 0 0 1.6662.6755c.5074.1453 1.0314.2376 1.5601.2845.2188.0188.4404.0281.6569.0281a9.0297 9.0297 0 0 0 3.5237-.7011c.4215-.1734.8265-.3784 1.2104-.6178a8.8603 8.8603 0 0 0 2.0113-1.6897c.5207-.5629.9645-1.1883 1.3127-1.8723.0422-.0844.0844-.1664.1219-.2508a5.2669 5.2669 0 0 0 .3066-.7597c.0656-.1969.1219-.3962.1664-.5996.0375-.1758.0656-.3549.0844-.5371.0141-.1336.0234-.2695.0234-.4051 0-.139-.0047-.2765-.0141-.4151a2.5246 2.5246 0 0 0-.0234-.3628 1.4143 1.4143 0 0 0-.0422-.3394z" />
+        <path d="M23.5594 14.7228c-.7114 1.7205-1.1655 3.5808-2.0618 5.1456-.8938 1.5648-2.206 2.8476-3.8577 3.7283-1.6518.8807-3.5913 1.2923-5.4521 1.5252-1.8608.2329-3.7422.2811-5.5847-.0487-1.8425-.3298-3.6462-.9969-5.1952-2.036-1.549-1.039-2.8433-2.461-3.6861-4.0983-.8429-1.6372-1.2344-3.4997-1.1811-5.3623.0532-1.8625.5598-3.7172 1.4931-5.3623C4.006 5.8173 5.3588 4.347 7.0105 3.3041c1.6518-.8938 3.5017-1.2344 5.3035-1.2344 1.8019 0 3.6462.3406 5.298 1.2344 1.6517.8938 3.0045 2.3132 3.9094 4.0267.9049 1.7135 1.3623 3.6198 1.3623 5.5154 0 .4297-.0108.8601-.0324 1.2901zm-8.2257-11.926c-1.3623 0-2.7246.4513-3.8577 1.3544-1.133 1.6-1.7135 3.7172-1.7135 5.8344 0 2.117.5805 4.2337 1.7135 5.8344 1.133.9031 2.4954 1.3544 3.8577 1.3544 1.3623 0 2.7246-.4513 3.8577-1.3544 1.133-1.6007 1.7135-3.7174 1.7135-5.8344 0-2.1172-.5805-4.2344-1.7135-5.8344-1.133-.903-2.4954-1.3544-3.8577-1.3544z" />
     </svg>
 );
 
 const LogoPython = () => (
     <svg viewBox="0 0 24 24" fill="currentColor" className="w-full h-full">
-        <path d="M14.25.18l.9.2.73.26.59.3.45.32.34.34.25.34.16.33.1.3.04.26.02.2-.01.13V8.5l-.05.63-.13.55-.21.46-.26.38-.3.31-.33.25-.35.19-.35.14-.33.1-.3.07-.26.04-.21.02H8.77l-.69.05-.59.14-.5.22-.41.27-.33.32-.27.35-.2.36-.15.37-.1.35-.07.32-.04.27-.02.21v3.06H3.17l-.21-.03-.28-.07-.32-.12-.35-.18-.36-.26-.36-.36-.35-.46-.32-.59-.28-.73-.21-.88-.14-1.05-.05-1.23.06-1.22.16-1.04.24-.87.32-.71.36-.57.4-.44.42-.33.42-.24.4-.16.36-.1.32-.05.24-.01h.16l.06.01h8.16v-.83H6.18l-.01-2.75-.02-.37.05-.34.11-.31.17-.28.25-.26.31-.23.38-.2.44-.18.51-.15.58-.12.64-.1.71-.06.77-.04.84-.02 1.27.05zm-6.3 1.98l-.23.33-.08.41.08.41.23.34.33.22.41.09.41-.09.33-.22.23-.34.08-.41-.08-.41-.23-.33-.33-.22-.41-.09-.41.09zm13.09 3.95l.28.06.32.12.35.18.36.27.36.35.35.47.32.59.28.73.21.88.14 1.04.05 1.23-.06 1.23-.16 1.04-.24.86-.32.71-.36.57-.4.45-.42.33-.42.24-.4.16-.36.09-.32.05-.24.02-.16-.01h-8.22v.82h5.84l.01 2.76.02.36-.05.34-.11.31-.17.29-.25.25-.31.24-.38.2-.44.17-.51.15-.58.13-.64.09-.71.07-.77.04-.84.01-1.27-.04-1.07-.14-.9-.2-.73-.25-.59-.3-.45-.33-.34-.34-.25-.34-.16-.33-.1-.3-.04-.25-.02-.2.01-.13v-5.34l.05-.64.13-.54.21-.46.26-.38.3-.32.33-.24.35-.2.35-.14.33-.1.3-.06.26-.04.21-.02.13-.01h5.84l.69-.05.59-.14.5-.21.41-.28.33-.32.27-.35.2-.36.15-.36.1-.35.07-.32.04-.28.02-.21V6.07h2.09l.14.01zm-6.47 14.25l-.23.33-.08.41.08.41.23.33.33.23.41.08.41-.08.33-.23.23-.33.08-.41-.08-.41-.23-.33-.33-.23-.41-.08-.41.08z" />
+        <path d="M14.25.18l.9.2.73.26.59.3.45.32.34.34.25.34.16.33.1.3.04.26.02.2-.01.13V8.5l-.05.63-.13.55-.21.46-.26.38-.3.31-.33.25-.35.19-.35.14-.33.1-.3.07-.26.04-.21.02H8.77l-.69.05-.59.14-.5.22-.41.27-.33.32-.27.35-.2.36-.15.37-.1.35-.07.32-.04.27-.02.21v3.06H3.17l-.21-.03-.28-.07-.32-.12-.35-.18-.36-.26-.36-.36-.35-.46-.32-.59-.28-.73-.21-.88-.14-1.05-.05-1.23.06-1.22.16-1.04.24-.87.32-.71.36-.57.4-.44.42-.33.42-.24.4-.16.36-.1.32-.05.24-.01h.16l.06.01h8.16v-.83H6.18l-.01-2.75-.02-.37.05-.34.11-.31.17-.28.25-.26.31-.23.38-.2.44-.18.51-.15.58-.12.64-.1.71-.06.77-.04.84-.02 1.27.05zm-6.3 1.98l-.23.33-.08.41.08.41.23.34.33.22.41.09.41-.09.33-.22.23-.34.08-.41-.08-.41-.23-.33-.33-.22-.41-.09-.41.09zm13.09 3.95l.28.06.32.12.35.18.36.27.36.35.35.47.32.59.28.73.21.88.14 1.04.05 1.23-.06 1.23-.16 1.04-.24.86-.32.71-.36.57.4-.45-.42.33-.42.24-.4.16-.36.09-.32.05-.24.02-.16-.01h-8.22v.82h5.84l.01 2.76.02.36-.05.34-.11.31-.17.29-.25.25-.31.24-.38.2-.44.17-.51.15-.58.13-.64.09-.71.07-.77.04-.84.01-1.27-.04-1.07-.14-.9-.2-.73-.25-.59-.3-.45-.33-.34-.34-.25-.34-.16-.33-.1-.3-.04-.25-.02-.2.01-.13v-5.34l.05-.64.13-.54.21-.46.26-.38.3-.32.33-.24.35-.2.35-.14.33-.1.3-.06.26-.04.21-.02.13-.01h5.84l.69-.05.59-.14.5-.21.41-.28.33-.32.27-.35.2-.36.15-.36.1-.35.07-.32.04-.28.02-.21V6.07h2.09l.14.01zm-6.47 14.25l-.23.33-.08.41.08.41.23.33.33.23.41.08.41-.08.33-.23.23-.33.08-.41-.08-.41-.23-.33-.33-.23-.41-.08-.41.08z" />
     </svg>
 );
 
@@ -49,32 +49,51 @@ const LogoGitHub = () => (
     </svg>
 );
 
+const LogoNextJS = () => (
+    <svg viewBox="0 0 24 24" fill="currentColor" className="w-full h-full">
+        <path d="M11.5725 0c-.1763 0-.3098.0013-.3584.0067-.0516.0053-.2159.021-.3636.0328-3.4088.3073-6.6017 2.1463-8.624 4.9728C1.1004 6.584.3802 8.3666.1082 10.255c-.0962.659-.108.8537-.108 1.7474s.012 1.0884.108 1.7476c.652 4.506 3.8591 8.2919 8.2087 9.6945.7789.2511 1.6.4223 2.5337.5255.3636.04 1.9354.04 2.299 0 1.6117-.1783 2.9772-.577 4.3237-1.2643.2065-.1056.2464-.1337.2183-.1573-.0188-.0139-.8987-1.1938-1.9543-2.62l-1.919-2.592-2.4047-3.5583c-1.3231-1.9564-2.4117-3.556-2.4211-3.556-.0094-.0026-.0187 1.5787-.0235 3.509-.0067 3.3802-.0093 3.5162-.0516 3.596-.061.115-.108.1618-.2064.2134-.075.0374-.1408.0445-.495.0445h-.406l-.1078-.068a.4383.4383 0 0 1-.1572-.1712l-.0493-.1056.0053-4.703.0067-4.7054.0726-.0915c.0376-.0493.1174-.1125.1736-.143.0962-.047.1338-.0517.5396-.0517.4787 0 .5584.0187.6827.1547.0353.0377 1.3373 1.9987 2.895 4.3608a10760.433 10760.433 0 0 0 4.7344 7.1706l1.9002 2.8782.0968-.0634c.9955-.6479 2.0515-1.5455 2.8339-2.408.9595-1.0577 1.719-2.3177 2.2058-3.6583.2344-.6435.4353-1.4125.5237-2.0182.0492-.3377.0986-.8737.1102-1.2383v-.3478c0-.6943-.0118-.8806-.1102-1.7476-.6548-4.5057-3.8605-8.2918-8.2087-9.6945C14.697.406 13.8625.2195 12.8756.132 12.5635.1067 11.8504 0 11.5725 0zm3.1595 5.463c.0962.0405.1866.1288.2301.2254.0188.0413.0234 1.3854.0234 4.6768v4.6225l-.7931-1.2043-1.3155-2.0017v-3.0695c0-2.1852.0094-3.1025.0328-3.1613.0517-.1288.144-.2277.2673-.2923.1103-.0573.1456-.064.5394-.064.3938 0 .4291.0067.5156.064z" />
+    </svg>
+);
+
+const LogoTypeScript = () => (
+    <svg viewBox="0 0 24 24" fill="currentColor" className="w-full h-full">
+        <path d="M1.125 0C.502 0 0 .502 0 1.125v21.75C0 23.498.502 24 1.125 24h21.75c.623 0 1.125-.502 1.125-1.125V1.125C24 .502 23.498 0 22.875 0zm17.363 9.75c.612 0 1.154.037 1.627.111a6.38 6.38 0 0 1 1.306.34v2.458a3.95 3.95 0 0 0-.643-.361 5.093 5.093 0 0 0-.717-.26 5.453 5.453 0 0 0-1.426-.2c-.3 0-.573.028-.819.086a2.1 2.1 0 0 0-.623.242c-.17.104-.3.229-.393.374a.888.888 0 0 0-.14.49c0 .196.053.373.156.529.104.156.252.304.443.444s.423.276.696.41c.273.135.582.274.926.416.47.197.892.407 1.266.628.374.222.695.473.963.753.268.279.472.598.614.957.142.359.214.776.214 1.253 0 .657-.125 1.21-.373 1.656a3.033 3.033 0 0 1-1.012 1.085 4.38 4.38 0 0 1-1.487.596c-.566.12-1.163.18-1.79.18a9.916 9.916 0 0 1-1.84-.164 5.544 5.544 0 0 1-1.512-.493v-2.63a5.033 5.033 0 0 0 3.237 1.2c.333 0 .624-.03.872-.09.249-.06.456-.144.623-.25.166-.108.29-.234.373-.38a1.023 1.023 0 0 0-.074-1.089 2.12 2.12 0 0 0-.537-.5 5.597 5.597 0 0 0-.807-.444 27.72 27.72 0 0 0-1.007-.436c-.918-.383-1.602-.852-2.053-1.405-.45-.553-.676-1.222-.676-2.005 0-.614.123-1.141.369-1.582.246-.441.58-.804 1.004-1.089a4.494 4.494 0 0 1 1.47-.629 7.536 7.536 0 0 1 1.77-.201zm-15.113.188h9.563v2.166H9.506v9.646H6.789v-9.646H3.375z" />
+    </svg>
+);
+
+const LogoVercel = () => (
+    <svg viewBox="0 0 24 24" fill="currentColor" className="w-full h-full">
+        <path d="M24 22.525H0l12-21.05 12 21.05z" />
+    </svg>
+);
+
 const brands = [
     { name: "React", component: LogoReact },
-    { name: "Node.js", component: LogoNodeJS },
+    { name: "Next.js", component: LogoNextJS },
+    { name: "TypeScript", component: LogoTypeScript },
     { name: "Vite", component: LogoVite },
     { name: "Tailwind", component: LogoTailwind },
     { name: "Supabase", component: LogoSupabase },
-    { name: "PostgreSQL", component: LogoPostgreSQL },
     { name: "Python", component: LogoPython },
+    { name: "Vercel", component: LogoVercel },
     { name: "GitHub", component: LogoGitHub },
 ];
 
 const Brands = () => {
     return (
-        <section className="py-16 bg-gradient-to-b from-black/20 via-primary-950/10 to-black/20 border-y border-white/10 overflow-hidden backdrop-blur-sm relative">
+        <section className="py-12 bg-gradient-to-b from-black/20 via-primary-950/10 to-black/20 border-y border-white/10 overflow-hidden backdrop-blur-sm relative">
             {/* Subtle animated background gradient */}
             <div className="absolute inset-0 bg-gradient-to-r from-primary-500/5 via-purple-500/5 to-primary-500/5 opacity-50"></div>
 
-            <div className="max-w-7xl mx-auto px-4 mb-10 text-center relative z-10">
-                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-xs text-primary-400 mb-4">
-                    <div className="w-1.5 h-1.5 rounded-full bg-primary-400 animate-pulse"></div>
-                    <span className="font-semibold uppercase tracking-wider">Tecnología de Punta</span>
+            <div className="max-w-7xl mx-auto px-4 mb-6 text-center relative z-10">
+                <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/5 border border-white/10 text-xs text-primary-400 mb-3 shadow-lg shadow-primary-500/10 backdrop-blur-md">
+                    <div className="w-1.5 h-1.5 rounded-full bg-primary-400 animate-pulse shadow-[0_0_8px_rgba(45,212,191,0.5)]"></div>
+                    <span className="font-semibold uppercase tracking-wider leading-none pt-[1px]">Tecnología de Punta</span>
                 </div>
-                <h2 className="text-2xl md:text-3xl font-bold mb-3 text-gradient">
+                <h2 className="text-xl md:text-2xl font-bold mb-2 text-gradient">
                     Construido con el Mejor Stack del Mercado
                 </h2>
-                <p className="text-gray-400 text-sm max-w-2xl mx-auto">
+                <p className="text-gray-400 text-xs md:text-sm max-w-2xl mx-auto">
                     Usamos las mismas herramientas que empresas como Netflix, Airbnb y GitHub. <br className="hidden md:block" />
                     <span className="text-primary-400 font-medium">Velocidad, seguridad y escalabilidad garantizadas.</span>
                 </p>
@@ -85,7 +104,7 @@ const Brands = () => {
                 <div className="absolute right-0 top-0 bottom-0 w-32 z-10 bg-gradient-to-l from-gray-900 via-gray-900/50 to-transparent pointer-events-none"></div>
 
                 <motion.div
-                    className="flex items-center gap-20 whitespace-nowrap pb-14 pt-4"
+                    className="flex items-center gap-16 whitespace-nowrap pb-10 pt-3"
                     animate={{ x: "-50%" }}
                     transition={{
                         x: {
@@ -102,30 +121,32 @@ const Brands = () => {
                         return (
                             <div
                                 key={`${brand.name}-${index}`}
-                                className="group relative flex flex-col items-center justify-center cursor-default min-w-[120px]"
+                                className="group relative flex flex-col items-center justify-center cursor-default min-w-[100px]"
                             >
-                                <div className={`relative h-14 w-14 flex items-center justify-center transition-all duration-500 transform group-hover:scale-125 ${brand.name === 'GitHub'
+                                <div className={`relative h-12 w-12 flex items-center justify-center transition-all duration-500 transform group-hover:scale-125 ${brand.name === 'GitHub'
                                     ? 'text-white/75 group-hover:text-white'
                                     : 'text-white/75 group-hover:text-[var(--brand-color)]'
                                     }`}
                                     style={{
                                         '--brand-color': brand.name === 'React' ? '#61DAFB' :
-                                            brand.name === 'Node.js' ? '#339933' :
-                                                brand.name === 'Vite' ? '#646CFF' :
-                                                    brand.name === 'Tailwind' ? '#06B6D4' :
-                                                        brand.name === 'Supabase' ? '#3ECF8E' :
-                                                            brand.name === 'PostgreSQL' ? '#4169E1' :
-                                                                brand.name === 'Python' ? '#3776AB' : '#fff'
+                                            brand.name === 'Next.js' ? '#FFFFFF' :
+                                                brand.name === 'TypeScript' ? '#3178C6' :
+                                                    brand.name === 'Vite' ? '#646CFF' :
+                                                        brand.name === 'Tailwind' ? '#06B6D4' :
+                                                            brand.name === 'Supabase' ? '#3ECF8E' :
+                                                                brand.name === 'PostgreSQL' ? '#4169E1' :
+                                                                    brand.name === 'Python' ? '#3776AB' :
+                                                                        brand.name === 'Vercel' ? '#FFFFFF' : '#fff'
                                     }}>
                                     <LogoComponent />
                                 </div>
 
-                                <div className="absolute -bottom-10 opacity-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none transform group-hover:translate-y-0 translate-y-2">
+                                <div className="absolute -bottom-8 opacity-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none transform group-hover:translate-y-0 translate-y-2">
                                     <div className="relative">
-                                        <span className="text-[10px] uppercase font-semibold text-gray-300 tracking-[0.15em] bg-gray-900/95 px-3 py-1.5 rounded-md border border-white/20 whitespace-nowrap shadow-xl backdrop-blur-md">
+                                        <span className="text-[9px] uppercase font-semibold text-gray-300 tracking-[0.15em] bg-gray-900/95 px-2 py-1 rounded-md border border-white/20 whitespace-nowrap shadow-xl backdrop-blur-md">
                                             {brand.name}
                                         </span>
-                                        <div className="absolute -top-1 left-1/2 transform -translate-x-1/2 w-2 h-2 bg-gray-900/95 border-t border-l border-white/20 rotate-45"></div>
+                                        <div className="absolute -top-0.5 left-1/2 transform -translate-x-1/2 w-1.5 h-1.5 bg-gray-900/95 border-t border-l border-white/20 rotate-45"></div>
                                     </div>
                                 </div>
                             </div>
