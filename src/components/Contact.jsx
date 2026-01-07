@@ -53,18 +53,14 @@ const Contact = () => {
                                     Completa el formulario y nos pondremos en contacto contigo dentro de 24 horas.
                                 </p>
 
-                                <div className="space-y-6">
-                                    <div className="flex items-center gap-4 text-gray-300 group/item">
-                                        <div className="w-12 h-12 rounded-xl bg-primary-500/10 flex items-center justify-center text-primary-400 group-hover/item:text-primary-300 group-hover/item:bg-primary-500/20 transition-all duration-300">
-                                            <Send size={20} />
-                                        </div>
-                                        <span className="font-medium">contacto@interfaz360.cl</span>
-                                    </div>
-                                    <div className="flex items-center gap-4 text-gray-300 group/item">
-                                        <div className="w-12 h-12 rounded-xl bg-purple-500/10 flex items-center justify-center text-purple-400 group-hover/item:text-purple-300 group-hover/item:bg-purple-500/20 transition-all duration-300">
-                                            <CheckCircle size={20} />
-                                        </div>
-                                        <span className="font-medium">+56 9 5414 6176</span>
+                                <div className="space-y-8">
+                                    <blockquote className="text-2xl font-light italic text-gray-300 border-l-4 border-primary-500 pl-6 py-2">
+                                        "La innovación distingue a los líderes de los seguidores. Transformemos hoy tu visión en una realidad digital."
+                                    </blockquote>
+
+                                    <div className="flex items-center gap-3 text-primary-400">
+                                        <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
+                                        <p className="text-sm font-medium tracking-wide uppercase">Sistema de Atención Activo 24/7</p>
                                     </div>
                                 </div>
                             </div>
@@ -132,6 +128,18 @@ const Contact = () => {
                                             className="w-full bg-dark-bg/50 border border-white/10 rounded-xl px-5 py-4 text-white placeholder-gray-600 focus:outline-none focus:border-primary-500/50 focus:ring-2 focus:ring-primary-500/20 transition-all duration-300 resize-none"
                                             placeholder="Cuéntanos sobre tu proyecto..."
                                         ></textarea>
+                                    </div>
+
+                                    <div className="flex items-center gap-3 p-4 bg-dark-bg/30 rounded-xl border border-white/5">
+                                        <input
+                                            type="checkbox"
+                                            required
+                                            id="bot-check"
+                                            className="w-5 h-5 rounded border-gray-600 text-primary-500 focus:ring-primary-500/50 bg-dark-bg"
+                                        />
+                                        <label htmlFor="bot-check" className="text-sm text-gray-400 cursor-pointer select-none">
+                                            Soy humano (Verificación de seguridad)
+                                        </label>
                                     </div>
 
                                     <Button

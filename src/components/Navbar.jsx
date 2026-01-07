@@ -2,6 +2,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import Button from './ui/Button';
+import { Lock } from 'lucide-react';
 
 const Navbar = () => {
     const [scrolled, setScrolled] = useState(false);
@@ -29,7 +30,7 @@ const Navbar = () => {
         >
             <div className="max-w-7xl mx-auto px-4 md:px-8 flex items-center justify-between">
                 <Link to="/" className="flex items-center gap-3">
-                    <img src="/logo.png" alt="Logo" className="h-16 w-16 rounded-full object-cover" />
+                    <img src="/logo.png" alt="Logo" className="h-12 w-12 rounded-full object-cover" />
                     <img
                         src="/brand-text-v2.png"
                         alt="Interfaz 360"
@@ -38,11 +39,29 @@ const Navbar = () => {
                 </Link>
 
                 <div className="hidden md:flex items-center gap-8">
-                    <Link to="/servicios" className={`text-sm font-medium transition-colors ${isActive('/servicios') ? 'text-primary-400' : 'text-gray-300 hover:text-white'}`}>Servicios</Link>
-                    <Link to="/portafolio" className={`text-sm font-medium transition-colors ${isActive('/portafolio') ? 'text-primary-400' : 'text-gray-300 hover:text-white'}`}>Portafolio</Link>
-                    <Link to="/nosotros" className={`text-sm font-medium transition-colors ${isActive('/nosotros') ? 'text-primary-400' : 'text-gray-300 hover:text-white'}`}>Sobre Mí</Link>
-                    <Link to="/login" className="text-gray-300 hover:text-white transition-colors text-sm font-medium">Acceso Clientes</Link>
-                    <Button href="/contacto" variant="primary" className="!py-2 !px-4 text-sm">Hablemos</Button>
+                    {['Servicios', 'Portafolio', 'Nosotros'].map((item) => {
+                        const path = `/${item.toLowerCase().replace(' ', '-')}`;
+                        const active = isActive(path);
+                        return (
+                            <Link
+                                key={item}
+                                to={path}
+                                className={`text-xs uppercase tracking-widest font-semibold transition-all duration-300 relative group ${active ? 'text-primary-400' : 'text-gray-400 hover:text-white'}`}
+                            >
+                                {item}
+                                <span className={`absolute -bottom-1 left-0 w-full h-[1px] bg-primary-400 transform origin-left transition-transform duration-300 ${active ? 'scale-x-100' : 'scale-x-0 group-hover:scale-x-50'}`}></span>
+                            </Link>
+                        );
+                    })}
+
+                    <div className="h-6 w-[1px] bg-white/10 mx-2"></div>
+
+                    <Link to="/login" className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-gray-300 hover:text-white transition-all px-4 py-2 rounded-lg bg-white/5 border border-white/5 hover:border-white/20 hover:bg-white/10 backdrop-blur-sm group">
+                        <Lock className="w-3 h-3 text-primary-400 group-hover:text-white transition-colors" />
+                        <span>Clientes</span>
+                    </Link>
+
+                    <Button href="/contacto" variant="primary" className="!py-2.5 !px-6 text-xs uppercase tracking-widest shadow-lg shadow-primary-500/20 hover:shadow-primary-500/40">Hablemos</Button>
                 </div>
 
                 {/* Mobile Menu Button Placeholder */}
