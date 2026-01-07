@@ -6,7 +6,7 @@ const WhatsAppButton = () => {
     const [showTooltip, setShowTooltip] = useState(false);
     const phoneNumber = "56954146176";
     // Modified message to be more professional/technological as requested
-    const message = "Hola Interfaz 360, me gustaría digitalizar mi negocio y conocer sus soluciones web.";
+    const message = "Hola Interfaz 360, vi su página web y me gustaría cotizar un proyecto para mi negocio.";
     const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
 
     // Auto-show tooltip periodically
@@ -36,7 +36,7 @@ const WhatsAppButton = () => {
                         </span>
                         {/* Glow effect */}
                         <div className="absolute inset-0 bg-gradient-to-r from-primary-500/20 to-purple-500/20 rounded-2xl blur-sm -z-10"></div>
-                        <div className="absolute -bottom-2 right-6 w-4 h-4 bg-white/10 border-r border-b border-white/20 transform rotate-45 backdrop-blur-md"></div>
+
                     </motion.div>
                 )}
             </AnimatePresence>

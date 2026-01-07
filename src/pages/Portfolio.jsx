@@ -39,7 +39,7 @@ const Portfolio = () => {
             title: "E-Commerce Luxury",
             category: "Tienda Online",
             type: "web",
-            image: "/portfolio_ecommerce_luxury_v2.png",
+            image: "/portfolio_ecommerce_luxury_human.png",
             tags: ["Stripe", "Next.js", "Sales"],
             icon: ShoppingBag
         },
@@ -55,7 +55,7 @@ const Portfolio = () => {
             title: "SEO Local & Maps",
             category: "Google Business",
             type: "web",
-            image: "/portfolio_seo_maps.png",
+            image: "/portfolio_seo_maps_human.png",
             tags: ["Maps", "Reviews", "Growth"],
             icon: Search
         },
@@ -132,7 +132,7 @@ const Portfolio = () => {
                                         <img
                                             src={p.image}
                                             alt={p.title}
-                                            className="w-full h-full object-cover opacity-80 grayscale-[20%] group-hover:grayscale-0 group-hover:scale-105 group-hover:opacity-100 transition-all duration-1000 ease-out"
+                                            className="w-full h-full object-cover group-hover:scale-105 transition-all duration-1000 ease-out"
                                         />
                                     </div>
 
