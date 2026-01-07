@@ -8,9 +8,9 @@ const Footer = () => {
                     <div className="flex items-center gap-3 mb-4">
                         <img src="/logo.png" alt="Logo" className="h-16 w-16 rounded-full object-cover" />
                         <img
-                            src="/brand-text-neon.png"
+                            src="/brand-text-v2.png"
                             alt="Interfaz 360"
-                            className="h-14 object-contain"
+                            className="h-10 md:h-12 object-contain"
                         />
                     </div>
                     <p className="text-gray-400 max-w-xs">
