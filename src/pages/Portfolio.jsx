@@ -4,52 +4,60 @@ import WhatsAppButton from '../components/WhatsAppButton';
 import Section from '../components/ui/Section';
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { ExternalLink, ArrowUpRight, Code, Layout, ShoppingBag, BarChart3, Search, Database } from 'lucide-react';
 
 const Portfolio = () => {
     const [activeCategory, setActiveCategory] = useState('all');
 
+    // Mapped Dedicated Images
     const projects = [
         {
             title: "SupplyTech Inventarios",
             category: "SaaS / Sistema a Medida",
             type: "app",
-            image: "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-            tags: ["React", "Supabase", "Stock Control"]
+            image: "/portfolio_supplytech_inventory.png",
+            tags: ["React", "Supabase", "Stock Control"],
+            icon: Database
         },
         {
             title: "Portal Clientes Interfaz 360",
             category: "CRM & Dashboard",
             type: "app",
-            image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-            tags: ["React", "Auth", "Security"]
+            image: "/portfolio_interfaz360_crm.png",
+            tags: ["React", "Auth", "Security"],
+            icon: Layout
         },
         {
             title: "Contabilidad CMP",
             category: "Web Corporativa",
             type: "web",
-            image: "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-            tags: ["SEO", "Conversion", "Design"]
+            image: "/portfolio_cmp_accounting.png",
+            tags: ["SEO", "Conversion", "Design"],
+            icon: BarChart3
         },
         {
             title: "E-Commerce Luxury",
             category: "Tienda Online",
             type: "web",
-            image: "https://images.unsplash.com/photo-1441986300917-64674bd600d8?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-            tags: ["Stripe", "Next.js", "Sales"]
+            image: "/portfolio_ecommerce_luxury_v2.png",
+            tags: ["Stripe", "Next.js", "Sales"],
+            icon: ShoppingBag
         },
         {
             title: "Campañas Google Ads",
             category: "Marketing & Performance",
             type: "web",
-            image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-            tags: ["ROAS", "Leads", "Analytics"]
+            image: "/portfolio_google_ads.png",
+            tags: ["ROAS", "Leads", "Analytics"],
+            icon: BarChart3
         },
         {
             title: "SEO Local & Maps",
             category: "Google Business",
             type: "web",
-            image: "https://images.unsplash.com/photo-1524661135-423995f22d0b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-            tags: ["Maps", "Reviews", "Growth"]
+            image: "/portfolio_seo_maps.png",
+            tags: ["Maps", "Reviews", "Growth"],
+            icon: Search
         },
     ];
 
@@ -62,29 +70,45 @@ const Portfolio = () => {
             <Navbar />
             <WhatsAppButton />
 
-            <Section className="pt-32 pb-20">
-                <div className="flex flex-col md:flex-row justify-between items-end mb-16 gap-6 px-4 md:px-0">
+            <Section className="pt-32 pb-20 relative overflow-hidden">
+                {/* Background Decor */}
+                <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none z-0">
+                    <div className="absolute top-20 right-[-10%] w-[500px] h-[500px] bg-primary-500/10 rounded-full blur-[120px]"></div>
+                    <div className="absolute bottom-20 left-[-10%] w-[500px] h-[500px] bg-purple-500/10 rounded-full blur-[120px]"></div>
+                </div>
+
+                <div className="relative z-10 flex flex-col md:flex-row justify-between items-end mb-16 gap-6 px-4 md:px-0">
                     <div>
                         <div className="flex items-center gap-2 text-primary-400 mb-2">
                             <span className="h-px w-8 bg-primary-400"></span>
                             <span className="text-xs uppercase tracking-widest font-bold">Portafolio</span>
                         </div>
-                        <h1 className="text-4xl md:text-6xl font-bold mb-4">Casos de Éxito</h1>
-                        <p className="text-gray-400 max-w-md">Descubre cómo potenciamos empresas con tecnología de punta.</p>
+                        <h1 className="text-4xl md:text-6xl font-bold mb-4">
+                            Nuestros <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary-400 to-purple-400">Casos de Éxito</span>
+                        </h1>
+                        <p className="text-gray-400 max-w-md">Descubre cómo potenciamos empresas con tecnología de punta y diseño de vanguardia.</p>
                     </div>
 
                     {/* Filter Pills */}
-                    <div className="flex gap-2 p-1 bg-white/5 rounded-full backdrop-blur-sm border border-white/5">
+                    <div className="p-1.5 bg-white/5 rounded-full backdrop-blur-md border border-white/10 flex gap-1">
                         {['all', 'web', 'app'].map((cat) => (
                             <button
                                 key={cat}
                                 onClick={() => setActiveCategory(cat)}
-                                className={`px-6 py-2 rounded-full text-sm font-medium transition-all duration-300 ${activeCategory === cat
-                                    ? 'bg-primary-600 text-white shadow-[0_0_20px_rgba(37,99,235,0.3)]'
+                                className={`px-6 py-2.5 rounded-full text-sm font-medium transition-all duration-500 relative overflow-hidden ${activeCategory === cat
+                                    ? 'text-white shadow-lg'
                                     : 'text-gray-400 hover:text-white hover:bg-white/5'
                                     }`}
                             >
-                                {cat === 'all' ? 'Todo' : cat === 'web' ? 'Web' : 'Apps'}
+                                {activeCategory === cat && (
+                                    <motion.div
+                                        layoutId="activePill"
+                                        className="absolute inset-0 bg-gradient-to-r from-primary-600 to-primary-500"
+                                        initial={false}
+                                        transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                                    />
+                                )}
+                                <span className="relative z-10">{cat === 'all' ? 'Ver Todo' : cat === 'web' ? 'Websites' : 'Apps & Sistemas'}</span>
                             </button>
                         ))}
                     </div>
@@ -95,37 +119,53 @@ const Portfolio = () => {
                         {filteredProjects.map((p, i) => (
                             <motion.div
                                 layout
-                                initial={{ opacity: 0, y: 20 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                exit={{ opacity: 0, scale: 0.95 }}
-                                transition={{ duration: 0.4, delay: i * 0.1 }}
+                                initial={{ opacity: 0, scale: 0.9 }}
+                                animate={{ opacity: 1, scale: 1 }}
+                                exit={{ opacity: 0, scale: 0.9 }}
+                                transition={{ duration: 0.5, delay: i * 0.05 }}
                                 key={p.title}
-                                className="group cursor-pointer"
+                                className="group relative"
                             >
-                                <div className="relative overflow-hidden rounded-2xl aspect-[16/10] mb-5 border border-white/5 bg-gray-900 shadow-2xl">
-                                    <div className="absolute inset-0 bg-gray-900">
+                                <div className="relative aspect-[4/3] rounded-2xl overflow-hidden border border-white/10 bg-dark-card shadow-2xl transition-all duration-700 hover:shadow-primary-500/20 hover:border-primary-500/50">
+                                    {/* Image with Overlay */}
+                                    <div className="absolute inset-0 bg-gray-900 overflow-hidden">
                                         <img
                                             src={p.image}
                                             alt={p.title}
-                                            className="w-full h-full object-cover opacity-80 group-hover:opacity-100 group-hover:scale-105 transition-all duration-700 ease-out"
+                                            className="w-full h-full object-cover opacity-80 grayscale-[20%] group-hover:grayscale-0 group-hover:scale-105 group-hover:opacity-100 transition-all duration-1000 ease-out"
                                         />
                                     </div>
-                                    <div className="absolute inset-0 bg-gradient-to-t from-gray-900 via-gray-900/40 to-transparent opacity-90 transition-opacity"></div>
-                                    <div className="absolute top-4 right-4 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 transform translate-y-[-10px] group-hover:translate-y-0">
-                                        {p.tags.map(tag => (
-                                            <span key={tag} className="text-[10px] font-bold bg-black/50 backdrop-blur-md text-white px-3 py-1.5 rounded-full border border-white/10 shadow-lg">
-                                                {tag}
-                                            </span>
-                                        ))}
-                                    </div>
-                                    <div className="absolute bottom-0 left-0 p-6 w-full transform translate-y-2 group-hover:translate-y-0 transition-transform duration-300">
-                                        <div className="flex items-center gap-2 mb-2 opacity-80">
-                                            <div className="w-1.5 h-1.5 rounded-full bg-primary-400"></div>
-                                            <span className="text-xs font-semibold uppercase tracking-wider text-gray-300">{p.category}</span>
+
+                                    {/* Gradient Overlay - Slower transition */}
+                                    <div className="absolute inset-0 bg-gradient-to-t from-dark-bg via-dark-bg/60 to-transparent opacity-90 group-hover:opacity-70 transition-opacity duration-700"></div>
+
+                                    {/* Content - Slower transitions */}
+                                    <div className="absolute inset-0 p-6 flex flex-col justify-end">
+                                        <div className="transform translate-y-4 group-hover:translate-y-0 transition-transform duration-700 ease-out">
+                                            <div className="flex items-center gap-3 mb-3">
+                                                <div className="w-10 h-10 rounded-lg bg-white/5 backdrop-blur-md border border-white/10 flex items-center justify-center text-primary-400 group-hover:bg-primary-500 group-hover:text-white transition-colors duration-500">
+                                                    <p.icon size={20} />
+                                                </div>
+                                                <div className="flex flex-wrap gap-2">
+                                                    {p.tags.slice(0, 2).map(tag => (
+                                                        <span key={tag} className="text-[10px] font-bold uppercase tracking-wider bg-white/5 text-gray-300 px-2.5 py-1 rounded-md border border-white/5 backdrop-blur-sm">
+                                                            {tag}
+                                                        </span>
+                                                    ))}
+                                                </div>
+                                            </div>
+
+                                            <h3 className="text-2xl font-bold text-white mb-2 group-hover:text-primary-300 transition-colors duration-500">
+                                                {p.title}
+                                            </h3>
+                                            <p className="text-sm text-gray-400 mb-6 opacity-0 h-0 group-hover:h-auto group-hover:opacity-100 transition-all duration-700 delay-100 ease-out">
+                                                Solución digital enfocada en {p.category.toLowerCase()}.
+                                            </p>
+
+                                            <button className="flex items-center gap-2 text-sm font-bold text-white uppercase tracking-wider opacity-0 group-hover:opacity-100 transition-opacity duration-700 delay-200 hover:text-primary-400">
+                                                Ver Proyecto <ArrowUpRight size={16} />
+                                            </button>
                                         </div>
-                                        <h3 className="text-2xl font-bold text-white group-hover:text-primary-300 transition-colors leading-tight">
-                                            {p.title}
-                                        </h3>
                                     </div>
                                 </div>
                             </motion.div>
