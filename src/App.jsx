@@ -1,4 +1,5 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import ScrollToTop from './components/ScrollToTop';
 import Home from './pages/Home';
 import Services from './pages/Services';
 import Portfolio from './pages/Portfolio';
@@ -14,6 +15,7 @@ import UpdatePassword from './pages/UpdatePassword';
 function App() {
   return (
     <Router>
+      <ScrollToTop />
       <ScrollProgress />
       <Routes>
         <Route path="/" element={<Home />} />

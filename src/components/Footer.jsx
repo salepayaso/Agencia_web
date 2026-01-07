@@ -1,5 +1,6 @@
-import { Facebook, Instagram, Linkedin, Search } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { Facebook, Instagram, Linkedin } from 'lucide-react';
+
+import { Link } from 'react-router-dom';
 
 const Footer = () => {
     return (
@@ -35,22 +36,22 @@ const Footer = () => {
                         </h4>
                         <ul className="space-y-4 text-gray-400">
                             <li>
-                                <a href="#" className="flex items-center gap-2 hover:text-primary-400 transition-colors group">
+                                <Link to="/" className="flex items-center gap-2 hover:text-primary-400 transition-colors group">
                                     <span className="w-0 group-hover:w-2 h-[1px] bg-primary-400 transition-all"></span>
                                     Inicio
-                                </a>
+                                </Link>
                             </li>
                             <li>
-                                <a href="#services" className="flex items-center gap-2 hover:text-primary-400 transition-colors group">
+                                <Link to="/servicios" className="flex items-center gap-2 hover:text-primary-400 transition-colors group">
                                     <span className="w-0 group-hover:w-2 h-[1px] bg-primary-400 transition-all"></span>
                                     Servicios
-                                </a>
+                                </Link>
                             </li>
                             <li>
-                                <a href="#work" className="flex items-center gap-2 hover:text-primary-400 transition-colors group">
+                                <Link to="/portafolio" className="flex items-center gap-2 hover:text-primary-400 transition-colors group">
                                     <span className="w-0 group-hover:w-2 h-[1px] bg-primary-400 transition-all"></span>
                                     Portafolio
-                                </a>
+                                </Link>
                             </li>
                         </ul>
                     </div>

@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { supabase } from '../supabase';
 import { useNavigate } from 'react-router-dom';
 import Button from '../components/ui/Button';
-import { LogOut, LayoutDashboard, FileText, Settings, User, Globe, Calendar, Download, AlertCircle, HardDrive, Mail, Activity, Server, Plus, X, Send, ShieldCheck, Check } from 'lucide-react';
+import { LogOut, LayoutDashboard, FileText, Settings, User, Globe, Calendar, Download, HardDrive, Mail, Activity, Server, Plus, X, Send, ShieldCheck, Check } from 'lucide-react';
 
 const Dashboard = () => {
     const [user, setUser] = useState(null);
