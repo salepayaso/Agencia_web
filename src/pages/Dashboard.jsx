@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { supabase } from '../supabase';
 import { useNavigate } from 'react-router-dom';
 import Button from '../components/ui/Button';
-import { LogOut, LayoutDashboard, FileText, Settings, User, Globe, Calendar, Download, AlertCircle } from 'lucide-react';
+import { LogOut, LayoutDashboard, FileText, Settings, User, Globe, Calendar, Download, AlertCircle, HardDrive, Mail, Activity, Server, Plus, X, Send, ShieldCheck, Check } from 'lucide-react';
 
 const Dashboard = () => {
     const [user, setUser] = useState(null);
@@ -47,21 +47,33 @@ const Dashboard = () => {
 
     if (loading) {
         return (
-            <div className="min-h-screen bg-gray-900 text-white flex items-center justify-center">
-                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary-500"></div>
+            <div className="min-h-screen bg-dark-bg text-white flex items-center justify-center">
+                <div className="relative">
+                    <div className="w-16 h-16 border-4 border-primary-500/30 border-t-primary-500 rounded-full animate-spin"></div>
+                    <div className="mt-4 text-center text-primary-400 text-sm font-medium animate-pulse">Cargando Panel...</div>
+                </div>
             </div>
         );
     }
 
     return (
-        <div className="min-h-screen bg-gray-900 text-white flex">
+        <div className="min-h-screen bg-dark-bg text-white flex overflow-hidden font-sans">
+            {/* Background Ambience */}
+            <div className="fixed top-0 left-0 w-full h-full overflow-hidden pointer-events-none z-0">
+                <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-primary-500/5 rounded-full blur-[120px]"></div>
+                <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-purple-500/5 rounded-full blur-[120px]"></div>
+            </div>
+
             {/* Sidebar */}
-            <aside className="w-64 bg-black/30 border-r border-white/5 p-6 flex flex-col">
-                <div className="mb-10 flex items-center gap-3">
-                    <img src="/logo.png" alt="Logo" className="h-16 w-16 rounded-full object-cover" />
+            <aside className="w-72 bg-dark-card/50 backdrop-blur-xl border-r border-white/5 p-6 flex flex-col relative z-10 hidden md:flex">
+                <div className="mb-12 flex items-center gap-3 px-2">
+                    <div className="relative group cursor-pointer">
+                        <div className="absolute inset-0 bg-primary-500/20 blur-lg rounded-full group-hover:bg-primary-500/30 transition-all"></div>
+                        <img src="/logo.png" alt="Logo" className="h-12 w-12 rounded-full object-cover relative z-10 border border-white/10" />
+                    </div>
                     <div>
-                        <img src="/brand-text-v2.png" alt="Interfaz 360" className="h-8 object-contain mb-1" />
-                        <span className="text-xs text-gray-400 block pl-1">Portal Cliente</span>
+                        <img src="/brand-text-v2.png" alt="Interfaz 360" className="h-6 object-contain mb-1" />
+                        <span className="text-[10px] tracking-widest uppercase text-primary-400 font-bold block pl-1">Portal Cliente</span>
                     </div>
                 </div>
 
@@ -71,38 +83,50 @@ const Dashboard = () => {
                         active={view === 'overview'}
                         onClick={() => setView('overview')}
                     >
-                        Resumen
+                        Resumen General
                     </NavItem>
                     <NavItem
                         icon={FileText}
                         active={view === 'tickets'}
                         onClick={() => setView('tickets')}
                     >
-                        Soporte / Tickets
+                        Soporte & Tickets
+                    </NavItem>
+                    <NavItem icon={Settings} onClick={() => alert("Próximamente: Configuración de cuenta")}>
+                        Configuración
                     </NavItem>
                 </nav>
 
                 <div className="pt-6 border-t border-white/5">
-                    <div className="flex items-center gap-3 mb-4">
-                        <div className="w-10 h-10 rounded-full bg-primary-500/20 flex items-center justify-center text-primary-400 overflow-hidden relative">
-                            {profile?.avatar_url ? (
-                                <img
-                                    src={profile.avatar_url}
-                                    alt="Profile"
-                                    className="w-full h-full object-cover"
-                                />
-                            ) : (
-                                <User size={20} />
-                            )}
+                    <div className="bg-white/5 rounded-xl p-4 mb-4 border border-white/5">
+                        <div className="flex items-center gap-3 mb-3">
+                            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary-500 to-purple-500 p-[1px]">
+                                <div className="w-full h-full rounded-full bg-dark-bg flex items-center justify-center overflow-hidden">
+                                    {profile?.avatar_url ? (
+                                        <img
+                                            src={profile.avatar_url}
+                                            alt="Profile"
+                                            className="w-full h-full object-cover"
+                                        />
+                                    ) : (
+                                        <User size={18} className="text-white" />
+                                    )}
+                                </div>
+                            </div>
+                            <div className="overflow-hidden">
+                                <p className="text-sm font-bold text-white truncate">{profile?.client_name || 'Nuevo Cliente'}</p>
+                                <p className="text-xs text-gray-500 truncate">{user?.email}</p>
+                            </div>
                         </div>
-                        <div className="overflow-hidden">
-                            <p className="text-sm font-medium truncate">{profile?.client_name || 'Nuevo Cliente'}</p>
-                            <p className="text-xs text-gray-500 truncate">{user?.email}</p>
+                        <div className="flex items-center gap-2">
+                            <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+                            <span className="text-xs text-green-400 font-medium">Conectado</span>
                         </div>
                     </div>
+
                     <button
                         onClick={handleLogout}
-                        className="flex items-center gap-2 text-gray-400 hover:text-red-400 transition-colors text-sm w-full"
+                        className="flex items-center gap-2 text-gray-400 hover:text-red-400 transition-colors text-sm w-full px-2 py-2 rounded-lg hover:bg-white/5"
                     >
                         <LogOut size={16} /> Cerrar Sesión
                     </button>
@@ -110,9 +134,9 @@ const Dashboard = () => {
             </aside>
 
             {/* Main Content */}
-            <main className="flex-1 p-8 overflow-y-auto">
+            <main className="flex-1 p-8 md:p-12 overflow-y-auto relative z-10">
                 {view === 'overview' && <Overview profile={profile} />}
-                {view === 'tickets' && <TicketsView />}
+                {view === 'tickets' && <TicketsView user={user} profile={profile} />}
             </main>
         </div>
     );
@@ -123,11 +147,10 @@ const Overview = ({ profile }) => {
         if (!profile?.document_url) return;
 
         try {
-            // Asumimos que document_url es solo el nombre del archivo en el bucket 'documents'
             const { data, error } = await supabase
                 .storage
                 .from('documents')
-                .createSignedUrl(profile.document_url, 60); // URL válida por 60 segundos
+                .createSignedUrl(profile.document_url, 60);
 
             if (error) throw error;
             if (data?.signedUrl) {
@@ -143,114 +166,365 @@ const Overview = ({ profile }) => {
         ? Math.ceil((new Date(profile.next_payment_date) - new Date()) / (1000 * 60 * 60 * 24))
         : null;
 
+    const hostingPlan = profile?.hosting_plan || "Plan Básico";
+    const diskUsage = profile?.disk_usage || "0%";
+    const emailCount = profile?.email_count || "0";
+
     return (
-        <>
-            <header className="mb-8">
-                <h1 className="text-3xl font-bold mb-2">Hola, {profile?.client_name?.split(' ')[0] || 'Cliente'}</h1>
-                <p className="text-gray-400">Aquí está el estado actual de tus servicios digitales.</p>
+        <div className="max-w-6xl mx-auto animate-fade-in-up">
+            <header className="mb-10 flex flex-col md:flex-row md:items-end justify-between gap-4">
+                <div>
+                    <h1 className="text-4xl font-bold mb-2 text-white/90">
+                        Hola, <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary-400 to-purple-400">{profile?.client_name?.split(' ')[0] || 'Cliente'}</span>
+                    </h1>
+                    <p className="text-gray-400 text-lg">Resumen de tus servicios digitales en tiempo real.</p>
+                </div>
+                <div className="text-right hidden md:block">
+                    <p className="text-sm text-gray-500 uppercase tracking-widest mb-1">Última actualización</p>
+                    <p className="text-white font-mono">{new Date().toLocaleDateString()}</p>
+                </div>
             </header>
 
             <div className="grid md:grid-cols-3 gap-6 mb-8">
-                <div className="glass-card p-6 rounded-2xl border border-white/5 bg-gradient-to-br from-white/5 to-transparent">
-                    <div className="flex items-start justify-between mb-4">
-                        <div className="p-3 bg-purple-500/20 rounded-lg text-purple-400">
-                            <Globe size={24} />
+                {/* Website Card */}
+                <div className="group relative bg-dark-card/40 backdrop-blur-md rounded-2xl border border-white/10 p-6 overflow-hidden hover:border-primary-500/30 transition-all duration-300">
+                    <div className="absolute inset-0 bg-gradient-to-br from-primary-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                    <div className="relative z-10">
+                        <div className="flex justify-between items-start mb-6">
+                            <div className="p-3 rounded-xl bg-blue-500/10 text-blue-400">
+                                <Globe size={28} />
+                            </div>
+                            <span className="px-3 py-1 rounded-full bg-green-500/10 text-green-400 text-xs font-bold border border-green-500/20 flex items-center gap-2">
+                                <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></span>
+                                ONLINE
+                            </span>
                         </div>
-                        <span className="text-xs text-gray-500 bg-white/5 px-2 py-1 rounded">Activo</span>
+                        <h3 className="text-gray-400 text-sm font-medium mb-1">Sitio Web Activo</h3>
+                        <a
+                            href={`https://${profile?.active_web}`}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="text-2xl font-bold text-white hover:text-primary-400 transition-colors truncate block"
+                        >
+                            {profile?.active_web || 'No asignado'}
+                        </a>
                     </div>
-                    <p className="text-gray-400 text-sm mb-1">Sitio Web</p>
-                    <a
-                        href={`https://${profile?.active_web}`}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="text-xl font-bold hover:text-primary-400 transition-colors truncate block"
-                    >
-                        {profile?.active_web || 'No asignado'}
-                    </a>
                 </div>
 
-                <div className="glass-card p-6 rounded-2xl border border-white/5 bg-gradient-to-br from-white/5 to-transparent">
-                    <div className="flex items-start justify-between mb-4">
-                        <div className="p-3 bg-blue-500/20 rounded-lg text-blue-400">
-                            <Calendar size={24} />
+                {/* Hosting & Emails Card */}
+                <div className="group relative bg-dark-card/40 backdrop-blur-md rounded-2xl border border-white/10 p-6 overflow-hidden hover:border-purple-500/30 transition-all duration-300">
+                    <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                    <div className="relative z-10">
+                        <div className="flex justify-between items-start mb-6">
+                            <div className="p-3 rounded-xl bg-purple-500/10 text-purple-400">
+                                <Server size={28} />
+                            </div>
+                            <span className="px-3 py-1 rounded-full bg-purple-500/10 text-purple-400 text-xs font-bold border border-purple-500/20">
+                                {hostingPlan}
+                            </span>
                         </div>
-                        {daysUntilPayment !== null && (
-                            <span className={`text-xs px-2 py-1 rounded ${daysUntilPayment < 5 ? 'bg-red-500/20 text-red-400' : 'bg-green-500/20 text-green-400'}`}>
-                                {daysUntilPayment} días restantes
+                        <div className="grid grid-cols-2 gap-4">
+                            <div>
+                                <p className="text-gray-500 text-xs uppercase font-bold mb-1">Correos</p>
+                                <div className="flex items-center gap-2 text-white font-bold text-lg">
+                                    <Mail size={16} className="text-gray-400" />
+                                    {emailCount}
+                                </div>
+                            </div>
+                            <div>
+                                <p className="text-gray-500 text-xs uppercase font-bold mb-1">Almacenamiento</p>
+                                <div className="flex items-center gap-2 text-white font-bold text-lg">
+                                    <HardDrive size={16} className="text-gray-400" />
+                                    {diskUsage}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Payments Card */}
+                <div className="group relative bg-dark-card/40 backdrop-blur-md rounded-2xl border border-white/10 p-6 overflow-hidden hover:border-orange-500/30 transition-all duration-300">
+                    <div className="absolute inset-0 bg-gradient-to-br from-orange-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                    <div className="relative z-10">
+                        <div className="flex justify-between items-start mb-6">
+                            <div className="p-3 rounded-xl bg-orange-500/10 text-orange-400">
+                                <Calendar size={28} />
+                            </div>
+                            {daysUntilPayment !== null && (
+                                <span className={`px-3 py-1 rounded-full text-xs font-bold border ${daysUntilPayment < 7 ? 'bg-red-500/10 text-red-400 border-red-500/20' : 'bg-green-500/10 text-green-400 border-green-500/20'}`}>
+                                    {daysUntilPayment} días
+                                </span>
+                            )}
+                        </div>
+                        <h3 className="text-gray-400 text-sm font-medium mb-1">Próxima Facturación</h3>
+                        <p className="text-2xl font-bold text-white">{profile?.next_payment_date || 'N/A'}</p>
+                    </div>
+                </div>
+            </div>
+
+            <div className="grid md:grid-cols-2 gap-6">
+                <div className="bg-dark-card/30 rounded-2xl border border-white/5 p-6">
+                    <h3 className="text-xl font-bold mb-6 flex items-center gap-2">
+                        <Activity size={20} className="text-primary-500" />
+                        Estado de Servicios
+                    </h3>
+                    <div className="space-y-4">
+                        <StatusItem label="Servidor Web (Apache)" status="active" />
+                        <StatusItem label="Base de Datos (MySQL)" status="active" />
+                        <StatusItem label="Servidor de Correos" status="active" />
+                        <StatusItem label="Copias de Seguridad" status="pending" text="Programado 03:00 AM" />
+                    </div>
+                </div>
+
+                <div className="bg-dark-card/30 rounded-2xl border border-white/5 p-6 flex flex-col justify-center items-center text-center relative overflow-hidden">
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent"></div>
+                    <div className="relative z-10">
+                        <div className="w-16 h-16 bg-white/5 rounded-2xl flex items-center justify-center mx-auto mb-4 text-gray-300">
+                            <FileText size={32} />
+                        </div>
+                        <h3 className="text-xl font-bold mb-2">Documentación del Proyecto</h3>
+                        <p className="text-gray-400 text-sm mb-6 max-w-xs mx-auto">Descarga tu contrato, manual de uso y credenciales de acceso.</p>
+
+                        {profile?.document_url ? (
+                            <Button
+                                onClick={handleDownloadDocument}
+                                variant="primary"
+                                icon={Download}
+                                className="w-full md:w-auto"
+                            >
+                                Descargar PDF
+                            </Button>
+                        ) : (
+                            <span className="px-4 py-2 rounded-lg bg-white/5 text-gray-500 text-sm font-medium border border-white/5">
+                                No disponible
                             </span>
                         )}
                     </div>
-                    <p className="text-gray-400 text-sm mb-1">Próximo Pago</p>
-                    <p className="text-xl font-bold">{profile?.next_payment_date || 'No programado'}</p>
-                </div>
-
-                <div className="glass-card p-6 rounded-2xl border border-white/5 bg-gradient-to-br from-white/5 to-transparent">
-                    <div className="flex items-start justify-between mb-4">
-                        <div className="p-3 bg-orange-500/20 rounded-lg text-orange-400">
-                            <FileText size={24} />
-                        </div>
-                    </div>
-                    <p className="text-gray-400 text-sm mb-1">Documentos</p>
-                    {profile?.document_url ? (
-                        <button
-                            onClick={handleDownloadDocument}
-                            className="text-lg font-bold flex items-center gap-2 hover:text-primary-400 transition-colors"
-                        >
-                            Descargar PDF <Download size={16} />
-                        </button>
-                    ) : (
-                        <p className="text-lg font-bold text-gray-500">Sin documentos</p>
-                    )}
                 </div>
             </div>
-
-            <div className="glass-card p-6 rounded-xl border border-white/5">
-                <h3 className="text-xl font-bold mb-4">Estado del Servicio</h3>
-                <div className="flex items-center gap-3 text-green-400 bg-green-500/10 p-4 rounded-lg border border-green-500/20">
-                    <span className="relative flex h-3 w-3">
-                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-                        <span className="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
-                    </span>
-                    <span className="font-medium">
-                        {profile?.app_name ? `Sistema ${profile.app_name} Operativo` : 'Todos los sistemas operativos'}
-                    </span>
-                </div>
-            </div>
-        </>
+        </div>
     );
 };
 
-const TicketsView = () => {
-    // Mock data por ahora
-    const tickets = [
-        { id: 1, title: 'Cambio de color en el footer', status: 'pending', date: '2024-01-03' },
-        { id: 2, title: 'Error en formulario de contacto', status: 'solved', date: '2023-12-28' },
-    ];
+const StatusItem = ({ label, status, text }) => (
+    <div className="flex items-center justify-between p-3 rounded-lg bg-white/5 border border-white/5">
+        <span className="text-sm font-medium text-gray-300">{label}</span>
+        <div className="flex items-center gap-2">
+            {text && <span className="text-xs text-gray-500 mr-2">{text}</span>}
+            <span className={`w-2 h-2 rounded-full ${status === 'active' ? 'bg-green-500 shadow-[0_0_10px_rgba(34,197,94,0.5)]' : 'bg-yellow-500'}`}></span>
+            <span className={`text-xs font-bold uppercase ${status === 'active' ? 'text-green-400' : 'text-yellow-400'}`}>
+                {status === 'active' ? 'Ok' : 'Wait'}
+            </span>
+        </div>
+    </div>
+);
+
+const TicketsView = ({ user, profile }) => {
+    const [tickets, setTickets] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [newTicket, setNewTicket] = useState({ title: '', description: '' });
+    const [isHuman, setIsHuman] = useState(false);
+    const [isSubmitting, setIsSubmitting] = useState(false);
+
+    const fetchTickets = async () => {
+        try {
+            const { data, error } = await supabase
+                .from('tickets')
+                .select('*')
+                .eq('user_id', user.id)
+                .order('created_at', { ascending: false });
+
+            if (data) {
+                setTickets(data);
+            }
+        } catch (error) {
+            console.error("Error fetching tickets:", error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        if (user) {
+            fetchTickets();
+        }
+    }, [user]);
+
+    const handleSubmitTicket = async (e) => {
+        e.preventDefault();
+
+        if (!isHuman) {
+            alert("Por favor confirma que no eres un robot.");
+            return;
+        }
+
+        setIsSubmitting(true);
+
+        try {
+            // 1. Save to Supabase (Priority is default 'normal')
+            const { error } = await supabase
+                .from('tickets')
+                .insert([
+                    {
+                        user_id: user.id,
+                        title: newTicket.title,
+                        description: newTicket.description,
+                        priority: 'normal',
+                        status: 'pending'
+                    }
+                ]);
+
+            if (error) throw error;
+
+            // 2. Notify Admin via Formspree
+            const formData = new FormData();
+            formData.append('email', user.email);
+            formData.append('subject', `Nuevo Ticket de Soporte: ${newTicket.title}`);
+            formData.append('message', `Cliente: ${profile?.client_name || 'Desconocido'}\n\nDescripción:\n${newTicket.description}`);
+
+            await fetch("https://formspree.io/f/mojvoerb", {
+                method: "POST",
+                body: formData,
+                headers: { 'Accept': 'application/json' }
+            });
+
+            setIsModalOpen(false);
+            setNewTicket({ title: '', description: '' });
+            setIsHuman(false);
+            fetchTickets();
+            alert("Ticket creado exitosamente. Hemos sido notificados.");
+
+        } catch (error) {
+            console.error("Error creating ticket:", error);
+            alert("Hubo un error al crear el ticket.");
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
 
     return (
-        <div className="max-w-4xl">
+        <div className="max-w-4xl animate-fade-in-up relative">
             <header className="mb-8 flex justify-between items-center">
                 <div>
-                    <h1 className="text-3xl font-bold mb-2">Sistema de Tickets</h1>
-                    <p className="text-gray-400">Solicita cambios o reporta incidencias.</p>
+                    <h1 className="text-3xl font-bold mb-2 text-white/90">Soporte Técnico</h1>
+                    <p className="text-gray-400">Gestiona tus incidencias y solicitudes.</p>
                 </div>
-                <Button variant="primary">Nuevo Ticket</Button>
+                <Button onClick={() => setIsModalOpen(true)} variant="primary" icon={Plus}>Crear Ticket</Button>
             </header>
 
-            <div className="space-y-4">
-                {tickets.map(ticket => (
-                    <div key={ticket.id} className="glass-card p-4 rounded-xl border border-white/5 flex justify-between items-center hover:bg-white/5 transition-colors">
-                        <div>
-                            <h4 className="font-bold text-lg mb-1">{ticket.title}</h4>
-                            <p className="text-xs text-gray-500">Creado el {ticket.date}</p>
+            {loading ? (
+                <div className="text-center py-10"><div className="animate-spin rounded-full h-8 w-8 border-2 border-primary-500 mx-auto"></div></div>
+            ) : tickets.length > 0 ? (
+                <div className="space-y-4">
+                    {tickets.map(ticket => (
+                        <div key={ticket.id} className="group glass-card p-5 rounded-xl border border-white/5 flex flex-col md:flex-row justify-between md:items-center hover:bg-white/5 transition-all hover:border-white/10 cursor-pointer">
+                            <div className="flex items-start gap-4 mb-3 md:mb-0">
+                                <div className={`mt-1 w-2 h-2 rounded-full ${ticket.status === 'solved' ? 'bg-green-500' : 'bg-yellow-500'}`}></div>
+                                <div>
+                                    <h4 className="font-bold text-lg mb-1 text-white group-hover:text-primary-400 transition-colors">{ticket.title}</h4>
+                                    <div className="flex items-center gap-3 text-xs text-gray-500">
+                                        <span className="flex items-center gap-1"><Calendar size={12} /> {new Date(ticket.created_at).toLocaleDateString()}</span>
+                                        <span>•</span>
+                                        <span className="uppercase font-bold text-gray-500">Normal</span>
+                                    </div>
+                                    <p className="text-sm text-gray-400 mt-2 line-clamp-1">{ticket.description}</p>
+                                </div>
+                            </div>
+                            <span className={`self-start md:self-center px-3 py-1 rounded-full text-xs font-bold uppercase border ${ticket.status === 'pending' ? 'bg-yellow-500/10 text-yellow-400 border-yellow-500/20' : 'bg-green-500/10 text-green-400 border-green-500/20'
+                                }`}>
+                                {ticket.status === 'pending' ? 'En Revisión' : 'Resuelto'}
+                            </span>
                         </div>
-                        <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase ${ticket.status === 'pending' ? 'bg-yellow-500/20 text-yellow-400' : 'bg-green-500/20 text-green-400'
-                            }`}>
-                            {ticket.status === 'pending' ? 'En Proceso' : 'Resuelto'}
-                        </span>
+                    ))}
+                </div>
+            ) : (
+                <div className="text-center py-20 bg-white/5 rounded-2xl border border-white/5">
+                    <div className="w-16 h-16 bg-white/5 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <FileText size={32} className="text-gray-500" />
                     </div>
-                ))}
-            </div>
+                    <h3 className="text-xl font-bold text-white mb-2">Todo en orden</h3>
+                    <p className="text-gray-400">No tienes tickets de soporte activos.</p>
+                </div>
+            )}
+
+            {/* Create Ticket Modal High-Tech Refined */}
+            <AnimatePresence>
+                {isModalOpen && (
+                    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+                        <motion.div
+                            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+                            className="absolute inset-0 bg-black/60 backdrop-blur-xl transition-all"
+                            onClick={() => setIsModalOpen(false)}
+                        ></motion.div>
+                        <motion.div
+                            initial={{ scale: 0.95, opacity: 0, y: 20 }}
+                            animate={{ scale: 1, opacity: 1, y: 0 }}
+                            exit={{ scale: 0.95, opacity: 0, y: 20 }}
+                            className="relative bg-dark-bg/90 border border-white/10 rounded-2xl p-8 w-full max-w-lg shadow-[0_0_50px_rgba(14,165,233,0.15)] z-10 overflow-hidden"
+                        >
+                            {/* Decorative Glows */}
+                            <div className="absolute top-0 right-0 w-32 h-32 bg-primary-500/10 rounded-full blur-3xl pointer-events-none -mr-10 -mt-10"></div>
+                            <div className="absolute bottom-0 left-0 w-32 h-32 bg-purple-500/10 rounded-full blur-3xl pointer-events-none -ml-10 -mb-10"></div>
+
+                            <button onClick={() => setIsModalOpen(false)} className="absolute top-4 right-4 text-gray-500 hover:text-white transition-colors">
+                                <X size={24} />
+                            </button>
+
+                            <div className="text-center mb-8">
+                                <span className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-primary-500/10 text-primary-400 mb-4 border border-primary-500/20 shadow-[0_0_15px_rgba(14,165,233,0.2)]">
+                                    <Send size={24} />
+                                </span>
+                                <h2 className="text-2xl font-bold text-white mb-1">Nuevo Ticket de Soporte</h2>
+                                <p className="text-sm text-gray-400">Describe tu problema y te ayudaremos a la brevedad.</p>
+                            </div>
+
+                            <form onSubmit={handleSubmitTicket} className="space-y-6">
+                                <div className="space-y-2">
+                                    <label className="text-xs font-bold text-gray-500 uppercase tracking-wider ml-1">Asunto</label>
+                                    <div className="relative group">
+                                        <input
+                                            required
+                                            type="text"
+                                            className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3.5 text-white placeholder-gray-600 focus:outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500 transition-all group-hover:border-white/20"
+                                            placeholder="Ej: Problema con el correo corporativo"
+                                            value={newTicket.title}
+                                            onChange={(e) => setNewTicket({ ...newTicket, title: e.target.value })}
+                                        />
+                                    </div>
+                                </div>
+                                <div className="space-y-2">
+                                    <label className="text-xs font-bold text-gray-500 uppercase tracking-wider ml-1">Descripción Detallada</label>
+                                    <div className="relative group">
+                                        <textarea
+                                            required
+                                            className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-gray-600 focus:outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500 resize-none h-32 transition-all group-hover:border-white/20"
+                                            placeholder="Explícanos qué sucede..."
+                                            value={newTicket.description}
+                                            onChange={(e) => setNewTicket({ ...newTicket, description: e.target.value })}
+                                        ></textarea>
+                                    </div>
+                                </div>
+
+                                {/* Security Check */}
+                                <div className="bg-white/5 border border-white/5 rounded-xl p-3 flex items-center justify-between cursor-pointer hover:bg-white/10 transition-colors" onClick={() => setIsHuman(!isHuman)}>
+                                    <div className="flex items-center gap-3">
+                                        <div className={`w-6 h-6 rounded border flex items-center justify-center transition-all ${isHuman ? 'bg-primary-500 border-primary-500' : 'border-gray-500'}`}>
+                                            {isHuman && <Check size={14} className="text-white" />}
+                                        </div>
+                                        <span className="text-sm text-gray-300 font-medium select-none">Confirmar que soy un humano</span>
+                                    </div>
+                                    <ShieldCheck size={18} className="text-gray-600" />
+                                </div>
+
+                                <Button type="submit" variant="primary" className="w-full justify-center py-4 text-base shadow-lg shadow-primary-500/20" disabled={isSubmitting}>
+                                    {isSubmitting ? 'Enviando Solicitud...' : 'Crear Ticket'}
+                                </Button>
+                            </form>
+                        </motion.div>
+                    </div>
+                )}
+            </AnimatePresence>
         </div>
     );
 };
@@ -258,18 +532,14 @@ const TicketsView = () => {
 const NavItem = ({ icon: Icon, children, active, onClick }) => (
     <button
         onClick={onClick}
-        className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${active ? 'bg-primary-600 text-white shadow-lg shadow-primary-500/20' : 'text-gray-400 hover:bg-white/5 hover:text-white'}`}
+        className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 group relative overflow-hidden ${active ? 'text-white' : 'text-gray-400 hover:text-white'}`}
     >
-        <Icon size={20} />
-        <span className="font-medium">{children}</span>
+        {active && (
+            <div className="absolute inset-0 bg-gradient-to-r from-primary-600/20 to-transparent border-l-4 border-primary-500"></div>
+        )}
+        <Icon size={20} className={`relative z-10 transition-transform group-hover:scale-110 ${active ? 'text-primary-400' : 'text-gray-500 group-hover:text-white'}`} />
+        <span className="font-medium relative z-10">{children}</span>
     </button>
-);
-
-const StatCard = ({ title, value }) => (
-    <div className="bg-white/5 border border-white/5 p-6 rounded-2xl">
-        <p className="text-gray-400 text-sm mb-1">{title}</p>
-        <p className="text-3xl font-bold">{value}</p>
-    </div>
 );
 
 export default Dashboard;

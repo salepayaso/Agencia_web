@@ -2,8 +2,9 @@ import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import WhatsAppButton from '../components/WhatsAppButton';
 import Brands from '../components/Brands';
+
 import Button from '../components/ui/Button';
-import { Rocket, ArrowRight } from 'lucide-react';
+import { Rocket, ArrowRight, Zap, ShieldCheck, Headphones, TrendingUp, MonitorSmartphone, ShoppingBag, Globe, Activity, BarChart3, Mail, MessageSquare, User, Lock } from 'lucide-react';
 import { motion, useScroll, useTransform } from 'framer-motion';
 
 const Home = () => {
@@ -105,22 +106,26 @@ const Home = () => {
                     <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
                         {[
                             {
-                                icon: "⚡",
+                                icon: Zap,
+                                gradient: "from-amber-500 to-orange-600 shadow-orange-500/20",
                                 title: "Velocidad Real",
                                 desc: "Nuestros sitios cargan en menos de 1 segundo (vs 3-5s de WordPress)."
                             },
                             {
-                                icon: "🔒",
+                                icon: ShieldCheck,
+                                gradient: "from-blue-500 to-cyan-600 shadow-cyan-500/20",
                                 title: "Seguridad Garantizada",
                                 desc: "Arquitectura moderna sin plugins vulnerables ni actualizaciones constantes."
                             },
                             {
-                                icon: "🚀",
+                                icon: Headphones,
+                                gradient: "from-purple-500 to-pink-600 shadow-purple-500/20",
                                 title: "Soporte 24/7",
                                 desc: "No te dejamos solo después de entregar. Estamos cuando nos necesites."
                             },
                             {
-                                icon: "💰",
+                                icon: TrendingUp,
+                                gradient: "from-emerald-500 to-green-600 shadow-emerald-500/20",
                                 title: "ROI Comprobado",
                                 desc: "En promedio, nuestros clientes ven +40% más conversiones."
                             }
@@ -133,8 +138,8 @@ const Home = () => {
                                 transition={{ delay: i * 0.1 }}
                                 className="glass-card p-6 rounded-2xl border border-white/10 hover:border-primary-500/50 transition-all duration-300 group"
                             >
-                                <div className="text-4xl mb-4 transform group-hover:scale-110 transition-transform duration-300">
-                                    {benefit.icon}
+                                <div className={`w-12 h-12 rounded-lg bg-gradient-to-br ${benefit.gradient} p-2.5 mb-4 group-hover:scale-110 transition-transform duration-300 shadow-lg`}>
+                                    <benefit.icon className="w-full h-full text-white" />
                                 </div>
                                 <h3 className="text-lg font-bold mb-2 group-hover:text-primary-400 transition-colors">
                                     {benefit.title}
@@ -163,19 +168,22 @@ const Home = () => {
                     <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
                         {[
                             {
-                                icon: "🎨",
+                                icon: MonitorSmartphone,
+                                gradient: "from-pink-500 to-rose-600 shadow-pink-500/20",
                                 title: "Diseño Web Profesional",
                                 desc: "Sitios únicos que venden, no plantillas genéricas.",
                                 link: "/servicios"
                             },
                             {
-                                icon: "🛒",
+                                icon: ShoppingBag,
+                                gradient: "from-violet-500 to-purple-600 shadow-purple-500/20",
                                 title: "E-Commerce",
                                 desc: "Tiendas online rápidas y seguras. Vende 24/7.",
                                 link: "/servicios"
                             },
                             {
-                                icon: "🌐",
+                                icon: Globe,
+                                gradient: "from-cyan-500 to-blue-600 shadow-cyan-500/20",
                                 title: "Dominios, Correos & Hosting",
                                 desc: "Tu identidad digital completa. Dominios, correos profesionales y hosting seguro.",
                                 link: "/servicios"
@@ -190,7 +198,9 @@ const Home = () => {
                                 transition={{ delay: i * 0.1 }}
                                 className="glass-card p-6 rounded-2xl border border-white/10 hover:border-primary-500 transition-all duration-300 group cursor-pointer"
                             >
-                                <div className="text-4xl mb-4">{service.icon}</div>
+                                <div className={`w-12 h-12 rounded-lg bg-gradient-to-br ${service.gradient} p-2.5 mb-4 group-hover:scale-110 transition-transform duration-300 shadow-lg`}>
+                                    <service.icon className="w-full h-full text-white" />
+                                </div>
                                 <h3 className="text-xl font-bold mb-2 group-hover:text-primary-400 transition-colors">
                                     {service.title}
                                 </h3>
@@ -208,6 +218,111 @@ const Home = () => {
                         <Button href="/servicios" variant="glass">
                             Ver Todos los Servicios
                         </Button>
+                    </div>
+                </div>
+            </section>
+
+            {/* Client Panel Preview Section */}
+            <section className="py-16 px-4 md:px-8 bg-dark-bg/50 relative overflow-hidden">
+                <div className="absolute top-1/2 left-0 w-1/3 h-1/3 bg-blue-500/10 rounded-full blur-[100px] -translate-y-1/2"></div>
+
+                <div className="max-w-7xl mx-auto relative z-10">
+                    <div className="grid lg:grid-cols-2 gap-12 items-center">
+                        <motion.div
+                            initial={{ opacity: 0, x: -50 }}
+                            whileInView={{ opacity: 1, x: 0 }}
+                            viewport={{ once: true }}
+                        >
+                            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-xs text-blue-400 mb-6">
+                                <Lock className="w-3 h-3" />
+                                <span className="font-semibold uppercase tracking-wider">Exclusivo para Nuestros Clientes</span>
+                            </div>
+                            <h2 className="text-3xl md:text-4xl font-bold mb-4 leading-tight">
+                                Tu Panel de <br />
+                                <span className="text-gradient">Control Personal</span>
+                            </h2>
+                            <p className="text-gray-400 text-base mb-6 leading-relaxed">
+                                Todos nuestros clientes tienen acceso a un panel exclusivo donde pueden ver y gestionar sus servicios activos las 24 horas. Transparencia total.
+                            </p>
+
+                            <div className="space-y-4">
+                                {[
+                                    { icon: Activity, color: "text-emerald-400", bg: "bg-emerald-500/10", text: "Estado de tus servicios en tiempo real" },
+                                    { icon: BarChart3, color: "text-blue-400", bg: "bg-blue-500/10", text: "Métricas de visitas y rendimiento de tu web" },
+                                    { icon: Mail, color: "text-purple-400", bg: "bg-purple-500/10", text: "Gestión de correos corporativos" },
+                                    { icon: MessageSquare, color: "text-amber-400", bg: "bg-amber-500/10", text: "Soporte técnico directo desde el panel" }
+                                ].map((item, i) => (
+                                    <div key={i} className="flex items-center gap-3 group">
+                                        <div className={`p-1.5 rounded-lg ${item.bg} ${item.color} group-hover:scale-110 transition-transform`}>
+                                            <item.icon className="w-4 h-4" />
+                                        </div>
+                                        <span className="text-gray-300 text-sm group-hover:text-white transition-colors">{item.text}</span>
+                                    </div>
+                                ))}
+                            </div>
+
+                            <div className="mt-8">
+                                <Button href="/login" variant="primary" icon={ArrowRight} className="!py-3 !px-6 text-sm">
+                                    Acceso Clientes
+                                </Button>
+                            </div>
+                        </motion.div>
+
+                        <motion.div
+                            initial={{ opacity: 0, scale: 0.9 }}
+                            whileInView={{ opacity: 1, scale: 1 }}
+                            viewport={{ once: true }}
+                            className="relative"
+                        >
+                            <div className="absolute -inset-1 bg-gradient-to-r from-blue-500 to-purple-600 rounded-2xl blur opacity-20"></div>
+                            <div className="relative bg-gray-900 border border-white/10 rounded-2xl p-6 md:p-8 shadow-2xl">
+                                {/* Mock Header */}
+                                <div className="flex items-center gap-4 mb-8 border-b border-white/5 pb-6">
+                                    <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary-500 to-purple-600 p-[2px]">
+                                        <div className="w-full h-full rounded-full bg-gray-900 flex items-center justify-center">
+                                            <User className="w-6 h-6 text-gray-400" />
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <h3 className="font-bold text-lg">Panel de Cliente</h3>
+                                        <p className="text-xs text-green-400 flex items-center gap-1.5">
+                                            <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse"></span>
+                                            Acceso 24/7
+                                        </p>
+                                    </div>
+                                </div>
+
+                                {/* Mock Cards */}
+                                <div className="space-y-4">
+                                    <div className="bg-white/5 border border-white/5 rounded-xl p-4 flex items-center justify-between">
+                                        <div>
+                                            <p className="text-xs text-gray-500 mb-1">Sitio Web</p>
+                                            <p className="font-semibold text-white">www.tunegocio.com</p>
+                                        </div>
+                                        <span className="px-2 py-1 rounded text-[10px] font-bold bg-green-500/20 text-green-400 uppercase tracking-wide">Activo</span>
+                                    </div>
+
+                                    <div className="bg-white/5 border border-white/5 rounded-xl p-4 flex items-center justify-between">
+                                        <div>
+                                            <p className="text-xs text-gray-500 mb-1">Correos</p>
+                                            <p className="font-semibold text-white">5 cuentas configuradas</p>
+                                        </div>
+                                        <span className="px-2 py-1 rounded text-[10px] font-bold bg-green-500/20 text-green-400 uppercase tracking-wide">Activo</span>
+                                    </div>
+
+                                    <div className="bg-gradient-to-r from-blue-500/10 to-purple-500/10 border border-blue-500/20 rounded-xl p-5">
+                                        <div className="flex justify-between items-end mb-2">
+                                            <p className="text-xs text-blue-300">Visitas este mes</p>
+                                            <TrendingUp className="w-4 h-4 text-green-400" />
+                                        </div>
+                                        <div className="flex items-baseline gap-2">
+                                            <h4 className="text-3xl font-bold text-white">1,247</h4>
+                                            <span className="text-xs text-green-400 font-medium">+24%</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </motion.div>
                     </div>
                 </div>
             </section>

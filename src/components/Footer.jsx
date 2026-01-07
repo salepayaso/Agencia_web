@@ -1,44 +1,103 @@
-import { Facebook, Instagram, Linkedin } from 'lucide-react';
+import { Facebook, Instagram, Linkedin, Search } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 const Footer = () => {
     return (
-        <footer className="bg-dark-card border-t border-white/5 py-12 px-4 md:px-8">
-            <div className="max-w-7xl mx-auto grid md:grid-cols-4 gap-8 mb-8">
-                <div className="col-span-1 md:col-span-2">
-                    <div className="flex items-center gap-3 mb-4">
-                        <img src="/logo.png" alt="Logo" className="h-16 w-16 rounded-full object-cover" />
-                        <img
-                            src="/brand-text-v2.png"
-                            alt="Interfaz 360"
-                            className="h-10 md:h-12 object-contain"
-                        />
+        <footer className="relative bg-dark-bg border-t border-white/5 py-16 px-4 md:px-8 overflow-hidden">
+            {/* Background elements */}
+            <div className="absolute top-0 left-1/4 w-96 h-96 bg-primary-500/5 rounded-full blur-[100px]"></div>
+            <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-purple-500/5 rounded-full blur-[100px]"></div>
+
+            <div className="max-w-7xl mx-auto relative z-10">
+                <div className="grid md:grid-cols-4 gap-12 mb-16">
+                    <div className="col-span-1 md:col-span-2">
+                        <div className="flex items-center gap-3 mb-6">
+                            <div className="relative">
+                                <div className="absolute inset-0 bg-primary-500/20 blur-xl rounded-full"></div>
+                                <img src="/logo.png" alt="Logo" className="h-14 w-14 rounded-full object-cover relative z-10 border border-white/10" />
+                            </div>
+                            <img
+                                src="/brand-text-v2.png"
+                                alt="Interfaz 360"
+                                className="h-10 object-contain"
+                            />
+                        </div>
+                        <p className="text-gray-400 max-w-sm text-lg leading-relaxed">
+                            Transformando marcas con experiencias digitales <span className="text-primary-400 font-medium">premium</span>.
+                            Potenciamos tu negocio con tecnología de vanguardia y diseño estratégico.
+                        </p>
                     </div>
-                    <p className="text-gray-400 max-w-xs">
-                        Transformando marcas con experiencias digitales premium.
+
+                    <div>
+                        <h4 className="font-bold text-white mb-6 flex items-center gap-2">
+                            <span className="w-1.5 h-1.5 rounded-full bg-primary-500"></span>
+                            Navegación
+                        </h4>
+                        <ul className="space-y-4 text-gray-400">
+                            <li>
+                                <a href="#" className="flex items-center gap-2 hover:text-primary-400 transition-colors group">
+                                    <span className="w-0 group-hover:w-2 h-[1px] bg-primary-400 transition-all"></span>
+                                    Inicio
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#services" className="flex items-center gap-2 hover:text-primary-400 transition-colors group">
+                                    <span className="w-0 group-hover:w-2 h-[1px] bg-primary-400 transition-all"></span>
+                                    Servicios
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#work" className="flex items-center gap-2 hover:text-primary-400 transition-colors group">
+                                    <span className="w-0 group-hover:w-2 h-[1px] bg-primary-400 transition-all"></span>
+                                    Portafolio
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div>
+                        <h4 className="font-bold text-white mb-6 flex items-center gap-2">
+                            <span className="w-1.5 h-1.5 rounded-full bg-purple-500"></span>
+                            Conectar
+                        </h4>
+                        <div className="flex gap-4">
+                            <a
+                                href="https://facebook.com"
+                                target="_blank"
+                                rel="noreferrer"
+                                className="w-10 h-10 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center text-gray-400 hover:bg-[#1877F2]/10 hover:border-[#1877F2]/50 hover:text-[#1877F2] transition-all duration-300"
+                            >
+                                <Facebook size={20} />
+                            </a>
+                            <a
+                                href="https://instagram.com"
+                                target="_blank"
+                                rel="noreferrer"
+                                className="w-10 h-10 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center text-gray-400 hover:bg-[#E4405F]/10 hover:border-[#E4405F]/50 hover:text-[#E4405F] transition-all duration-300"
+                            >
+                                <Instagram size={20} />
+                            </a>
+                            <a
+                                href="https://linkedin.com"
+                                target="_blank"
+                                rel="noreferrer"
+                                className="w-10 h-10 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center text-gray-400 hover:bg-[#0A66C2]/10 hover:border-[#0A66C2]/50 hover:text-[#0A66C2] transition-all duration-300"
+                            >
+                                <Linkedin size={20} />
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <div className="pt-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-4 text-center md:text-left">
+                    <p className="text-gray-500 text-sm">
+                        &copy; {new Date().getFullYear()} Interfaz 360. Todos los derechos reservados.
                     </p>
-                </div>
-
-                <div>
-                    <h4 className="font-bold mb-4">Enlaces</h4>
-                    <ul className="space-y-2 text-gray-400">
-                        <li><a href="#" className="hover:text-primary-500 transition-colors">Inicio</a></li>
-                        <li><a href="#services" className="hover:text-primary-500 transition-colors">Servicios</a></li>
-                        <li><a href="#work" className="hover:text-primary-500 transition-colors">Portafolio</a></li>
-                    </ul>
-                </div>
-
-                <div>
-                    <h4 className="font-bold mb-4">Conectar</h4>
-                    <div className="flex gap-4 text-gray-400">
-                        <a href="https://facebook.com" target="_blank" rel="noreferrer" className="hover:text-blue-500 transition-colors"><Facebook size={24} /></a>
-                        <a href="https://instagram.com" target="_blank" rel="noreferrer" className="hover:text-pink-500 transition-colors"><Instagram size={24} /></a>
-                        <a href="https://linkedin.com" target="_blank" rel="noreferrer" className="hover:text-blue-400 transition-colors"><Linkedin size={24} /></a>
+                    <div className="flex gap-6 text-sm text-gray-500">
+                        <a href="#" className="hover:text-white transition-colors">Privacidad</a>
+                        <a href="#" className="hover:text-white transition-colors">Términos</a>
                     </div>
                 </div>
-            </div>
-
-            <div className="max-w-7xl mx-auto pt-8 border-t border-white/5 text-center text-gray-500 text-sm">
-                &copy; {new Date().getFullYear()} Interfaz 360. Todos los derechos reservados.
             </div>
         </footer>
     );
