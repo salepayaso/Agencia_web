@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://interfaz360.cl/sitemap.xml
