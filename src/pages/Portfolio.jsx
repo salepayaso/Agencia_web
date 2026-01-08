@@ -12,7 +12,7 @@ const Portfolio = () => {
     // Mapped Dedicated Images
     const projects = [
         {
-            title: "SupplyTech Inventarios",
+            title: "Sistema de Inventarios",
             category: "SaaS / Sistema a Medida",
             type: "app",
             image: "/portfolio_supplytech_inventory.png",
@@ -20,7 +20,7 @@ const Portfolio = () => {
             icon: Database
         },
         {
-            title: "Portal Clientes Interfaz 360",
+            title: "Portal de Clientes",
             category: "CRM & Dashboard",
             type: "app",
             image: "/portfolio_interfaz360_crm.png",
