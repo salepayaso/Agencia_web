@@ -17,7 +17,8 @@ const Portfolio = () => {
             type: "app",
             image: "/portfolio_supplytech_inventory.png",
             tags: ["React", "Supabase", "Stock Control"],
-            icon: Database
+            icon: Database,
+            link: null
         },
         {
             title: "Portal de Clientes",
@@ -25,7 +26,8 @@ const Portfolio = () => {
             type: "app",
             image: "/portfolio_interfaz360_crm.png",
             tags: ["React", "Auth", "Security"],
-            icon: Layout
+            icon: Layout,
+            link: null
         },
         {
             title: "Contabilidad CMP",
@@ -33,7 +35,8 @@ const Portfolio = () => {
             type: "web",
             image: "/portfolio_cmp_accounting.png",
             tags: ["SEO", "Conversion", "Design"],
-            icon: BarChart3
+            icon: BarChart3,
+            link: "https://www.contabilidadcmp.cl"
         },
         {
             title: "E-Commerce Luxury",
@@ -41,7 +44,8 @@ const Portfolio = () => {
             type: "web",
             image: "/portfolio_ecommerce_luxury_human.png",
             tags: ["Stripe", "Next.js", "Sales"],
-            icon: ShoppingBag
+            icon: ShoppingBag,
+            link: null
         },
         {
             title: "Campañas Google Ads",
@@ -49,7 +53,8 @@ const Portfolio = () => {
             type: "web",
             image: "/portfolio_google_ads.png",
             tags: ["ROAS", "Leads", "Analytics"],
-            icon: BarChart3
+            icon: BarChart3,
+            link: null
         },
         {
             title: "SEO Local & Maps",
@@ -57,7 +62,8 @@ const Portfolio = () => {
             type: "web",
             image: "/portfolio_seo_maps_human.png",
             tags: ["Maps", "Reviews", "Growth"],
-            icon: Search
+            icon: Search,
+            link: null
         },
     ];
 
@@ -162,9 +168,20 @@ const Portfolio = () => {
                                                 Solución digital enfocada en {p.category.toLowerCase()}.
                                             </p>
 
-                                            <button className="flex items-center gap-2 text-sm font-bold text-white uppercase tracking-wider opacity-0 group-hover:opacity-100 transition-opacity duration-700 delay-200 hover:text-primary-400">
-                                                Ver Proyecto <ArrowUpRight size={16} />
-                                            </button>
+                                            {p.link ? (
+                                                <a 
+                                                    href={p.link}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    className="flex items-center gap-2 text-sm font-bold text-white uppercase tracking-wider opacity-0 group-hover:opacity-100 transition-opacity duration-700 delay-200 hover:text-primary-400"
+                                                >
+                                                    Ver Proyecto <ArrowUpRight size={16} />
+                                                </a>
+                                            ) : (
+                                                <span className="flex items-center gap-2 text-sm font-bold text-gray-500 uppercase tracking-wider opacity-0 group-hover:opacity-100 transition-opacity duration-700 delay-200 cursor-not-allowed">
+                                                    Próximamente
+                                                </span>
+                                            )}
                                         </div>
                                     </div>
                                 </div>
