@@ -1,10 +1,19 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Section from './ui/Section';
 import Button from './ui/Button';
 import { Send, CheckCircle, Instagram, Facebook, Linkedin } from 'lucide-react';
+import { useLocation } from 'react-router-dom';
 
 const Contact = () => {
     const [formState, setFormState] = useState('idle'); // idle, submitting, success
+    const [message, setMessage] = useState('');
+    const location = useLocation();
+
+    useEffect(() => {
+        if (location.state?.subject) {
+            setMessage(`Hola, estoy interesado en contratar el servicio de ${location.state.subject}.\n\nMe gustaría saber más detalles y cotizar este servicio.`);
+        }
+    }, [location.state]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -24,6 +33,7 @@ const Contact = () => {
             if (response.ok) {
                 setFormState('success');
                 e.target.reset();
+                setMessage(''); // Reset message state too
             } else {
                 console.error("Form error:", response);
                 alert("Hubo un error al enviar el mensaje. Por favor intenta nuevamente.");
@@ -124,6 +134,8 @@ const Contact = () => {
                                         <textarea
                                             required
                                             name="message"
+                                            value={message}
+                                            onChange={(e) => setMessage(e.target.value)}
                                             rows="4"
                                             className="w-full bg-dark-bg/50 border border-white/10 rounded-xl px-5 py-4 text-white placeholder-gray-600 focus:outline-none focus:border-primary-500/50 focus:ring-2 focus:ring-primary-500/20 transition-all duration-300 resize-none"
                                             placeholder="Cuéntanos sobre tu proyecto..."

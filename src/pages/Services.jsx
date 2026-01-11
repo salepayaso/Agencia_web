@@ -5,8 +5,11 @@ import Section from '../components/ui/Section';
 import Button from '../components/ui/Button';
 import { Layout, Rocket, Mail, Zap, Code, ArrowRight, MonitorSmartphone, ShoppingBag, Megaphone, Server, CheckCircle2, Activity, BarChart3, MessageSquare, User, Lock, TrendingUp } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
 
 const Services = () => {
+    const navigate = useNavigate();
+
     const services = [
         {
             icon: MonitorSmartphone,
@@ -75,6 +78,7 @@ const Services = () => {
                             whileInView={{ opacity: 1, y: 0 }}
                             viewport={{ once: true }}
                             transition={{ delay: i * 0.1 }}
+                            onClick={() => navigate('/contacto', { state: { subject: service.title } })}
                             className="glass-card p-8 rounded-3xl border border-white/10 hover:border-primary-500 transition-all duration-300 relative group cursor-pointer"
                         >
                             {service.badge && (
