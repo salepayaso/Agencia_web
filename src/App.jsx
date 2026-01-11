@@ -11,6 +11,7 @@ import ProtectedRoute from './components/ProtectedRoute';
 import ScrollProgress from './components/ScrollProgress';
 
 import UpdatePassword from './pages/UpdatePassword';
+import BusinessCard from './components/BusinessCard';
 
 function App() {
   return (
@@ -25,6 +26,7 @@ function App() {
         <Route path="/contacto" element={<ContactPage />} />
         <Route path="/login" element={<Login />} />
         <Route path="/update-password" element={<UpdatePassword />} />
+        <Route path="/tarjeta" element={<BusinessCard />} />
         <Route
           path="/dashboard"
           element={

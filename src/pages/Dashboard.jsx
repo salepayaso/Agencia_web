@@ -47,11 +47,41 @@ const Dashboard = () => {
 
     if (loading) {
         return (
-            <div className="min-h-screen bg-dark-bg text-white flex items-center justify-center">
-                <div className="relative">
-                    <div className="w-16 h-16 border-4 border-primary-500/30 border-t-primary-500 rounded-full animate-spin"></div>
-                    <div className="mt-4 text-center text-primary-400 text-sm font-medium animate-pulse">Cargando Panel...</div>
-                </div>
+            <div className="min-h-screen bg-dark-bg flex items-center justify-center relative overflow-hidden">
+                {/* Background Ambience */}
+                <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-primary-500/5 rounded-full blur-[120px]"></div>
+                <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-purple-500/5 rounded-full blur-[120px]"></div>
+
+                <motion.div
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    className="relative z-10 flex flex-col items-center"
+                >
+                    <div className="relative w-24 h-24 mb-6 flex items-center justify-center">
+                        {/* Outer Spinning Ring */}
+                        <motion.div
+                            animate={{ rotate: 360 }}
+                            transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+                            className="absolute inset-0 rounded-full border-t-2 border-r-2 border-primary-500/50"
+                        />
+                        {/* Inner Counter Spinning Ring */}
+                        <motion.div
+                            animate={{ rotate: -360 }}
+                            transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
+                            className="absolute inset-2 rounded-full border-b-2 border-l-2 border-purple-500/50"
+                        />
+
+                        {/* Logo */}
+                        <div className="w-12 h-12 rounded-full bg-white/5 backdrop-blur-sm flex items-center justify-center border border-white/10 relative z-10">
+                            <img src="/logo.png" alt="Logo" className="w-8 h-8 object-contain" />
+                        </div>
+                    </div>
+
+                    <div className="text-center">
+                        <h3 className="text-lg font-bold text-white tracking-[0.3em] uppercase mb-1">Cargando</h3>
+                        <p className="text-primary-400/80 text-[10px] tracking-widest uppercase">Estableciendo Conexión Segura</p>
+                    </div>
+                </motion.div>
             </div>
         );
     }
@@ -115,7 +145,9 @@ const Dashboard = () => {
                             </div>
                             <div className="overflow-hidden">
                                 <p className="text-sm font-bold text-white truncate">{profile?.client_name || 'Nuevo Cliente'}</p>
-                                <p className="text-xs text-gray-500 truncate">{user?.email}</p>
+                                <p className="text-xs text-gray-500 truncate" title={profile?.contact_email || user?.email}>
+                                    {profile?.contact_email || user?.email}
+                                </p>
                             </div>
                         </div>
                         <div className="flex items-center gap-2">
@@ -143,24 +175,7 @@ const Dashboard = () => {
 };
 
 const Overview = ({ profile }) => {
-    const handleDownloadDocument = async () => {
-        if (!profile?.document_url) return;
-
-        try {
-            const { data, error } = await supabase
-                .storage
-                .from('documents')
-                .createSignedUrl(profile.document_url, 60);
-
-            if (error) throw error;
-            if (data?.signedUrl) {
-                window.open(data.signedUrl, '_blank');
-            }
-        } catch (err) {
-            console.error('Error downloading:', err);
-            alert('Error al descargar el documento. Verifica que el archivo exista en el bucket "documents".');
-        }
-    };
+    const [viewingDoc, setViewingDoc] = useState(null);
 
     const daysUntilPayment = profile?.next_payment_date
         ? Math.ceil((new Date(profile.next_payment_date) - new Date()) / (1000 * 60 * 60 * 24))
@@ -226,9 +241,16 @@ const Overview = ({ profile }) => {
                         <div className="grid grid-cols-2 gap-4">
                             <div>
                                 <p className="text-gray-500 text-xs uppercase font-bold mb-1">Correos</p>
-                                <div className="flex items-center gap-2 text-white font-bold text-lg">
-                                    <Mail size={16} className="text-gray-400" />
-                                    {emailCount}
+                                <div className="flex flex-col">
+                                    <div className="flex items-center gap-2 text-white font-bold text-lg">
+                                        <Mail size={16} className="text-gray-400" />
+                                        {emailCount}
+                                    </div>
+                                    {profile?.contact_email && (
+                                        <p className="text-[10px] text-gray-400 mt-0.5 truncate max-w-[120px]" title={profile.contact_email}>
+                                            {profile.contact_email}
+                                        </p>
+                                    )}
                                 </div>
                             </div>
                             <div>
@@ -278,31 +300,116 @@ const Overview = ({ profile }) => {
 
                 <div className="bg-dark-card/30 rounded-2xl border border-white/5 p-6 flex flex-col justify-center items-center text-center relative overflow-hidden">
                     <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent"></div>
-                    <div className="relative z-10">
+                    <div className="relative z-10 w-full">
                         <div className="w-16 h-16 bg-white/5 rounded-2xl flex items-center justify-center mx-auto mb-4 text-gray-300">
                             <FileText size={32} />
                         </div>
-                        <h3 className="text-xl font-bold mb-2">Documentación del Proyecto</h3>
-                        <p className="text-gray-400 text-sm mb-6 max-w-xs mx-auto">Descarga tu contrato, manual de uso y credenciales de acceso.</p>
+                        <h3 className="text-xl font-bold mb-2">Documentación</h3>
 
                         {profile?.document_url ? (
-                            <Button
-                                onClick={handleDownloadDocument}
-                                variant="primary"
-                                icon={Download}
-                                className="w-full md:w-auto"
-                            >
-                                Descargar PDF
-                            </Button>
+                            <>
+                                <div className="bg-black/30 rounded-lg p-3 mb-6 max-w-xs mx-auto border border-white/5">
+                                    <p className="text-xs text-gray-500 uppercase font-bold mb-1">Archivo Disponible:</p>
+                                    <p className="text-gray-300 text-sm truncate font-mono" title={profile.document_url}>
+                                        {profile.document_url}
+                                    </p>
+                                </div>
+                                <Button
+                                    onClick={() => setViewingDoc(profile.document_url)}
+                                    variant="primary"
+                                    icon={Download}
+                                    className="w-full md:w-auto"
+                                >
+                                    Descargar
+                                </Button>
+                            </>
                         ) : (
-                            <span className="px-4 py-2 rounded-lg bg-white/5 text-gray-500 text-sm font-medium border border-white/5">
-                                No disponible
-                            </span>
+                            <>
+                                <p className="text-gray-400 text-sm mb-6 max-w-xs mx-auto">No hay documentos vinculados a tu cuenta actualmente.</p>
+                                <span className="px-4 py-2 rounded-lg bg-white/5 text-gray-500 text-sm font-medium border border-white/5">
+                                    No disponible
+                                </span>
+                            </>
                         )}
                     </div>
                 </div>
             </div>
+
+            {/* Document Details Modal (Ventana Detallada) */}
+            <DocumentPreviewModal
+                isOpen={!!viewingDoc}
+                onClose={() => setViewingDoc(null)}
+                docName={viewingDoc}
+            />
         </div>
+    );
+};
+
+// ... (Existing StatusItem component) ...
+
+// New Component: Document Modal
+const DocumentPreviewModal = ({ isOpen, onClose, docName }) => {
+    const [downloading, setDownloading] = useState(false);
+
+    const performDownload = async () => {
+        setDownloading(true);
+        try {
+            const { data, error } = await supabase
+                .storage
+                .from('documents')
+                .createSignedUrl(docName, 60);
+
+            if (error) throw error;
+            if (data?.signedUrl) {
+                window.open(data.signedUrl, '_blank');
+                onClose();
+            }
+        } catch (err) {
+            console.error('Error downloading:', err);
+            alert(`Error: No se pudo descargar "${docName}". \n\nPosibles causas:\n1. El nombre del archivo en el perfil no coincide EXACTAMENTE con el del Storage.\n2. Faltan permisos de lectura en el bucket 'documents' (Corre el script SQL).`);
+        } finally {
+            setDownloading(false);
+        }
+    };
+
+    return (
+        <AnimatePresence>
+            {isOpen && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+                    <motion.div
+                        initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+                        className="absolute inset-0 bg-black/80 backdrop-blur-sm"
+                        onClick={onClose}
+                    ></motion.div>
+                    <motion.div
+                        initial={{ scale: 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.95, opacity: 0 }}
+                        className="relative bg-dark-card border border-white/10 rounded-2xl p-8 w-full max-w-md shadow-2xl z-10"
+                    >
+                        <button onClick={onClose} className="absolute top-4 right-4 text-gray-500 hover:text-white"><X size={24} /></button>
+
+                        <div className="text-center">
+                            <div className="w-20 h-20 bg-blue-500/10 rounded-2xl flex items-center justify-center mx-auto mb-6 text-blue-400 border border-blue-500/20">
+                                <ShieldCheck size={40} />
+                            </div>
+                            <h2 className="text-2xl font-bold text-white mb-2">Descarga Segura</h2>
+                            <p className="text-gray-400 text-sm mb-6">Estás a punto de descargar un documento confidencial.</p>
+
+                            <div className="bg-white/5 rounded-xl p-4 mb-8 text-left">
+                                <p className="text-xs text-gray-500 uppercase font-bold mb-1">Nombre del Archivo</p>
+                                <p className="text-white font-mono text-sm break-all">{docName}</p>
+                            </div>
+
+                            <div className="flex gap-3">
+                                <Button onClick={onClose} className="flex-1 bg-white/5 hover:bg-white/10 text-white border border-white/5">Cancelar</Button>
+                                <Button onClick={performDownload} variant="primary" className="flex-1" disabled={downloading}>
+                                    {downloading ? 'Descargando...' : 'Confirmar y Abrir'}
+                                </Button>
+                            </div>
+                        </div>
+                    </motion.div>
+                </div>
+            )}
+        </AnimatePresence>
     );
 };
 

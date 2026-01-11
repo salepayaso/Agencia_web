@@ -28,6 +28,9 @@ begin
     if not exists (select 1 from information_schema.columns where table_name = 'profiles' and column_name = 'document_url') then
         alter table profiles add column document_url text; -- Para el PDF (Factura o Contrato)
     end if;
+    if not exists (select 1 from information_schema.columns where table_name = 'profiles' and column_name = 'contact_email') then
+        alter table profiles add column contact_email text; -- Correo de contacto visible
+    end if;
 end $$;
 
 -- 3. Habilitar seguridad (RLS)
