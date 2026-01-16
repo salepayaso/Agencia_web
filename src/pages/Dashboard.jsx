@@ -238,26 +238,29 @@ const Overview = ({ profile }) => {
                                 {hostingPlan}
                             </span>
                         </div>
-                        <div className="grid grid-cols-2 gap-4">
-                            <div>
-                                <p className="text-gray-500 text-xs uppercase font-bold mb-1">Correos</p>
+                        <div className="flex flex-col gap-6">
+                            <div className="overflow-hidden">
+                                <p className="text-gray-500 text-xs uppercase font-bold mb-2">Correos</p>
                                 <div className="flex flex-col">
-                                    <div className="flex items-center gap-2 text-white font-bold text-lg">
+                                    <div className="flex items-center gap-2 text-white font-bold text-lg mb-1">
                                         <Mail size={16} className="text-gray-400" />
                                         {emailCount}
                                     </div>
                                     {profile?.contact_email && (
-                                        <p className="text-[10px] text-gray-400 mt-0.5 truncate max-w-[120px]" title={profile.contact_email}>
-                                            {profile.contact_email}
-                                        </p>
+                                        <CopyEmail email={profile.contact_email} />
                                     )}
                                 </div>
                             </div>
                             <div>
-                                <p className="text-gray-500 text-xs uppercase font-bold mb-1">Almacenamiento</p>
-                                <div className="flex items-center gap-2 text-white font-bold text-lg">
-                                    <HardDrive size={16} className="text-gray-400" />
-                                    {diskUsage}
+                                <p className="text-gray-500 text-xs uppercase font-bold mb-2">Almacenamiento</p>
+                                <div className="flex flex-col">
+                                    <div className="flex items-center gap-2 text-white font-bold text-lg">
+                                        <HardDrive size={16} className="text-gray-400" />
+                                        {diskUsage}
+                                    </div>
+                                    <p className="text-xs text-gray-400 mt-1 pl-6">
+                                        de {profile?.storage_limit || extractStorageLimit(hostingPlan)}
+                                    </p>
                                 </div>
                             </div>
                         </div>
@@ -648,5 +651,42 @@ const NavItem = ({ icon: Icon, children, active, onClick }) => (
         <span className="font-medium relative z-10">{children}</span>
     </button>
 );
+
+const CopyEmail = ({ email }) => {
+    const [copied, setCopied] = useState(false);
+
+    const handleCopy = () => {
+        navigator.clipboard.writeText(email);
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+    };
+
+    return (
+        <div className="flex items-center gap-2 w-full group/copy bg-white/5 p-2 rounded-lg border border-white/5 hover:border-white/10 transition-all">
+            <p className="text-sm text-gray-200 font-mono break-all flex-1" title={email}>
+                {email}
+            </p>
+            <button
+                onClick={handleCopy}
+                className={`p-1.5 rounded-md transition-all shrink-0 ${copied ? 'bg-green-500/20 text-green-400' : 'text-gray-500 hover:text-white hover:bg-white/10'}`}
+                title="Copiar email"
+            >
+                {copied ? <Check size={14} /> : (
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                )}
+            </button>
+        </div>
+    );
+};
+
+const extractStorageLimit = (planName) => {
+    const limits = {
+        "Plan Básico": "10 GB",
+        "Plan Emprendedor": "25 GB",
+        "Plan Pyme": "50 GB",
+        "Plan Corporativo": "100 GB"
+    };
+    return limits[planName] || "10 GB";
+};
 
 export default Dashboard;
