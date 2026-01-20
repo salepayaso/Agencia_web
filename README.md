@@ -1,23 +1,23 @@
-# WebArchitect | Digital Manager & Arquitecto UX
+# Interfaz360 | Transformación Digital & Desarrollo Web
 
-**Plataforma profesional de servicios digitales y desarrollo de software.**
+**Agencia de servicios digitales y desarrollo de software a medida.**
 
-Este proyecto representa la identidad digital de **WebArchitect**, ofreciendo servicios de alta gama en:
--   **Arquitectura UX/UI**: Diseño centrado en la conversión.
--   **Desarrollo Full-Stack**: Aplicaciones web robustas (React, Node.js).
--   **Gestión Digital**: Estrategias de crecimiento y SEO técnico.
+Este proyecto representa la identidad digital de **Interfaz360**, ofreciendo servicios de alta gama en:
+-   **Diseño UI/UX**: Experiencias de usuario intuitivas y atractivas.
+-   **Desarrollo Full-Stack**: Aplicaciones web escalables y modernas.
+-   **Estrategia Digital**: Soluciones tecnológicas alineadas con tus objetivos de negocio.
 
 ## 🚀 Características del Proyecto
--   **Diseño Premium**: Interfaz moderna con animaciones fluidas (Framer Motion).
--   **Portafolio Inteligente**: Filtrado dinámico entre Sitios Web y Aplicaciones.
--   **Contacto Directo**: Integración flotante con WhatsApp API.
--   **Performance**: Construido con Vite para máxima velocidad y optimización.
+-   **Diseño Premium**: Interfaz moderna con animaciones fluidas.
+-   **Portafolio Dinámico**: Exhibición clara de nuestros proyectos y capacidades.
+-   **Contacto Ágil**: Integración directa para facilitar la comunicación.
+-   **Performance**: Optimizado para velocidad y rendimiento en todos los dispositivos.
 
 ## 🛠️ Tecnologías Usadas
--   **React 18**: Biblioteca principal de interfaz.
+-   **React**: Biblioteca principal de interfaz.
 -   **Tailwind CSS**: Estilizado moderno y responsivo.
 -   **Framer Motion**: Animaciones avanzadas.
--   **Lucide React**: Iconografía profesional.
+-   **Vite**: Entorno de desarrollo ultrarrápido.
 
 ## 💻 Cómo Iniciar Localmente
 
@@ -35,6 +35,6 @@ Este proyecto representa la identidad digital de **WebArchitect**, ofreciendo se
     ```
 
 ## 📞 Contacto
-**WebArchitect Chile**
+**Interfaz360**
 -   WhatsApp: [+56 9 5414 6176](https://wa.me/56954146176)
--   Email: contacto@webarchitect.cl
+-   Email: contacto@interfaz360.cl
