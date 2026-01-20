@@ -4,7 +4,7 @@ import WhatsAppButton from '../components/WhatsAppButton';
 import Brands from '../components/Brands';
 
 import Button from '../components/ui/Button';
-import { Rocket, ArrowRight, Zap, ShieldCheck, Headphones, TrendingUp, MonitorSmartphone, ShoppingBag, Globe, Activity, BarChart3, Mail, MessageSquare, User, Lock } from 'lucide-react';
+import { Rocket, ArrowRight, Zap, ShieldCheck, Headphones, TrendingUp, MonitorSmartphone, ShoppingBag, Globe, Activity, BarChart3, Mail, MessageSquare, User, Lock, Server, Search } from 'lucide-react';
 import { motion, useScroll, useTransform } from 'framer-motion';
 
 const Home = () => {
@@ -58,22 +58,22 @@ const Home = () => {
                     >
                         {/* Modern Tech Visual */}
                         <div className="relative z-10 glass-card p-4 rounded-3xl border-t border-l border-white/20 overflow-hidden group">
-                            <div className="h-80 rounded-2xl overflow-hidden relative">
+                            <div className="h-80 rounded-2xl overflow-hidden relative flex items-center justify-center bg-black/20">
                                 <img
-                                    src="/hero_tech_visual.png"
-                                    alt="Modern Technology Visualization"
-                                    className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700"
+                                    src="/hero_google_security.png"
+                                    alt="Google Security & Tech Ecosystem"
+                                    className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700"
                                 />
                                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
                                 <div className="absolute bottom-4 left-4 right-4">
                                     <div className="flex items-center gap-2 mb-2">
                                         <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse"></div>
-                                        <span className="text-green-400 text-sm font-medium">System Active</span>
+                                        <span className="text-green-400 text-sm font-medium">Google Certified</span>
                                     </div>
                                     <div className="flex gap-2">
-                                        <div className="px-3 py-1.5 rounded-full bg-primary-500/20 border border-primary-500/30 text-xs text-primary-300 backdrop-blur-sm">React</div>
-                                        <div className="px-3 py-1.5 rounded-full bg-purple-500/20 border border-purple-500/30 text-xs text-purple-300 backdrop-blur-sm">Next.js</div>
-                                        <div className="px-3 py-1.5 rounded-full bg-cyan-500/20 border border-cyan-500/30 text-xs text-cyan-300 backdrop-blur-sm">TypeScript</div>
+                                        <div className="px-3 py-1.5 rounded-full bg-blue-500/20 border border-blue-500/30 text-xs text-blue-300 backdrop-blur-sm">Secure SSL</div>
+                                        <div className="px-3 py-1.5 rounded-full bg-orange-500/20 border border-orange-500/30 text-xs text-orange-300 backdrop-blur-sm">Google Cloud</div>
+                                        <div className="px-3 py-1.5 rounded-full bg-yellow-500/20 border border-yellow-500/30 text-xs text-yellow-300 backdrop-blur-sm">Analytics</div>
                                     </div>
                                 </div>
                             </div>
@@ -99,35 +99,39 @@ const Home = () => {
                             ¿Por Qué <span className="text-gradient">Elegirnos?</span>
                         </h2>
                         <p className="text-gray-400 max-w-2xl mx-auto">
-                            No somos una agencia más. Somos tu socio tecnológico con resultados comprobados.
+                            No somos una agencia más. Somos tu socio tecnológico integral.
                         </p>
                     </div>
 
                     <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
                         {[
                             {
-                                icon: Zap,
+                                icon: MonitorSmartphone,
                                 gradient: "from-amber-500 to-orange-600 shadow-orange-500/20",
-                                title: "Velocidad Real",
-                                desc: "Nuestros sitios cargan en menos de 1 segundo (vs 3-5s de WordPress)."
+                                title: "Diseño Web High-Tech",
+                                desc: "Sitios de última generación con tecnología React. Sin plantillas, pura innovación."
                             },
                             {
-                                icon: ShieldCheck,
+                                icon: Lock,
                                 gradient: "from-blue-500 to-cyan-600 shadow-cyan-500/20",
-                                title: "Seguridad Garantizada",
-                                desc: "Arquitectura moderna sin plugins vulnerables ni actualizaciones constantes."
+                                title: "Servidor & SSL Google",
+                                desc: "Incluye hosting, dominios y Certificado SSL (candado seguro) de Google."
+                            },
+                            {
+                                icon: () => (
+                                    <svg viewBox="0 0 24 24" fill="currentColor" className="w-full h-full text-white">
+                                        <path d="M12.48 10.92v3.28h7.84c-.24 1.84-.853 3.187-1.787 4.133-1.147 1.147-2.933 2.4-6.053 2.4-4.827 0-8.6-3.893-8.6-8.72s3.773-8.72 8.6-8.72c2.6 0 4.507 1.027 5.907 2.347l2.307-2.307C18.747 1.44 16.133 0 12.48 0 5.867 0 .533 5.333 .533 12S5.867 24 12.48 24c3.44 0 6.013-1.147 8.027-3.24 2.053-2.08 2.667-5.013 2.667-7.467 0-.747-.053-1.467-.16-2.133H12.48z" />
+                                    </svg>
+                                ),
+                                gradient: "from-blue-500 via-red-500 to-yellow-500 shadow-blue-500/20",
+                                title: "Ecosistema Google",
+                                desc: "Potencia tu presencia con Google Search Console, Analytics y Google Maps (Business). Te ayudamos a aparecer primero."
                             },
                             {
                                 icon: Headphones,
-                                gradient: "from-purple-500 to-pink-600 shadow-purple-500/20",
-                                title: "Soporte 24/7",
-                                desc: "No te dejamos solo después de entregar. Estamos cuando nos necesites."
-                            },
-                            {
-                                icon: TrendingUp,
                                 gradient: "from-emerald-500 to-green-600 shadow-emerald-500/20",
-                                title: "ROI Comprobado",
-                                desc: "En promedio, nuestros clientes ven +40% más conversiones."
+                                title: "Soporte Dedicado",
+                                desc: "Equipo real para ayudarte con correos, claves y dudas técnicas."
                             }
                         ].map((benefit, i) => (
                             <motion.div

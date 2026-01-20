@@ -28,12 +28,16 @@ const Services = () => {
             benefits: ["Acepta pagos con tarjeta", "Control total de inventario", "Tus clientes compran fácil y rápido"],
         },
         {
-            icon: Megaphone,
-            gradient: "from-amber-500 to-orange-600 shadow-orange-500/20",
-            title: "Marketing Digital",
+            icon: () => (
+                <svg viewBox="0 0 24 24" fill="currentColor" className="w-full h-full text-white">
+                    <path d="M12.48 10.92v3.28h7.84c-.24 1.84-.853 3.187-1.787 4.133-1.147 1.147-2.933 2.4-6.053 2.4-4.827 0-8.6-3.893-8.6-8.72s3.773-8.72 8.6-8.72c2.6 0 4.507 1.027 5.907 2.347l2.307-2.307C18.747 1.44 16.133 0 12.48 0 5.867 0 .533 5.333 .533 12S5.867 24 12.48 24c3.44 0 6.013-1.147 8.027-3.24 2.053-2.08 2.667-5.013 2.667-7.467 0-.747-.053-1.467-.16-2.133H12.48z" />
+                </svg>
+            ),
+            gradient: "from-blue-500 via-red-500 to-yellow-500 shadow-blue-500/20",
+            title: "Ecosistema Google & Marketing",
             tagline: "Que te encuentren tus clientes",
-            desc: "Te ayudamos a aparecer primero en Google y atraer más clientes con publicidad en redes sociales.",
-            benefits: ["Tu negocio en Google Maps", "Campañas de Facebook e Instagram", "Más visitas, más ventas"],
+            desc: "Potencia tu presencia con Google Search Console, Analytics y Google Maps (Business). Te ayudamos a aparecer primero en Google y atraer más clientes.",
+            benefits: ["Tu negocio en Google Maps (Business)", "Métricas reales con Google Analytics", "Posicionamiento SEO Técnico"],
         },
         {
             icon: Server,
