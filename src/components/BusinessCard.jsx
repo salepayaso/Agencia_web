@@ -69,7 +69,7 @@ END:VCARD`
                             <div className="w-24 h-24 rounded-full p-1 bg-gradient-to-r from-primary-400 to-purple-500 relative group">
                                 <div className="absolute inset-0 rounded-full bg-gradient-to-r from-primary-400 to-purple-500 blur opacity-50 group-hover:opacity-100 transition-opacity duration-500"></div>
                                 <img
-                                    src="/logo.png"
+                                    src="/logo sin fondo optimizado.png"
                                     alt="Profile"
                                     className="w-full h-full rounded-full object-cover bg-dark-bg relative z-10"
                                 />
