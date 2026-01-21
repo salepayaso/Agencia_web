@@ -15,7 +15,7 @@ const Footer = () => {
                         <div className="flex items-center gap-3 mb-6">
                             <div className="relative">
                                 <div className="absolute inset-0 bg-primary-500/20 blur-xl rounded-full"></div>
-                                <img src="/logo.png" alt="Logo" className="h-14 w-14 rounded-full object-cover relative z-10 border border-white/10" />
+                                <img src="/logo sin fondo optimizado.png" alt="Logo" className="h-14 w-14 rounded-full object-cover relative z-10 border border-white/10" />
                             </div>
                             <img
                                 src="/brand-text-v2.png"

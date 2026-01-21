@@ -73,7 +73,7 @@ const Dashboard = () => {
 
                         {/* Logo */}
                         <div className="w-12 h-12 rounded-full bg-white/5 backdrop-blur-sm flex items-center justify-center border border-white/10 relative z-10">
-                            <img src="/logo.png" alt="Logo" className="w-8 h-8 object-contain" />
+                            <img src="/logo sin fondo optimizado.png" alt="Logo" className="w-8 h-8 object-contain" />
                         </div>
                     </div>
 
@@ -99,7 +99,7 @@ const Dashboard = () => {
                 <div className="mb-12 flex items-center gap-3 px-2">
                     <div className="relative group cursor-pointer">
                         <div className="absolute inset-0 bg-primary-500/20 blur-lg rounded-full group-hover:bg-primary-500/30 transition-all"></div>
-                        <img src="/logo.png" alt="Logo" className="h-12 w-12 rounded-full object-cover relative z-10 border border-white/10" />
+                        <img src="/logo sin fondo optimizado.png" alt="Logo" className="h-12 w-12 rounded-full object-cover relative z-10 border border-white/10" />
                     </div>
                     <div>
                         <img src="/brand-text-v2.png" alt="Interfaz 360" className="h-6 object-contain mb-1" />

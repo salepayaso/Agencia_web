@@ -44,7 +44,7 @@ const Login = () => {
             >
                 <div className="glass-card p-8 rounded-2xl border border-white/10 shadow-2xl">
                     <div className="text-center mb-8">
-                        <img src="/logo.png" alt="Interfaz 360" className="h-32 w-32 rounded-full object-cover mx-auto mb-4 drop-shadow-[0_0_15px_rgba(56,189,248,0.5)]" />
+                        <img src="/logo sin fondo optimizado.png" alt="Interfaz 360" className="h-32 w-32 rounded-full object-cover mx-auto mb-4 drop-shadow-[0_0_15px_rgba(56,189,248,0.5)]" />
                         <h1 className="text-3xl font-bold text-white mb-2">Interfaz 360</h1>
                         <p className="text-gray-400">Accede a tu Portal de Cliente</p>
                     </div>
