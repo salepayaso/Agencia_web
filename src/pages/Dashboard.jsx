@@ -10,6 +10,7 @@ const Dashboard = () => {
     const [profile, setProfile] = useState(null);
     const [view, setView] = useState('overview');
     const [loading, setLoading] = useState(true);
+    const [isSettingsOpen, setIsSettingsOpen] = useState(false);
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -122,7 +123,7 @@ const Dashboard = () => {
                     >
                         Soporte & Tickets
                     </NavItem>
-                    <NavItem icon={Settings} onClick={() => alert("Próximamente: Configuración de cuenta")}>
+                    <NavItem icon={Settings} onClick={() => setIsSettingsOpen(true)}>
                         Configuración
                     </NavItem>
                 </nav>
@@ -170,6 +171,9 @@ const Dashboard = () => {
                 {view === 'overview' && <Overview profile={profile} user={user} />}
                 {view === 'tickets' && <TicketsView user={user} profile={profile} />}
             </main>
+
+            {/* Settings Modal */}
+            <SettingsModal isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)} />
         </div>
     );
 };
@@ -217,7 +221,7 @@ const Overview = ({ profile, user }) => {
     } catch (e) {
         console.error("Error parsing emails", e);
     }
-    const allEmails = [profile?.contact_email || user?.email, ...extraEmails].filter(Boolean).slice(0, 5); // Max 5
+    const allEmails = [...extraEmails].filter(Boolean).slice(0, 5); // Max 5
 
     return (
         <div className="max-w-6xl mx-auto animate-fade-in-up">
@@ -400,6 +404,8 @@ const Overview = ({ profile, user }) => {
                 onClose={() => setViewingDoc(null)}
                 docName={viewingDoc}
             />
+
+
         </div>
     );
 };
@@ -736,6 +742,38 @@ const TicketSuccessModal = ({ isOpen, onClose }) => (
 
                     <Button onClick={onClose} variant="primary" className="w-full justify-center bg-green-600 hover:bg-green-700 shadow-lg shadow-green-500/20">
                         Entendido, gracias
+                    </Button>
+                </motion.div>
+            </div>
+        )}
+    </AnimatePresence>
+);
+
+const SettingsModal = ({ isOpen, onClose }) => (
+    <AnimatePresence>
+        {isOpen && (
+            <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
+                <motion.div
+                    initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+                    className="absolute inset-0 bg-black/80 backdrop-blur-md"
+                    onClick={onClose}
+                ></motion.div>
+                <motion.div
+                    initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.8, opacity: 0 }}
+                    className="relative bg-dark-bg border border-primary-500/30 rounded-2xl p-8 w-full max-w-sm shadow-[0_0_60px_rgba(14,165,233,0.2)] z-10 text-center"
+                >
+                    <div className="w-24 h-24 bg-primary-500/10 rounded-full flex items-center justify-center mx-auto mb-6 border border-primary-500/20 relative">
+                        <div className="absolute inset-0 bg-primary-500/10 rounded-full animate-ping"></div>
+                        <Settings size={48} className="text-primary-500 relative z-10" />
+                    </div>
+
+                    <h3 className="text-2xl font-bold text-white mb-2">Próximamente</h3>
+                    <p className="text-gray-400 mb-8 text-sm leading-relaxed">
+                        Estamos trabajando en la configuración de cuenta avanzada. Pronto podrás gestionar tu perfil y servicios desde aquí.
+                    </p>
+
+                    <Button onClick={onClose} variant="primary" className="w-full justify-center shadow-lg shadow-primary-500/20">
+                        Entendido
                     </Button>
                 </motion.div>
             </div>
