@@ -1,4 +1,6 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { supabase } from './supabase';
+import { BrowserRouter as Router, Routes, Route, useNavigate, useLocation } from 'react-router-dom';
 import ScrollToTop from './components/ScrollToTop';
 import Home from './pages/Home';
 import Services from './pages/Services';
@@ -13,9 +15,29 @@ import ScrollProgress from './components/ScrollProgress';
 import UpdatePassword from './pages/UpdatePassword';
 import BusinessCard from './components/BusinessCard';
 
+const AuthHandler = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  useEffect(() => {
+    const { data: authListener } = supabase.auth.onAuthStateChange(async (event, session) => {
+      if (event === 'PASSWORD_RECOVERY') {
+        navigate('/update-password');
+      }
+    });
+
+    return () => {
+      authListener.subscription.unsubscribe();
+    };
+  }, [navigate]);
+
+  return null;
+};
+
 function App() {
   return (
     <Router>
+      <AuthHandler />
       <ScrollToTop />
       <ScrollProgress />
       <Routes>
