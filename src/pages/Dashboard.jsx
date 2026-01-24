@@ -166,16 +166,37 @@ const Dashboard = () => {
             </aside>
 
             {/* Main Content */}
-            <main className="flex-1 p-8 md:p-12 overflow-y-auto relative z-10">
-                {view === 'overview' && <Overview profile={profile} />}
+            <main className="flex-1 p-6 md:p-8 overflow-y-auto relative z-10">
+                {view === 'overview' && <Overview profile={profile} user={user} />}
                 {view === 'tickets' && <TicketsView user={user} profile={profile} />}
             </main>
         </div>
     );
 };
 
-const Overview = ({ profile }) => {
+const Overview = ({ profile, user }) => {
     const [viewingDoc, setViewingDoc] = useState(null);
+    const [documents, setDocuments] = useState([]);
+    const [loadingDocs, setLoadingDocs] = useState(true);
+
+    useEffect(() => {
+        const fetchDocuments = async () => {
+            if (!user?.id) return;
+            try {
+                const { data, error } = await supabase
+                    .from('documents')
+                    .select('*')
+                    .eq('user_id', user.id)
+                    .order('created_at', { ascending: false });
+                if (data) setDocuments(data);
+            } catch (err) {
+                console.error("Error fetching docs:", err);
+            } finally {
+                setLoadingDocs(false);
+            }
+        };
+        fetchDocuments();
+    }, [user]);
 
     const daysUntilPayment = profile?.next_payment_date
         ? Math.ceil((new Date(profile.next_payment_date) - new Date()) / (1000 * 60 * 60 * 24))
@@ -185,41 +206,54 @@ const Overview = ({ profile }) => {
     const diskUsage = profile?.disk_usage || "0%";
     const emailCount = profile?.email_count || "0";
 
+    // Parse additional emails (support JSON string or array)
+    let extraEmails = [];
+    try {
+        if (profile?.additional_emails) {
+            extraEmails = typeof profile.additional_emails === 'string'
+                ? JSON.parse(profile.additional_emails)
+                : profile.additional_emails;
+        }
+    } catch (e) {
+        console.error("Error parsing emails", e);
+    }
+    const allEmails = [profile?.contact_email || user?.email, ...extraEmails].filter(Boolean).slice(0, 5); // Max 5
+
     return (
         <div className="max-w-6xl mx-auto animate-fade-in-up">
-            <header className="mb-10 flex flex-col md:flex-row md:items-end justify-between gap-4">
+            <header className="mb-6 flex flex-col md:flex-row md:items-end justify-between gap-4">
                 <div>
-                    <h1 className="text-4xl font-bold mb-2 text-white/90">
+                    <h1 className="text-3xl font-bold mb-1 text-white/90">
                         Hola, <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary-400 to-purple-400">{profile?.client_name?.split(' ')[0] || 'Cliente'}</span>
                     </h1>
-                    <p className="text-gray-400 text-lg">Resumen de tus servicios digitales en tiempo real.</p>
+                    <p className="text-gray-400 text-base">Resumen de tus servicios digitales en tiempo real.</p>
                 </div>
                 <div className="text-right hidden md:block">
-                    <p className="text-sm text-gray-500 uppercase tracking-widest mb-1">Última actualización</p>
-                    <p className="text-white font-mono">{new Date().toLocaleDateString()}</p>
+                    <p className="text-xs text-gray-500 uppercase tracking-widest mb-1">Última actualización</p>
+                    <p className="text-white font-mono text-sm">{new Date().toLocaleDateString()}</p>
                 </div>
             </header>
 
-            <div className="grid md:grid-cols-3 gap-6 mb-8">
+            <div className="grid md:grid-cols-3 gap-4 mb-6">
                 {/* Website Card */}
-                <div className="group relative bg-dark-card/40 backdrop-blur-md rounded-2xl border border-white/10 p-6 overflow-hidden hover:border-primary-500/30 transition-all duration-300">
+                <div className="group relative bg-dark-card/40 backdrop-blur-md rounded-2xl border border-white/10 p-5 overflow-hidden hover:border-primary-500/30 transition-all duration-300">
                     <div className="absolute inset-0 bg-gradient-to-br from-primary-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                    <div className="relative z-10">
-                        <div className="flex justify-between items-start mb-6">
-                            <div className="p-3 rounded-xl bg-blue-500/10 text-blue-400">
-                                <Globe size={28} />
+                    <div className="relative z-10 h-full flex flex-col">
+                        <div className="flex justify-between items-start mb-4">
+                            <div className="p-2.5 rounded-xl bg-blue-500/10 text-blue-400">
+                                <Globe size={24} />
                             </div>
-                            <span className="px-3 py-1 rounded-full bg-green-500/10 text-green-400 text-xs font-bold border border-green-500/20 flex items-center gap-2">
+                            <span className="px-2.5 py-0.5 rounded-full bg-green-500/10 text-green-400 text-[10px] font-bold border border-green-500/20 flex items-center gap-2">
                                 <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></span>
                                 ONLINE
                             </span>
                         </div>
-                        <h3 className="text-gray-400 text-sm font-medium mb-1">Sitio Web Activo</h3>
+                        <h3 className="text-gray-400 text-xs font-medium mb-1">Sitio Web Activo</h3>
                         <a
                             href={`https://${profile?.active_web}`}
                             target="_blank"
                             rel="noreferrer"
-                            className="text-2xl font-bold text-white hover:text-primary-400 transition-colors truncate block"
+                            className="text-xl font-bold text-white hover:text-primary-400 transition-colors truncate block mt-auto"
                         >
                             {profile?.active_web || 'No asignado'}
                         </a>
@@ -227,40 +261,41 @@ const Overview = ({ profile }) => {
                 </div>
 
                 {/* Hosting & Emails Card */}
-                <div className="group relative bg-dark-card/40 backdrop-blur-md rounded-2xl border border-white/10 p-6 overflow-hidden hover:border-purple-500/30 transition-all duration-300">
+                <div className="group relative bg-dark-card/40 backdrop-blur-md rounded-2xl border border-white/10 p-5 overflow-hidden hover:border-purple-500/30 transition-all duration-300">
                     <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
                     <div className="relative z-10">
-                        <div className="flex justify-between items-start mb-6">
-                            <div className="p-3 rounded-xl bg-purple-500/10 text-purple-400">
-                                <Server size={28} />
+                        <div className="flex justify-between items-start mb-4">
+                            <div className="p-2.5 rounded-xl bg-purple-500/10 text-purple-400">
+                                <Server size={24} />
                             </div>
-                            <span className="px-3 py-1 rounded-full bg-purple-500/10 text-purple-400 text-xs font-bold border border-purple-500/20">
+                            <span className="px-2.5 py-0.5 rounded-full bg-purple-500/10 text-purple-400 text-[10px] font-bold border border-purple-500/20">
                                 {hostingPlan}
                             </span>
                         </div>
-                        <div className="flex flex-col gap-6">
+                        <div className="flex flex-col gap-4">
                             <div className="overflow-hidden">
-                                <p className="text-gray-500 text-xs uppercase font-bold mb-2">Correos</p>
-                                <div className="flex flex-col">
-                                    <div className="flex items-center gap-2 text-white font-bold text-lg mb-1">
-                                        <Mail size={16} className="text-gray-400" />
-                                        {emailCount}
+                                <div className="flex items-center justify-between mb-2">
+                                    <p className="text-gray-500 text-[10px] uppercase font-bold">Correos ({allEmails.length})</p>
+                                    <div className="flex items-center gap-1 text-white font-bold text-xs">
+                                        <Mail size={12} className="text-gray-400" />
+                                        {allEmails.length} / {emailCount}
                                     </div>
-                                    {profile?.contact_email && (
-                                        <CopyEmail email={profile.contact_email} />
-                                    )}
+                                </div>
+
+                                <div className="flex flex-col gap-1.5 max-h-32 overflow-y-auto pr-1">
+                                    {allEmails.map((email, idx) => (
+                                        <CopyEmail key={idx} email={email} />
+                                    ))}
                                 </div>
                             </div>
-                            <div>
-                                <p className="text-gray-500 text-xs uppercase font-bold mb-2">Almacenamiento</p>
-                                <div className="flex flex-col">
-                                    <div className="flex items-center gap-2 text-white font-bold text-lg">
-                                        <HardDrive size={16} className="text-gray-400" />
-                                        {diskUsage}
-                                    </div>
-                                    <p className="text-xs text-gray-400 mt-1 pl-6">
-                                        de {profile?.storage_limit || extractStorageLimit(hostingPlan)}
-                                    </p>
+
+                            <div className="pt-2 border-t border-white/5">
+                                <div className="flex justify-between items-end">
+                                    <p className="text-gray-500 text-[10px] uppercase font-bold mb-1">Espacio</p>
+                                    <p className="text-xs text-gray-400">{diskUsage} / {profile?.storage_limit || extractStorageLimit(hostingPlan)}</p>
+                                </div>
+                                <div className="w-full bg-white/10 rounded-full h-1.5 mt-1 overflow-hidden">
+                                    <div className="bg-purple-500 h-full rounded-full" style={{ width: parseFloat(diskUsage) > 0 ? diskUsage : '5%' }}></div>
                                 </div>
                             </div>
                         </div>
@@ -268,72 +303,93 @@ const Overview = ({ profile }) => {
                 </div>
 
                 {/* Payments Card */}
-                <div className="group relative bg-dark-card/40 backdrop-blur-md rounded-2xl border border-white/10 p-6 overflow-hidden hover:border-orange-500/30 transition-all duration-300">
+                <div className="group relative bg-dark-card/40 backdrop-blur-md rounded-2xl border border-white/10 p-5 overflow-hidden hover:border-orange-500/30 transition-all duration-300">
                     <div className="absolute inset-0 bg-gradient-to-br from-orange-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                    <div className="relative z-10">
-                        <div className="flex justify-between items-start mb-6">
-                            <div className="p-3 rounded-xl bg-orange-500/10 text-orange-400">
-                                <Calendar size={28} />
+                    <div className="relative z-10 h-full flex flex-col">
+                        <div className="flex justify-between items-start mb-4">
+                            <div className="p-2.5 rounded-xl bg-orange-500/10 text-orange-400">
+                                <Calendar size={24} />
                             </div>
                             {daysUntilPayment !== null && (
-                                <span className={`px-3 py-1 rounded-full text-xs font-bold border ${daysUntilPayment < 7 ? 'bg-red-500/10 text-red-400 border-red-500/20' : 'bg-green-500/10 text-green-400 border-green-500/20'}`}>
+                                <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold border ${daysUntilPayment < 7 ? 'bg-red-500/10 text-red-400 border-red-500/20' : 'bg-green-500/10 text-green-400 border-green-500/20'}`}>
                                     {daysUntilPayment} días
                                 </span>
                             )}
                         </div>
-                        <h3 className="text-gray-400 text-sm font-medium mb-1">Próxima Facturación</h3>
-                        <p className="text-2xl font-bold text-white">{profile?.next_payment_date || 'N/A'}</p>
+                        <h3 className="text-gray-400 text-xs font-medium mb-1">Próxima Facturación</h3>
+                        <p className="text-2xl font-bold text-white mt-auto">{profile?.next_payment_date || 'N/A'}</p>
                     </div>
                 </div>
             </div>
 
-            <div className="grid md:grid-cols-2 gap-6">
-                <div className="bg-dark-card/30 rounded-2xl border border-white/5 p-6">
-                    <h3 className="text-xl font-bold mb-6 flex items-center gap-2">
-                        <Activity size={20} className="text-primary-500" />
+            <div className="grid md:grid-cols-2 gap-4">
+                <div className="bg-dark-card/30 rounded-2xl border border-white/5 p-5 h-full">
+                    <h3 className="text-lg font-bold mb-4 flex items-center gap-2">
+                        <Activity size={18} className="text-primary-500" />
                         Estado de Servicios
                     </h3>
-                    <div className="space-y-4">
+                    <div className="space-y-3">
                         <StatusItem label="Servidor Web (Apache)" status="active" />
                         <StatusItem label="Base de Datos (MySQL)" status="active" />
                         <StatusItem label="Servidor de Correos" status="active" />
-                        <StatusItem label="Copias de Seguridad" status="pending" text="Programado 03:00 AM" />
+                        <StatusItem label="Copias de Seguridad" status="pending" text="03:00 AM" />
                     </div>
                 </div>
 
-                <div className="bg-dark-card/30 rounded-2xl border border-white/5 p-6 flex flex-col justify-center items-center text-center relative overflow-hidden">
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent"></div>
-                    <div className="relative z-10 w-full">
-                        <div className="w-16 h-16 bg-white/5 rounded-2xl flex items-center justify-center mx-auto mb-4 text-gray-300">
-                            <FileText size={32} />
+                <div className="bg-dark-card/30 rounded-2xl border border-white/5 p-5 flex flex-col relative overflow-hidden h-full">
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent pointer-events-none"></div>
+                    <div className="relative z-10 flex flex-col h-full">
+                        <div className="flex items-center justify-between mb-4">
+                            <h3 className="text-lg font-bold flex items-center gap-2">
+                                <FileText size={18} className="text-gray-400" />
+                                Documentación
+                            </h3>
+                            {loadingDocs && <div className="w-4 h-4 border-2 border-primary-500 border-t-transparent rounded-full animate-spin"></div>}
                         </div>
-                        <h3 className="text-xl font-bold mb-2">Documentación</h3>
 
-                        {profile?.document_url ? (
-                            <>
-                                <div className="bg-black/30 rounded-lg p-3 mb-6 max-w-xs mx-auto border border-white/5">
-                                    <p className="text-xs text-gray-500 uppercase font-bold mb-1">Archivo Disponible:</p>
-                                    <p className="text-gray-300 text-sm truncate font-mono" title={profile.document_url}>
-                                        {profile.document_url}
-                                    </p>
+                        <div className="flex-1 space-y-2 max-h-48 overflow-y-auto pr-1">
+                            {documents.length > 0 ? (
+                                documents.map((doc) => (
+                                    <div key={doc.id} className="flex items-center justify-between p-2.5 rounded-lg bg-white/5 hover:bg-white/10 border border-white/5 transition-colors group">
+                                        <div className="flex items-center gap-3 overflow-hidden">
+                                            <div className="p-1.5 rounded-md bg-red-500/10 text-red-400 shrink-0">
+                                                <FileText size={14} />
+                                            </div>
+                                            <span className="text-sm text-gray-200 truncate group-hover:text-white transition-colors">{doc.title}</span>
+                                        </div>
+                                        <button
+                                            onClick={() => setViewingDoc(doc.file_url)}
+                                            className="p-1.5 rounded-md text-gray-500 hover:text-primary-400 hover:bg-primary-500/10 transition-all opacity-0 group-hover:opacity-100"
+                                            title="Descargar"
+                                        >
+                                            <Download size={14} />
+                                        </button>
+                                    </div>
+                                ))
+                            ) : (
+                                <div className="text-center py-8">
+                                    <p className="text-gray-500 text-sm">No hay documentos disponibles.</p>
                                 </div>
-                                <Button
-                                    onClick={() => setViewingDoc(profile.document_url)}
-                                    variant="primary"
-                                    icon={Download}
-                                    className="w-full md:w-auto"
-                                >
-                                    Descargar
-                                </Button>
-                            </>
-                        ) : (
-                            <>
-                                <p className="text-gray-400 text-sm mb-6 max-w-xs mx-auto">No hay documentos vinculados a tu cuenta actualmente.</p>
-                                <span className="px-4 py-2 rounded-lg bg-white/5 text-gray-500 text-sm font-medium border border-white/5">
-                                    No disponible
-                                </span>
-                            </>
-                        )}
+                            )}
+
+                            {/* Legacy support for document_url column */}
+                            {!loadingDocs && documents.length === 0 && profile?.document_url && (
+                                <div className="flex items-center justify-between p-2.5 rounded-lg bg-white/5 hover:bg-white/10 border border-white/5 transition-colors">
+                                    <div className="flex items-center gap-3 overflow-hidden">
+                                        <div className="p-1.5 rounded-md bg-red-500/10 text-red-400 shrink-0">
+                                            <FileText size={14} />
+                                        </div>
+                                        <span className="text-sm text-gray-200 truncate">Documento General</span>
+                                    </div>
+                                    <button
+                                        onClick={() => setViewingDoc(profile.document_url)}
+                                        className="p-1.5 rounded-md text-gray-400 hover:text-white"
+                                    >
+                                        <Download size={14} />
+                                    </button>
+                                </div>
+                            )}
+                        </div>
                     </div>
                 </div>
             </div>
@@ -436,6 +492,7 @@ const TicketsView = ({ user, profile }) => {
     const [newTicket, setNewTicket] = useState({ title: '', description: '' });
     const [isHuman, setIsHuman] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [showSuccess, setShowSuccess] = useState(false);
 
     const fetchTickets = async () => {
         try {
@@ -503,7 +560,7 @@ const TicketsView = ({ user, profile }) => {
             setNewTicket({ title: '', description: '' });
             setIsHuman(false);
             fetchTickets();
-            alert("Ticket creado exitosamente. Hemos sido notificados.");
+            setShowSuccess(true); // Trigger Success Modal
 
         } catch (error) {
             console.error("Error creating ticket:", error);
@@ -528,23 +585,35 @@ const TicketsView = ({ user, profile }) => {
             ) : tickets.length > 0 ? (
                 <div className="space-y-4">
                     {tickets.map(ticket => (
-                        <div key={ticket.id} className="group glass-card p-5 rounded-xl border border-white/5 flex flex-col md:flex-row justify-between md:items-center hover:bg-white/5 transition-all hover:border-white/10 cursor-pointer">
-                            <div className="flex items-start gap-4 mb-3 md:mb-0">
-                                <div className={`mt-1 w-2 h-2 rounded-full ${ticket.status === 'solved' ? 'bg-green-500' : 'bg-yellow-500'}`}></div>
-                                <div>
-                                    <h4 className="font-bold text-lg mb-1 text-white group-hover:text-primary-400 transition-colors">{ticket.title}</h4>
-                                    <div className="flex items-center gap-3 text-xs text-gray-500">
-                                        <span className="flex items-center gap-1"><Calendar size={12} /> {new Date(ticket.created_at).toLocaleDateString()}</span>
-                                        <span>•</span>
-                                        <span className="uppercase font-bold text-gray-500">Normal</span>
+                        <div key={ticket.id} className="group glass-card p-5 rounded-xl border border-white/5 flex flex-col hover:bg-white/5 transition-all hover:border-white/10 cursor-pointer">
+                            <div className="flex flex-col md:flex-row justify-between md:items-start gap-4">
+                                <div className="flex items-start gap-4">
+                                    <div className={`mt-1 w-2 h-2 rounded-full shrink-0 ${ticket.status === 'solved' ? 'bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.6)]' : 'bg-yellow-500'}`}></div>
+                                    <div>
+                                        <h4 className="font-bold text-lg mb-1 text-white group-hover:text-primary-400 transition-colors">{ticket.title}</h4>
+                                        <div className="flex items-center gap-3 text-xs text-gray-500 mb-2">
+                                            <span className="flex items-center gap-1"><Calendar size={12} /> {new Date(ticket.created_at).toLocaleDateString()}</span>
+                                            <span>•</span>
+                                            <span className="uppercase font-bold text-gray-500">Normal</span>
+                                        </div>
+                                        <p className="text-sm text-gray-400 line-clamp-2">{ticket.description}</p>
                                     </div>
-                                    <p className="text-sm text-gray-400 mt-2 line-clamp-1">{ticket.description}</p>
                                 </div>
+                                <span className={`self-start md:self-center px-3 py-1 rounded-full text-xs font-bold uppercase border shrink-0 ${ticket.status === 'pending' ? 'bg-yellow-500/10 text-yellow-400 border-yellow-500/20' : 'bg-green-500/10 text-green-400 border-green-500/20'
+                                    }`}>
+                                    {ticket.status === 'pending' ? 'En Revisión' : 'Resuelto'}
+                                </span>
                             </div>
-                            <span className={`self-start md:self-center px-3 py-1 rounded-full text-xs font-bold uppercase border ${ticket.status === 'pending' ? 'bg-yellow-500/10 text-yellow-400 border-yellow-500/20' : 'bg-green-500/10 text-green-400 border-green-500/20'
-                                }`}>
-                                {ticket.status === 'pending' ? 'En Revisión' : 'Resuelto'}
-                            </span>
+
+                            {/* Admin Response Section */}
+                            {ticket.admin_response && (
+                                <div className="mt-4 ml-6 pl-4 border-l-2 border-green-500/30 bg-green-500/5 p-3 rounded-r-lg">
+                                    <p className="text-xs text-green-400 font-bold uppercase mb-1 flex items-center gap-2">
+                                        <ShieldCheck size={12} /> Respuesta de Soporte
+                                    </p>
+                                    <p className="text-sm text-gray-300">{ticket.admin_response}</p>
+                                </div>
+                            )}
                         </div>
                     ))}
                 </div>
@@ -635,9 +704,44 @@ const TicketsView = ({ user, profile }) => {
                     </div>
                 )}
             </AnimatePresence>
+
+            {/* Success Modal */}
+            <TicketSuccessModal isOpen={showSuccess} onClose={() => setShowSuccess(false)} />
         </div>
     );
 };
+
+const TicketSuccessModal = ({ isOpen, onClose }) => (
+    <AnimatePresence>
+        {isOpen && (
+            <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
+                <motion.div
+                    initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+                    className="absolute inset-0 bg-black/80 backdrop-blur-md"
+                    onClick={onClose}
+                ></motion.div>
+                <motion.div
+                    initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.8, opacity: 0 }}
+                    className="relative bg-dark-bg border border-green-500/30 rounded-2xl p-8 w-full max-w-sm shadow-[0_0_60px_rgba(34,197,94,0.2)] z-10 text-center"
+                >
+                    <div className="w-24 h-24 bg-green-500/10 rounded-full flex items-center justify-center mx-auto mb-6 border border-green-500/20 relative">
+                        <div className="absolute inset-0 bg-green-500/10 rounded-full animate-ping"></div>
+                        <Check size={48} className="text-green-500 relative z-10" />
+                    </div>
+
+                    <h3 className="text-2xl font-bold text-white mb-2">¡Ticket Enviado!</h3>
+                    <p className="text-gray-400 mb-8 text-sm leading-relaxed">
+                        Hemos recibido tu solicitud correctamente. Nuestro equipo de soporte te responderá a la brevedad.
+                    </p>
+
+                    <Button onClick={onClose} variant="primary" className="w-full justify-center bg-green-600 hover:bg-green-700 shadow-lg shadow-green-500/20">
+                        Entendido, gracias
+                    </Button>
+                </motion.div>
+            </div>
+        )}
+    </AnimatePresence>
+);
 
 const NavItem = ({ icon: Icon, children, active, onClick }) => (
     <button
