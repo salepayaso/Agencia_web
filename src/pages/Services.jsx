@@ -13,11 +13,22 @@ const Services = () => {
     const services = [
         {
             icon: MonitorSmartphone,
-            gradient: "from-pink-500 to-rose-600 shadow-pink-500/20",
-            title: "Páginas Web Profesionales",
-            tagline: "Tu negocio merece destacar",
-            desc: "Diseñamos sitios web únicos que atraen clientes y generan ventas. Rápidos, seguros y fáciles de administrar.",
-            benefits: ["Diseño único para tu marca", "Se ve perfecto en móvil y computadora", "Fácil de actualizar"],
+            gradient: "from-blue-500 to-indigo-600 shadow-blue-500/20",
+            title: "Plan Pyme Digital",
+            tagline: "Tu carta de presentación digital",
+            desc: "Ideal para emprendedores. Diseño de Web Landing page Corporativa diseñada para vender y presencia en Google.",
+            benefits: ["Web Landing page Corporativa", "Google Business & Maps + SEO Local", "2 Correos Corporativos", "Dominio & Hosting 1 año GRATIS"],
+            price: "$250.000",
+            badge: "NUEVO"
+        },
+        {
+            icon: Rocket,
+            gradient: "from-purple-500 to-pink-600 shadow-purple-500/20",
+            title: "Web Profesional",
+            tagline: "Diseño Web Avanzado y SEO",
+            desc: "Para negocios que buscan potencia. Página Web Multi-Pestañas, infraestructura Google completa y arquitectura React de alto rendimiento.",
+            benefits: ["Página Web Multi-Pestañas", "4 Correos Corporativos", "Dominio & Hosting 1 año GRATIS", "Google Business & Maps + SEO Local", "GTM, Analytics & Search Console", "Google Looker Studio", "Panel de Cliente 24/7"],
+            price: "$350.000"
         },
         {
             icon: ShoppingBag,
@@ -44,9 +55,9 @@ const Services = () => {
             gradient: "from-cyan-500 to-blue-600 shadow-cyan-500/20",
             title: "Dominios, Correos & Hosting",
             tagline: "Tu identidad digital completa",
-            desc: "¿Necesitas un dominio nuevo o ya tienes uno? Te ayudamos con todo: desde crear tu dominio hasta correos profesionales y hosting seguro.",
-            benefits: ["Creamos o transferimos tu dominio", "Correos profesionales (@tunegocio.com)", "Tu web siempre disponible y rápida"],
-            badge: "NUEVO"
+            desc: "¿Necesitas un dominio nuevo o ya tienes uno? Gestionamos tu identidad profesional y aseguramos que tu web vuele.",
+            benefits: ["Gestión Integral de Dominios", "Correos Profesionales Ilimitados", "Hosting Low-Latency Optimizado"],
+            badge: "SOPORTE"
         }
     ];
 
@@ -83,7 +94,7 @@ const Services = () => {
                             viewport={{ once: true }}
                             transition={{ delay: i * 0.1 }}
                             onClick={() => navigate('/contacto', { state: { subject: service.title } })}
-                            className="glass-card p-8 rounded-3xl border border-white/10 hover:border-primary-500 transition-all duration-300 relative group cursor-pointer"
+                            className="glass-card p-8 rounded-3xl border border-white/10 hover:border-primary-500 transition-all duration-300 relative group cursor-pointer flex flex-col h-full"
                         >
                             {service.badge && (
                                 <div className="absolute -top-3 -right-3 px-4 py-1.5 bg-gradient-to-r from-primary-500 to-purple-500 text-white text-xs font-bold rounded-full shadow-lg">
@@ -107,14 +118,21 @@ const Services = () => {
                                 {service.desc}
                             </p>
 
-                            <div className="space-y-2 pt-4 border-t border-white/10">
+                            <div className="space-y-3 pt-4 border-t border-white/10">
                                 {service.benefits.map((benefit, idx) => (
-                                    <div key={idx} className="flex items-center gap-2 text-sm text-gray-400">
-                                        <div className="w-1.5 h-1.5 rounded-full bg-primary-400"></div>
-                                        {benefit}
+                                    <div key={idx} className="flex items-start gap-3 text-sm text-gray-400">
+                                        <CheckCircle2 className="w-4 h-4 text-primary-400 mt-0.5 shrink-0" />
+                                        <span>{benefit}</span>
                                     </div>
                                 ))}
                             </div>
+
+                            {service.price && (
+                                <div className="mt-auto pt-6 flex items-baseline gap-1">
+                                    <span className="text-2xl font-bold text-white">{service.price}</span>
+                                    <span className="text-xs text-gray-500">pago único CLP</span>
+                                </div>
+                            )}
                         </motion.div>
                     ))}
                 </div>

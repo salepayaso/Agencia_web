@@ -24,8 +24,7 @@ const Footer = () => {
                             />
                         </div>
                         <p className="text-gray-400 max-w-sm text-lg leading-relaxed">
-                            Transformando marcas con experiencias digitales <span className="text-primary-400 font-medium">premium</span>.
-                            Potenciamos tu negocio con tecnología de vanguardia y diseño estratégico.
+                            Agencia líder en <strong>Diseño Web y SEO en Chile</strong>. Transformamos marcas con experiencias digitales <span className="text-primary-400 font-medium">premium</span> y tecnología de vanguardia.
                         </p>
                     </div>
 

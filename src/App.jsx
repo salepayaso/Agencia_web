@@ -15,6 +15,7 @@ import ScrollProgress from './components/ScrollProgress';
 import UpdatePassword from './pages/UpdatePassword';
 import BusinessCard from './components/BusinessCard';
 import GTMTracker from './components/GTMTracker';
+import SessionManager from './components/SessionManager';
 
 const AuthHandler = () => {
   const navigate = useNavigate();
@@ -40,6 +41,7 @@ function App() {
     <Router>
       <GTMTracker />
       <AuthHandler />
+      <SessionManager />
       <ScrollToTop />
       <ScrollProgress />
       <Routes>

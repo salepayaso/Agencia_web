@@ -21,10 +21,20 @@ const Home = () => {
                 {/* Background Gradients with Parallax */}
                 <motion.div
                     className="absolute top-0 right-0 w-1/2 h-1/2 bg-primary-500/10 rounded-full blur-[120px] -translate-y-1/2 translate-x-1/2"
+                    animate={{
+                        scale: [1, 1.2, 1],
+                        opacity: [0.3, 0.5, 0.3]
+                    }}
+                    transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
                     style={{ y }}
                 ></motion.div>
                 <motion.div
                     className="absolute bottom-0 left-0 w-1/3 h-1/3 bg-purple-500/10 rounded-full blur-[100px] translate-y-1/2 -translate-x-1/2"
+                    animate={{
+                        scale: [1, 1.3, 1],
+                        opacity: [0.2, 0.4, 0.2]
+                    }}
+                    transition={{ duration: 15, repeat: Infinity, ease: "easeInOut", delay: 2 }}
                     style={{ y: useTransform(scrollYProgress, [0, 1], ['0%', '-30%']) }}
                 ></motion.div>
 
@@ -34,19 +44,19 @@ const Home = () => {
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ duration: 0.8 }}
                     >
-                        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-sm text-primary-400 mb-6">
+                        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-sm text-primary-400 mb-6 font-medium">
                             <Rocket className="w-4 h-4" />
-                            <span>Potenciado con Tecnología React & IA</span>
+                            <span>Agencia de Diseño Web & SEO en Chile</span>
                         </div>
                         <h1 className="text-5xl md:text-7xl font-bold leading-tight mb-6">
-                            Webs de Alta Tecnología <br /><span className="text-gradient">para Negocios Modernos.</span>
+                            ¿Tu negocio no aparece <br /><span className="text-gradient">en los primeros de Google?</span>
                         </h1>
                         <p className="text-gray-400 text-lg mb-8 max-w-lg">
-                            Desarrollamos sitios web a medida, rápidos y seguros. Deja atrás lo obsoleto y destaca frente a tu competencia con tecnología de punta.
+                            Diseñamos <strong>páginas web profesionales</strong> que venden y posicionamos tu negocio en los primeros lugares de Google con estrategias de <strong>SEO de alto impacto</strong>.
                         </p>
                         <div className="flex gap-4">
-                            <Button href="/contacto" variant="primary" icon={ArrowRight}>Consultoría Gratuita</Button>
-                            <Button href="/portafolio" variant="glass">Ver Casos de Estudio</Button>
+                            <Button href="/servicios" variant="primary" icon={ArrowRight}>Quiero Vender Más</Button>
+                            <Button href="/portafolio" variant="glass">Ver portafolio</Button>
                         </div>
                     </motion.div>
 
@@ -136,11 +146,19 @@ const Home = () => {
                         ].map((benefit, i) => (
                             <motion.div
                                 key={i}
-                                initial={{ opacity: 0, y: 20 }}
+                                initial={{ opacity: 0, y: 30 }}
                                 whileInView={{ opacity: 1, y: 0 }}
-                                viewport={{ once: true }}
-                                transition={{ delay: i * 0.1 }}
-                                className="glass-card p-6 rounded-2xl border border-white/10 hover:border-primary-500/50 transition-all duration-300 group"
+                                viewport={{ once: true, margin: "-100px" }}
+                                transition={{
+                                    duration: 0.8,
+                                    delay: i * 0.15,
+                                    ease: [0.21, 0.47, 0.32, 0.98]
+                                }}
+                                whileHover={{
+                                    y: -8,
+                                    transition: { duration: 0.3 }
+                                }}
+                                className="glass-card p-6 rounded-2xl border border-white/10 hover:border-primary-500/50 transition-all duration-300 group perspective-1000"
                             >
                                 <div className={`w-12 h-12 rounded-lg bg-gradient-to-br ${benefit.gradient} p-2.5 mb-4 group-hover:scale-110 transition-transform duration-300 shadow-lg`}>
                                     <benefit.icon className="w-full h-full text-white" />
@@ -196,10 +214,14 @@ const Home = () => {
                             <motion.a
                                 key={i}
                                 href={service.link}
-                                initial={{ opacity: 0, y: 20 }}
+                                initial={{ opacity: 0, y: 30 }}
                                 whileInView={{ opacity: 1, y: 0 }}
-                                viewport={{ once: true }}
-                                transition={{ delay: i * 0.1 }}
+                                viewport={{ once: true, margin: "-100px" }}
+                                transition={{
+                                    duration: 0.8,
+                                    delay: i * 0.1,
+                                    ease: [0.21, 0.47, 0.32, 0.98]
+                                }}
                                 className="glass-card p-6 rounded-2xl border border-white/10 hover:border-primary-500 transition-all duration-300 group cursor-pointer"
                             >
                                 <div className={`w-12 h-12 rounded-lg bg-gradient-to-br ${service.gradient} p-2.5 mb-4 group-hover:scale-110 transition-transform duration-300 shadow-lg`}>
@@ -226,6 +248,135 @@ const Home = () => {
                 </div>
             </section>
 
+            {/* Pricing Section */}
+            <section className="py-24 px-4 md:px-8 bg-dark-bg relative overflow-hidden">
+                {/* Simple Visible Particles */}
+                <div className="absolute inset-0 pointer-events-none overflow-hidden">
+                    {/* Large visible particles */}
+                    <div className="absolute top-10 left-20 w-4 h-4 bg-blue-500 rounded-full animate-pulse shadow-[0_0_20px_rgba(59,130,246,1)]"></div>
+                    <div className="absolute top-32 right-32 w-3 h-3 bg-purple-500 rounded-full animate-bounce shadow-[0_0_15px_rgba(168,85,247,1)]"></div>
+                    <div className="absolute bottom-40 left-40 w-4 h-4 bg-white rounded-full animate-ping shadow-[0_0_15px_white]"></div>
+                    <div className="absolute top-60 right-20 w-3 h-3 bg-blue-400 rounded-full animate-pulse shadow-[0_0_12px_rgba(96,165,250,1)]" style={{ animationDelay: '1s' }}></div>
+                    <div className="absolute bottom-20 right-60 w-2 h-2 bg-purple-400 rounded-full animate-bounce shadow-[0_0_10px_rgba(192,132,252,1)]" style={{ animationDelay: '0.5s' }}></div>
+                    <div className="absolute top-24 left-60 w-3 h-3 bg-white rounded-full animate-pulse shadow-[0_0_15px_white]" style={{ animationDelay: '1.5s' }}></div>
+                    <div className="absolute bottom-60 left-24 w-2 h-2 bg-blue-300 rounded-full animate-ping shadow-[0_0_10px_rgba(147,197,253,1)]"></div>
+                    <div className="absolute top-48 right-48 w-2 h-2 bg-purple-300 rounded-full animate-bounce shadow-[0_0_10px_rgba(216,180,254,1)]" style={{ animationDelay: '0.7s' }}></div>
+                </div>
+
+                <div className="max-w-7xl mx-auto relative z-10">
+                    <div className="text-center mb-16">
+                        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary-500/10 border border-primary-500/20 text-xs text-primary-400 mb-4">
+                            <span className="font-semibold uppercase tracking-wider">Nuestras ofertas</span>
+                        </div>
+                        <h2 className="text-4xl md:text-5xl font-bold mb-4">
+                            Planes <span className="text-gradient">Hechos para PYMES</span>
+                        </h2>
+                        <p className="text-gray-400 max-w-2xl mx-auto text-lg text-balance">
+                            Desde tu primera presencia digital hasta el motor completo de tu empresa.
+                            Tecnología de punta aplicada a tu crecimiento.
+                        </p>
+                    </div>
+
+                    <div className="grid lg:grid-cols-2 gap-8 max-w-5xl mx-auto">
+                        {/* Plan Pyme Digital */}
+                        <motion.div
+                            initial={{ opacity: 0, y: 30 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true, margin: "-100px" }}
+                            transition={{ duration: 0.8, ease: [0.21, 0.47, 0.32, 0.98] }}
+                            className="glass-card rounded-3xl border border-blue-500/20 p-8 md:p-10 relative overflow-hidden group hover:border-blue-500 transition-all duration-500 flex flex-col bg-gradient-to-b from-blue-900/10 to-transparent h-full"
+                        >
+                            <div className="absolute top-4 right-4 bg-gradient-to-r from-blue-500 to-indigo-600 text-white px-4 py-1 rounded-full font-bold text-[10px] tracking-widest shadow-lg uppercase">
+                                NUEVO
+                            </div>
+
+                            <div className="mb-8">
+                                <h3 className="text-2xl font-bold mb-2">Plan Pyme Digital</h3>
+                                <div className="text-blue-400 text-sm font-medium mb-6">Tu Carta de Presentación Digital</div>
+                                <p className="text-gray-400 text-sm leading-relaxed mb-4">
+                                    Ideal para emprendedores que necesitan una imagen impecable y aparecer en Google de inmediato.
+                                </p>
+                            </div>
+
+                            <div className="space-y-4 mb-10">
+                                {[
+                                    { text: "Web Landing page Corporativa", bold: true },
+                                    { text: "Google Business & Maps", bold: true },
+                                    { text: "2 Correos Corporativos", bold: true },
+                                    { text: "Dominio & Hosting 1 año GRATIS", bold: true },
+                                    { text: "Optimización SEO Local", bold: false },
+                                    { text: "Certificado SSL de Seguridad", bold: false }
+                                ].map((item, i) => (
+                                    <div key={i} className="flex items-start gap-3">
+                                        <Zap className="w-4 h-4 text-blue-500 mt-0.5 shrink-0" />
+                                        <span className={`${item.bold ? 'text-white' : 'text-gray-400'} text-sm`}>{item.text}</span>
+                                    </div>
+                                ))}
+                            </div>
+
+                            <div className="mt-auto">
+                                <div className="flex items-baseline gap-2 mb-6">
+                                    <span className="text-4xl font-extrabold text-white">$250.000</span>
+                                    <span className="text-gray-400 text-xs">pago único CLP</span>
+                                </div>
+                                <Button href="/contacto" variant="glass" className="w-full !py-4 hover:bg-blue-600/20">
+                                    Empezar Hoy
+                                </Button>
+                            </div>
+                        </motion.div>
+
+                        {/* Plan Web Profesional */}
+                        <motion.div
+                            initial={{ opacity: 0, y: 30 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true, margin: "-100px" }}
+                            transition={{ duration: 0.8, delay: 0.2, ease: [0.21, 0.47, 0.32, 0.98] }}
+                            className="glass-card rounded-3xl border-2 border-purple-500 p-8 md:p-10 relative overflow-hidden group shadow-[0_0_50px_rgba(168,85,247,0.15)] flex flex-col bg-gradient-to-b from-purple-900/20 to-transparent"
+                        >
+                            <div className="mb-8 relative z-20">
+                                <h3 className="text-2xl font-bold mb-2">Web Profesional</h3>
+                                <div className="text-purple-400 text-sm font-medium mb-6">El Motor Digital de tu Negocio</div>
+                                <p className="text-gray-300 text-sm leading-relaxed mb-4">
+                                    Para empresas que buscan mayor potencia, gestión de clientes y una infraestructura Google completa.
+                                </p>
+                            </div>
+
+                            <div className="space-y-4 mb-10 flex-grow">
+                                {[
+                                    { text: "Página Web profesional Multi-Pestañas", bold: true },
+                                    { text: "4 Correos Corporativos", bold: true },
+                                    { text: "Dominio & Hosting 1 año GRATIS", bold: true },
+                                    { text: "Google Business & Maps", bold: true },
+                                    { text: "GTM, Analytics & Search Console", bold: true },
+                                    { text: "Google Looker Studio", bold: true },
+                                    { text: "Panel de Cliente INTERFAZ 360 24/7", bold: true },
+                                    { text: "Tecnología React Alta Interactividad", bold: false }
+                                ].map((item, i) => (
+                                    <div key={i} className="flex items-start gap-3">
+                                        <Zap className="w-4 h-4 text-purple-500 mt-0.5 shrink-0" />
+                                        <span className={`${item.bold ? 'text-white' : 'text-gray-400'} text-sm`}>{item.text}</span>
+                                    </div>
+                                ))}
+                            </div>
+
+                            <div className="mt-auto">
+                                <div className="flex items-baseline gap-2 mb-6">
+                                    <span className="text-4xl font-extrabold text-white">$350.000</span>
+                                    <span className="text-gray-400 text-xs">pago único CLP</span>
+                                </div>
+                                <Button href="/contacto" variant="primary" className="w-full !py-4 shadow-lg bg-purple-600 hover:bg-purple-700 shadow-purple-500/20 border-none relative z-20">
+                                    Quiero Mi Web Profesional
+                                </Button>
+                            </div>
+                        </motion.div>
+                    </div>
+
+                    <p className="text-center text-gray-500 text-sm mt-12 italic">
+                        * Precios en pesos chilenos (CLP). Entrega en tiempo récord.
+                    </p>
+                </div>
+            </section>
+
             {/* Client Panel Preview Section */}
             <section className="py-16 px-4 md:px-8 bg-dark-bg/50 relative overflow-hidden">
                 <div className="absolute top-1/2 left-0 w-1/3 h-1/3 bg-blue-500/10 rounded-full blur-[100px] -translate-y-1/2"></div>
@@ -233,9 +384,10 @@ const Home = () => {
                 <div className="max-w-7xl mx-auto relative z-10">
                     <div className="grid lg:grid-cols-2 gap-12 items-center">
                         <motion.div
-                            initial={{ opacity: 0, x: -50 }}
-                            whileInView={{ opacity: 1, x: 0 }}
-                            viewport={{ once: true }}
+                            initial={{ opacity: 0, y: 30 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true, margin: "-100px" }}
+                            transition={{ duration: 0.8, ease: [0.21, 0.47, 0.32, 0.98] }}
                         >
                             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-xs text-blue-400 mb-6">
                                 <Lock className="w-3 h-3" />
@@ -273,9 +425,10 @@ const Home = () => {
                         </motion.div>
 
                         <motion.div
-                            initial={{ opacity: 0, scale: 0.9 }}
-                            whileInView={{ opacity: 1, scale: 1 }}
-                            viewport={{ once: true }}
+                            initial={{ opacity: 0, scale: 0.95, y: 30 }}
+                            whileInView={{ opacity: 1, scale: 1, y: 0 }}
+                            viewport={{ once: true, margin: "-100px" }}
+                            transition={{ duration: 1, delay: 0.3, ease: [0.21, 0.47, 0.32, 0.98] }}
                             className="relative"
                         >
                             <div className="absolute -inset-1 bg-gradient-to-r from-blue-500 to-purple-600 rounded-2xl blur opacity-20"></div>
