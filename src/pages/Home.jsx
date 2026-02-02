@@ -38,7 +38,7 @@ const Home = () => {
                     style={{ y: useTransform(scrollYProgress, [0, 1], ['0%', '-30%']) }}
                 ></motion.div>
 
-                <div className="max-w-7xl mx-auto w-full relative z-10 grid md:grid-cols-2 gap-12 items-center">
+                <div className="max-w-7xl mx-auto w-full relative z-10 grid md:grid-cols-2 lg:grid-cols-[1fr_1.1fr] gap-12 items-center">
                     <motion.div
                         initial={{ opacity: 0, x: -50 }}
                         animate={{ opacity: 1, x: 0 }}
@@ -67,10 +67,10 @@ const Home = () => {
                         className="relative hidden md:block"
                     >
                         {/* Modern Tech Visual */}
-                        <div className="relative z-10 glass-card p-4 rounded-3xl border-t border-l border-white/20 overflow-hidden group">
-                            <div className="h-80 rounded-2xl overflow-hidden relative flex items-center justify-center bg-black/20">
+                        <div className="relative z-10 glass-card p-2 rounded-3xl border-t border-l border-white/20 overflow-hidden group shadow-2xl">
+                            <div className="h-80 md:h-[480px] rounded-2xl overflow-hidden relative flex items-center justify-center bg-black/20">
                                 <img
-                                    src="/hero_google_security.png"
+                                    src="/hero_clean.png"
                                     alt="Google Security & Tech Ecosystem"
                                     className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700"
                                 />
