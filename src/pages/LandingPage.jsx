@@ -15,7 +15,7 @@ const LandingPage = () => {
     const [activeCategory, setActiveCategory] = useState('all');
 
     const services = [
-        { icon: Layout, title: "Diseño de Páginas Web", desc: "Diseño profesional y único. Tu negocio merece una web que venda, no una plantilla genérica." },
+        { icon: Layout, title: "Diseño Web Estratégico", desc: "Arquitectura digital de alto rendimiento. Tu negocio merece una web que venda, no una plantilla genérica." },
         { icon: Database, title: "Sistemas & Apps", desc: "Desarrollo de software a medida: Inventarios, CRMs y Dashboards inteligentes." },
         { icon: Zap, title: "Marketing & Presencia 360", desc: "Google Ads, Meta, Redes Sociales y posicionamiento local en Google Maps (SEO)." },
         { icon: Rocket, title: "E-Commerce", desc: "Tiendas online rápidas y seguras. Vende 24/7 con pagos automatizados." },
@@ -140,7 +140,7 @@ const LandingPage = () => {
             {/* Services Section - Unchanged */}
             <Section id="services" className="bg-dark-bg/50">
                 <div className="text-center max-w-2xl mx-auto mb-16">
-                    <h2 className="text-3xl md:text-5xl font-bold mb-4">Servicios Profesionales</h2>
+                    <h2 className="text-3xl md:text-5xl font-bold mb-4">Ingeniería & Resultados</h2>
                     <p className="text-gray-400">Soluciones de ingeniería de software y diseño estratégico.</p>
                 </div>
 

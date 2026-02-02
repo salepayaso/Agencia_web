@@ -4,7 +4,7 @@ import WhatsAppButton from '../components/WhatsAppButton';
 import Brands from '../components/Brands';
 
 import Button from '../components/ui/Button';
-import { Rocket, ArrowRight, Zap, ShieldCheck, Headphones, TrendingUp, MonitorSmartphone, ShoppingBag, Globe, Activity, BarChart3, Mail, MessageSquare, User, Lock, Server, Search } from 'lucide-react';
+import { Rocket, ArrowRight, Zap, ShieldCheck, Headphones, TrendingUp, MonitorSmartphone, ShoppingBag, Globe, Activity, BarChart3, Mail, MessageSquare, User, Lock, Server, Search, MapPin, PieChart, Instagram } from 'lucide-react';
 import { motion, useScroll, useTransform } from 'framer-motion';
 
 const Home = () => {
@@ -52,7 +52,7 @@ const Home = () => {
                             ¿Tu negocio no aparece <br /><span className="text-gradient">en los primeros de Google?</span>
                         </h1>
                         <p className="text-gray-400 text-lg mb-8 max-w-lg">
-                            Diseñamos <strong>páginas web profesionales</strong> que venden y posicionamos tu negocio en los primeros lugares de Google con estrategias de <strong>SEO de alto impacto</strong>.
+                            Desarrollamos <strong>infraestructuras digitales</strong> que impulsan tu crecimiento con un <strong>Estudio de Visibilidad</strong> y estrategias SEO de alto impacto.
                         </p>
                         <div className="flex gap-4">
                             <Button href="/servicios" variant="primary" icon={ArrowRight}>Quiero Vender Más</Button>
@@ -95,6 +95,39 @@ const Home = () => {
 
             <Brands />
 
+            {/* Community / Instagram Proof */}
+            <div className="flex justify-center -mt-6 mb-12 px-4 relative z-30">
+                <motion.a
+                    href="https://www.instagram.com/interfaz360/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    whileHover={{ scale: 1.05, y: -5 }}
+                    className="glass-card px-6 py-4 rounded-2xl border border-white/10 flex items-center gap-4 group hover:border-[#E4405F]/50 transition-all shadow-[0_0_80px_rgba(228,64,95,0.1)] bg-gray-900/50 backdrop-blur-xl"
+                >
+                    <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-[#f9ce34] via-[#ee2a7b] to-[#6228d7] p-[2px] shadow-lg shadow-[#ee2a7b]/20">
+                        <div className="w-full h-full rounded-[14px] bg-gray-900 flex items-center justify-center">
+                            <Instagram className="w-6 h-6 text-white group-hover:scale-110 transition-transform" />
+                        </div>
+                    </div>
+                    <div>
+                        <div className="text-white font-bold text-base flex items-center gap-2">
+                            @interfaz360
+                            <span className="flex h-2 w-2">
+                                <span className="animate-ping absolute inline-flex h-2 w-2 rounded-full bg-green-400 opacity-75"></span>
+                                <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+                            </span>
+                        </div>
+                        <div className="text-gray-400 text-sm">Comunidad de <strong>+1,100 seguidores</strong></div>
+                    </div>
+                    <div className="ml-4 w-8 h-8 rounded-full bg-white/5 flex items-center justify-center group-hover:bg-[#E4405F]/20 transition-colors">
+                        <ArrowRight className="w-4 h-4 text-gray-500 group-hover:text-white" />
+                    </div>
+                </motion.a>
+            </div>
+
 
             {/* Benefits Section - Por Qué Elegirnos */}
             <section className="py-20 px-4 md:px-8 bg-dark-bg relative overflow-hidden">
@@ -118,8 +151,8 @@ const Home = () => {
                             {
                                 icon: MonitorSmartphone,
                                 gradient: "from-amber-500 to-orange-600 shadow-orange-500/20",
-                                title: "Diseño Web High-Tech",
-                                desc: "Sitios de última generación con tecnología React. Sin plantillas, pura innovación."
+                                title: "Estudio de Visibilidad & Web",
+                                desc: "Análisis de métricas y sitios de última generación con React. Sin plantillas, pura estrategia digital."
                             },
                             {
                                 icon: Lock,
@@ -192,8 +225,8 @@ const Home = () => {
                             {
                                 icon: MonitorSmartphone,
                                 gradient: "from-pink-500 to-rose-600 shadow-pink-500/20",
-                                title: "Diseño Web Profesional",
-                                desc: "Sitios únicos que venden, no plantillas genéricas.",
+                                title: "Ecosistema Google 360",
+                                desc: "Infraestructura completa: Maps, Search Console y Analytics 4.",
                                 link: "/servicios"
                             },
                             {
@@ -207,7 +240,7 @@ const Home = () => {
                                 icon: Globe,
                                 gradient: "from-cyan-500 to-blue-600 shadow-cyan-500/20",
                                 title: "Dominios, Correos & Hosting",
-                                desc: "Tu identidad digital completa. Dominios, correos profesionales y hosting seguro.",
+                                desc: "Tu identidad digital completa. Dominios, correos corporativos y hosting seguro.",
                                 link: "/servicios"
                             }
                         ].map((service, i) => (
@@ -300,12 +333,12 @@ const Home = () => {
 
                             <div className="space-y-4 mb-10">
                                 {[
-                                    { text: "Web Landing page Corporativa", bold: true },
-                                    { text: "Google Business & Maps", bold: true },
+                                    { text: "Desarrollo Pagina Web", bold: true },
                                     { text: "2 Correos Corporativos", bold: true },
                                     { text: "Dominio & Hosting 1 año GRATIS", bold: true },
-                                    { text: "Optimización SEO Local", bold: false },
-                                    { text: "Certificado SSL de Seguridad", bold: false }
+                                    { text: "Google Business + SEO Local", bold: true },
+                                    { text: "Tecnología React Alta Interactividad", bold: true },
+                                    { text: "Certificado SSL de Seguridad", bold: true }
                                 ].map((item, i) => (
                                     <div key={i} className="flex items-start gap-3">
                                         <Zap className="w-4 h-4 text-blue-500 mt-0.5 shrink-0" />
@@ -319,13 +352,19 @@ const Home = () => {
                                     <span className="text-4xl font-extrabold text-white">$250.000</span>
                                     <span className="text-gray-400 text-xs">pago único CLP</span>
                                 </div>
-                                <Button href="/contacto" variant="glass" className="w-full !py-4 hover:bg-blue-600/20">
+                                <Button
+                                    href={`https://wa.me/56954146176?text=${encodeURIComponent("Hola Interfaz 360, me interesa contratar el Plan Pyme Digital. ¿Me podrían dar más información?")}`}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    variant="glass"
+                                    className="w-full !py-4 hover:bg-blue-600/20"
+                                >
                                     Empezar Hoy
                                 </Button>
                             </div>
                         </motion.div>
 
-                        {/* Plan Web Profesional */}
+                        {/* Plan Ecosistema 360 */}
                         <motion.div
                             initial={{ opacity: 0, y: 30 }}
                             whileInView={{ opacity: 1, y: 0 }}
@@ -334,7 +373,7 @@ const Home = () => {
                             className="glass-card rounded-3xl border-2 border-purple-500 p-8 md:p-10 relative overflow-hidden group shadow-[0_0_50px_rgba(168,85,247,0.15)] flex flex-col bg-gradient-to-b from-purple-900/20 to-transparent"
                         >
                             <div className="mb-8 relative z-20">
-                                <h3 className="text-2xl font-bold mb-2">Web Profesional</h3>
+                                <h3 className="text-2xl font-bold mb-2">Ecosistema Google 360</h3>
                                 <div className="text-purple-400 text-sm font-medium mb-6">El Motor Digital de tu Negocio</div>
                                 <p className="text-gray-300 text-sm leading-relaxed mb-4">
                                     Para empresas que buscan mayor potencia, gestión de clientes y una infraestructura Google completa.
@@ -343,14 +382,15 @@ const Home = () => {
 
                             <div className="space-y-4 mb-10 flex-grow">
                                 {[
-                                    { text: "Página Web profesional Multi-Pestañas", bold: true },
+                                    { text: "Desarrollo Pagina Web Multi-Sección", bold: true },
                                     { text: "4 Correos Corporativos", bold: true },
                                     { text: "Dominio & Hosting 1 año GRATIS", bold: true },
-                                    { text: "Google Business & Maps", bold: true },
+                                    { text: "Google Business + SEO Local", bold: true },
                                     { text: "GTM, Analytics & Search Console", bold: true },
-                                    { text: "Google Looker Studio", bold: true },
-                                    { text: "Panel de Cliente INTERFAZ 360 24/7", bold: true },
-                                    { text: "Tecnología React Alta Interactividad", bold: false }
+                                    { text: "Google Looker Studio (Métricas)", bold: true },
+                                    { text: "Perfil de Gestión INTERFAZ 360", bold: true },
+                                    { text: "Tecnología React Alta Interactividad", bold: true },
+                                    { text: "Certificado SSL de Seguridad", bold: true }
                                 ].map((item, i) => (
                                     <div key={i} className="flex items-start gap-3">
                                         <Zap className="w-4 h-4 text-purple-500 mt-0.5 shrink-0" />
@@ -364,8 +404,14 @@ const Home = () => {
                                     <span className="text-4xl font-extrabold text-white">$350.000</span>
                                     <span className="text-gray-400 text-xs">pago único CLP</span>
                                 </div>
-                                <Button href="/contacto" variant="primary" className="w-full !py-4 shadow-lg bg-purple-600 hover:bg-purple-700 shadow-purple-500/20 border-none relative z-20">
-                                    Quiero Mi Web Profesional
+                                <Button
+                                    href={`https://wa.me/56954146176?text=${encodeURIComponent("Hola Interfaz 360, me interesa contratar el Ecosistema Google 360. ¿Me podrían dar más información?")}`}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    variant="primary"
+                                    className="w-full !py-4 shadow-lg bg-purple-600 hover:bg-purple-700 shadow-purple-500/20 border-none relative z-20"
+                                >
+                                    Activar Mi Ecosistema 360
                                 </Button>
                             </div>
                         </motion.div>
@@ -394,11 +440,11 @@ const Home = () => {
                                 <span className="font-semibold uppercase tracking-wider">Exclusivo para Nuestros Clientes</span>
                             </div>
                             <h2 className="text-3xl md:text-4xl font-bold mb-4 leading-tight">
-                                Tu Panel de <br />
-                                <span className="text-gradient">Control Personal</span>
+                                Tu Perfil de <br />
+                                <span className="text-gradient">Gestión 360</span>
                             </h2>
                             <p className="text-gray-400 text-base mb-6 leading-relaxed">
-                                Todos nuestros clientes tienen acceso a un panel exclusivo donde pueden ver y gestionar sus servicios activos las 24 horas. Transparencia total.
+                                Nuestros clientes con Ecosistema Google 360 tienen acceso a un panel exclusivo donde pueden ver y gestionar sus servicios activos las 24 horas. Transparencia total.
                             </p>
 
                             <div className="space-y-4">
@@ -441,7 +487,7 @@ const Home = () => {
                                         </div>
                                     </div>
                                     <div>
-                                        <h3 className="font-bold text-lg">Panel de Cliente</h3>
+                                        <h3 className="font-bold text-lg">Perfil de Gestión</h3>
                                         <p className="text-xs text-green-400 flex items-center gap-1.5">
                                             <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse"></span>
                                             Acceso 24/7
@@ -449,34 +495,74 @@ const Home = () => {
                                     </div>
                                 </div>
 
-                                {/* Mock Cards */}
-                                <div className="space-y-4">
-                                    <div className="bg-white/5 border border-white/5 rounded-xl p-4 flex items-center justify-between">
-                                        <div>
-                                            <p className="text-xs text-gray-500 mb-1">Sitio Web</p>
-                                            <p className="font-semibold text-white">www.tunegocio.com</p>
+                                {/* Mock Dashboard Grid */}
+                                <div className="grid grid-cols-2 gap-4 mb-6">
+                                    <div className="bg-white/5 border border-white/5 rounded-xl p-4">
+                                        <div className="flex items-center gap-2 mb-2 text-primary-400">
+                                            <Search className="w-4 h-4" />
+                                            <span className="text-[10px] font-bold uppercase tracking-wider">Search Console</span>
                                         </div>
-                                        <span className="px-2 py-1 rounded text-[10px] font-bold bg-green-500/20 text-green-400 uppercase tracking-wide">Activo</span>
+                                        <p className="text-xl font-bold text-white">4.2k</p>
+                                        <p className="text-[10px] text-gray-500">Impresiones/mes</p>
                                     </div>
 
-                                    <div className="bg-white/5 border border-white/5 rounded-xl p-4 flex items-center justify-between">
-                                        <div>
-                                            <p className="text-xs text-gray-500 mb-1">Correos</p>
-                                            <p className="font-semibold text-white">5 cuentas configuradas</p>
+                                    <div className="bg-white/5 border border-white/5 rounded-xl p-4">
+                                        <div className="flex items-center gap-2 mb-2 text-purple-400">
+                                            <MapPin className="w-4 h-4" />
+                                            <span className="text-[10px] font-bold uppercase tracking-wider">Google Business</span>
                                         </div>
-                                        <span className="px-2 py-1 rounded text-[10px] font-bold bg-green-500/20 text-green-400 uppercase tracking-wide">Activo</span>
+                                        <p className="text-xl font-bold text-white">85</p>
+                                        <p className="text-[10px] text-gray-500">Interacciones Maps</p>
                                     </div>
 
-                                    <div className="bg-gradient-to-r from-blue-500/10 to-purple-500/10 border border-blue-500/20 rounded-xl p-5">
-                                        <div className="flex justify-between items-end mb-2">
-                                            <p className="text-xs text-blue-300">Visitas este mes</p>
-                                            <TrendingUp className="w-4 h-4 text-green-400" />
+                                    <div className="bg-white/5 border border-white/5 rounded-xl p-4">
+                                        <div className="flex items-center gap-2 mb-2 text-cyan-400">
+                                            <ShieldCheck className="w-4 h-4" />
+                                            <span className="text-[10px] font-bold uppercase tracking-wider">Infraestructura</span>
                                         </div>
-                                        <div className="flex items-baseline gap-2">
-                                            <h4 className="text-3xl font-bold text-white">1,247</h4>
-                                            <span className="text-xs text-green-400 font-medium">+24%</span>
+                                        <p className="text-xs font-semibold text-green-400">SSL Activo</p>
+                                        <p className="text-[10px] text-gray-500">cPanel & Hosting</p>
+                                    </div>
+
+                                    <div className="bg-white/5 border border-white/5 rounded-xl p-4">
+                                        <div className="flex items-center gap-2 mb-2 text-pink-400">
+                                            <Mail className="w-4 h-4" />
+                                            <span className="text-[10px] font-bold uppercase tracking-wider">Correos Admin</span>
+                                        </div>
+                                        <p className="text-xs font-semibold text-white truncate">contacto@tuweb.cl</p>
+                                        <p className="text-[10px] text-gray-500">Gestionar Cuentas</p>
+                                    </div>
+                                </div>
+
+                                {/* Looker Studio / Analytics Highlight */}
+                                <div className="bg-gradient-to-br from-primary-500/10 via-purple-500/10 to-transparent border border-white/10 rounded-xl p-6 relative overflow-hidden group">
+                                    <div className="relative z-10">
+                                        <div className="flex justify-between items-start mb-4">
+                                            <div>
+                                                <div className="flex items-center gap-2 mb-1">
+                                                    <PieChart className="w-4 h-4 text-primary-400" />
+                                                    <span className="text-[10px] font-bold uppercase tracking-wider text-gray-400">Google Looker Studio</span>
+                                                </div>
+                                                <h4 className="text-lg font-bold text-white">Informe de Métricas 360</h4>
+                                            </div>
+                                            <div className="px-2 py-1 bg-primary-500/20 rounded text-[10px] font-bold text-primary-400 uppercase tracking-wide">Actualizado</div>
+                                        </div>
+
+                                        <div className="flex items-end gap-4">
+                                            <div>
+                                                <p className="text-2xl font-bold text-white">1,247</p>
+                                                <p className="text-[10px] text-gray-500">Visitas únicas / mes</p>
+                                            </div>
+                                            <div className="h-10 flex-grow flex items-end gap-1 pb-1">
+                                                {[30, 45, 35, 60, 55, 80, 70].map((h, i) => (
+                                                    <div key={i} className="flex-grow bg-primary-500/30 rounded-t-sm" style={{ height: `${h}%` }}></div>
+                                                ))}
+                                            </div>
+                                            <TrendingUp className="w-5 h-5 text-green-400 mb-2" />
                                         </div>
                                     </div>
+                                    {/* Abstract glow */}
+                                    <div className="absolute top-0 right-0 w-32 h-32 bg-primary-500/10 blur-3xl -translate-y-1/2 translate-x-1/2"></div>
                                 </div>
                             </div>
                         </motion.div>
