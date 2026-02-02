@@ -70,7 +70,7 @@ const Footer = () => {
                                 <Facebook size={20} />
                             </a>
                             <a
-                                href="https://instagram.com"
+                                href="https://www.instagram.com/interfaz360/"
                                 target="_blank"
                                 rel="noreferrer"
                                 className="w-10 h-10 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center text-gray-400 hover:bg-[#E4405F]/10 hover:border-[#E4405F]/50 hover:text-[#E4405F] transition-all duration-300"

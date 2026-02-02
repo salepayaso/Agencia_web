@@ -3,7 +3,7 @@ import Footer from '../components/Footer';
 import WhatsAppButton from '../components/WhatsAppButton';
 import Section from '../components/ui/Section';
 import Button from '../components/ui/Button';
-import { Layout, Rocket, Mail, Zap, Code, ArrowRight, MonitorSmartphone, ShoppingBag, Megaphone, Server, CheckCircle2, Activity, BarChart3, MessageSquare, User, Lock, TrendingUp } from 'lucide-react';
+import { Layout, Rocket, Mail, Zap, Code, ArrowRight, MonitorSmartphone, ShoppingBag, Megaphone, Server, CheckCircle2, Activity, BarChart3, MessageSquare, User, Lock, TrendingUp, Search, MapPin, ShieldCheck, PieChart } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 
@@ -15,20 +15,22 @@ const Services = () => {
             icon: MonitorSmartphone,
             gradient: "from-blue-500 to-indigo-600 shadow-blue-500/20",
             title: "Plan Pyme Digital",
-            tagline: "Tu carta de presentación digital",
-            desc: "Ideal para emprendedores. Diseño de Web Landing page Corporativa diseñada para vender y presencia en Google.",
-            benefits: ["Web Landing page Corporativa", "Google Business & Maps + SEO Local", "2 Correos Corporativos", "Dominio & Hosting 1 año GRATIS"],
+            tagline: "Tu Carta de Presentación Digital",
+            desc: "Ideal para emprendedores que necesitan una imagen impecable y aparecer en Google de inmediato.",
+            benefits: ["Desarrollo Pagina Web", "2 Correos Corporativos", "Dominio & Hosting 1 año GRATIS", "Google Business + SEO Local", "Tecnología React Alta Interactividad", "Certificado SSL de Seguridad"],
             price: "$250.000",
+            whatsappMsg: "Hola Interfaz 360, me interesa contratar el Plan Pyme Digital. ¿Me podrían dar más información?",
             badge: "NUEVO"
         },
         {
             icon: Rocket,
             gradient: "from-purple-500 to-pink-600 shadow-purple-500/20",
-            title: "Web Profesional",
-            tagline: "Diseño Web Avanzado y SEO",
-            desc: "Para negocios que buscan potencia. Página Web Multi-Pestañas, infraestructura Google completa y arquitectura React de alto rendimiento.",
-            benefits: ["Página Web Multi-Pestañas", "4 Correos Corporativos", "Dominio & Hosting 1 año GRATIS", "Google Business & Maps + SEO Local", "GTM, Analytics & Search Console", "Google Looker Studio", "Panel de Cliente 24/7"],
-            price: "$350.000"
+            title: "Ecosistema Google 360",
+            tagline: "El Motor Digital de tu Negocio",
+            desc: "Para empresas que buscan mayor potencia, gestión de clientes y una infraestructura Google completa.",
+            benefits: ["Desarrollo Pagina Web Multi-Sección", "4 Correos Corporativos", "Dominio & Hosting 1 año GRATIS", "Google Business + SEO Local", "GTM, Analytics & Search Console", "Google Looker Studio (Métricas)", "Perfil de Gestión INTERFAZ 360", "Tecnología React Alta Interactividad", "Certificado SSL de Seguridad"],
+            price: "$350.000",
+            whatsappMsg: "Hola Interfaz 360, me interesa contratar el Ecosistema Google 360. ¿Me podrían dar más información?"
         },
         {
             icon: ShoppingBag,
@@ -37,6 +39,7 @@ const Services = () => {
             tagline: "Vende 24/7 sin límites",
             desc: "Creamos tu tienda online para que vendas en internet las 24 horas. Recibe pagos seguros y administra todo desde tu celular.",
             benefits: ["Acepta pagos con tarjeta", "Control total de inventario", "Tus clientes compran fácil y rápido"],
+            price: "Por Cotizar"
         },
         {
             icon: () => (
@@ -49,14 +52,16 @@ const Services = () => {
             tagline: "Que te encuentren tus clientes",
             desc: "Potencia tu presencia con Google Search Console, Analytics y Google Maps (Business). Te ayudamos a aparecer primero en Google y atraer más clientes.",
             benefits: ["Tu negocio en Google Maps (Business)", "Métricas reales con Google Analytics", "Posicionamiento SEO Técnico"],
+            price: "Por Cotizar"
         },
         {
             icon: Server,
             gradient: "from-cyan-500 to-blue-600 shadow-cyan-500/20",
             title: "Dominios, Correos & Hosting",
             tagline: "Tu identidad digital completa",
-            desc: "¿Necesitas un dominio nuevo o ya tienes uno? Gestionamos tu identidad profesional y aseguramos que tu web vuele.",
+            desc: "¿Necesitas un dominio nuevo o ya tienes uno? Gestionamos tu infraestructura cPanel y aseguramos que tu web vuele.",
             benefits: ["Gestión Integral de Dominios", "Correos Profesionales Ilimitados", "Hosting Low-Latency Optimizado"],
+            price: "Por Cotizar",
             badge: "SOPORTE"
         }
     ];
@@ -93,8 +98,7 @@ const Services = () => {
                             whileInView={{ opacity: 1, y: 0 }}
                             viewport={{ once: true }}
                             transition={{ delay: i * 0.1 }}
-                            onClick={() => navigate('/contacto', { state: { subject: service.title } })}
-                            className="glass-card p-8 rounded-3xl border border-white/10 hover:border-primary-500 transition-all duration-300 relative group cursor-pointer flex flex-col h-full"
+                            className="glass-card p-8 rounded-3xl border border-white/10 hover:border-primary-500 transition-all duration-300 relative group flex flex-col h-full"
                         >
                             {service.badge && (
                                 <div className="absolute -top-3 -right-3 px-4 py-1.5 bg-gradient-to-r from-primary-500 to-purple-500 text-white text-xs font-bold rounded-full shadow-lg">
@@ -118,7 +122,7 @@ const Services = () => {
                                 {service.desc}
                             </p>
 
-                            <div className="space-y-3 pt-4 border-t border-white/10">
+                            <div className="space-y-3 pt-4 border-t border-white/10 mb-8">
                                 {service.benefits.map((benefit, idx) => (
                                     <div key={idx} className="flex items-start gap-3 text-sm text-gray-400">
                                         <CheckCircle2 className="w-4 h-4 text-primary-400 mt-0.5 shrink-0" />
@@ -127,12 +131,28 @@ const Services = () => {
                                 ))}
                             </div>
 
-                            {service.price && (
-                                <div className="mt-auto pt-6 flex items-baseline gap-1">
-                                    <span className="text-2xl font-bold text-white">{service.price}</span>
-                                    <span className="text-xs text-gray-500">pago único CLP</span>
-                                </div>
-                            )}
+                            <div className="mt-auto">
+                                {service.price && (
+                                    <div className="flex items-baseline gap-1 mb-6">
+                                        <span className="text-2xl font-bold text-white">{service.price}</span>
+                                        {service.price !== "Por Cotizar" && <span className="text-xs text-gray-500">pago único CLP</span>}
+                                    </div>
+                                )}
+
+                                <Button
+                                    href={service.price === "Por Cotizar" ? undefined : `https://wa.me/56954146176?text=${encodeURIComponent(service.whatsappMsg)}`}
+                                    target={service.price === "Por Cotizar" ? undefined : "_blank"}
+                                    variant={service.price === "Por Cotizar" ? "glass" : "primary"}
+                                    className="w-full"
+                                    onClick={(e) => {
+                                        if (service.price === "Por Cotizar") {
+                                            navigate('/contacto', { state: { subject: service.title } });
+                                        }
+                                    }}
+                                >
+                                    {service.price === "Por Cotizar" ? "Cotizar ahora" : "Contratar"}
+                                </Button>
+                            </div>
                         </motion.div>
                     ))}
                 </div>
@@ -154,11 +174,11 @@ const Services = () => {
                                 <span className="font-semibold uppercase tracking-wider">Exclusivo para Nuestros Clientes</span>
                             </div>
                             <h2 className="text-3xl md:text-4xl font-bold mb-4 leading-tight">
-                                Tu Panel de <br />
-                                <span className="text-gradient">Control Personal</span>
+                                Tu Perfil de <br />
+                                <span className="text-gradient">Gestión 360</span>
                             </h2>
                             <p className="text-gray-400 text-base mb-6 leading-relaxed">
-                                Todos nuestros clientes tienen acceso a un panel exclusivo donde pueden ver y gestionar sus servicios activos las 24 horas. Transparencia total.
+                                Nuestros clientes con Ecosistema Google 360 tienen acceso a un panel exclusivo donde pueden ver y gestionar sus servicios activos las 24 horas. Transparencia total.
                             </p>
 
                             <div className="space-y-4">
@@ -200,7 +220,7 @@ const Services = () => {
                                         </div>
                                     </div>
                                     <div>
-                                        <h3 className="font-bold text-lg">Panel de Cliente</h3>
+                                        <h3 className="font-bold text-lg">Perfil de Gestión</h3>
                                         <p className="text-xs text-green-400 flex items-center gap-1.5">
                                             <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse"></span>
                                             Acceso 24/7
@@ -208,34 +228,74 @@ const Services = () => {
                                     </div>
                                 </div>
 
-                                {/* Mock Cards */}
-                                <div className="space-y-4">
-                                    <div className="bg-white/5 border border-white/5 rounded-xl p-4 flex items-center justify-between">
-                                        <div>
-                                            <p className="text-xs text-gray-500 mb-1">Sitio Web</p>
-                                            <p className="font-semibold text-white">www.tunegocio.com</p>
+                                {/* Mock Dashboard Grid */}
+                                <div className="grid grid-cols-2 gap-4 mb-6">
+                                    <div className="bg-white/5 border border-white/5 rounded-xl p-4">
+                                        <div className="flex items-center gap-2 mb-2 text-primary-400">
+                                            <Search className="w-4 h-4" />
+                                            <span className="text-[10px] font-bold uppercase tracking-wider">Search Console</span>
                                         </div>
-                                        <span className="px-2 py-1 rounded text-[10px] font-bold bg-green-500/20 text-green-400 uppercase tracking-wide">Activo</span>
+                                        <p className="text-xl font-bold text-white">4.2k</p>
+                                        <p className="text-[10px] text-gray-500">Impresiones/mes</p>
                                     </div>
 
-                                    <div className="bg-white/5 border border-white/5 rounded-xl p-4 flex items-center justify-between">
-                                        <div>
-                                            <p className="text-xs text-gray-500 mb-1">Correos</p>
-                                            <p className="font-semibold text-white">5 cuentas configuradas</p>
+                                    <div className="bg-white/5 border border-white/5 rounded-xl p-4">
+                                        <div className="flex items-center gap-2 mb-2 text-purple-400">
+                                            <MapPin className="w-4 h-4" />
+                                            <span className="text-[10px] font-bold uppercase tracking-wider">Google Business</span>
                                         </div>
-                                        <span className="px-2 py-1 rounded text-[10px] font-bold bg-green-500/20 text-green-400 uppercase tracking-wide">Activo</span>
+                                        <p className="text-xl font-bold text-white">85</p>
+                                        <p className="text-[10px] text-gray-500">Interacciones Maps</p>
                                     </div>
 
-                                    <div className="bg-gradient-to-r from-blue-500/10 to-purple-500/10 border border-blue-500/20 rounded-xl p-5">
-                                        <div className="flex justify-between items-end mb-2">
-                                            <p className="text-xs text-blue-300">Visitas este mes</p>
-                                            <TrendingUp className="w-4 h-4 text-green-400" />
+                                    <div className="bg-white/5 border border-white/5 rounded-xl p-4">
+                                        <div className="flex items-center gap-2 mb-2 text-cyan-400">
+                                            <ShieldCheck className="w-4 h-4" />
+                                            <span className="text-[10px] font-bold uppercase tracking-wider">Infraestructura</span>
                                         </div>
-                                        <div className="flex items-baseline gap-2">
-                                            <h4 className="text-3xl font-bold text-white">1,247</h4>
-                                            <span className="text-xs text-green-400 font-medium">+24%</span>
+                                        <p className="text-xs font-semibold text-green-400">SSL Activo</p>
+                                        <p className="text-[10px] text-gray-500">cPanel & Hosting</p>
+                                    </div>
+
+                                    <div className="bg-white/5 border border-white/5 rounded-xl p-4">
+                                        <div className="flex items-center gap-2 mb-2 text-pink-400">
+                                            <Mail className="w-4 h-4" />
+                                            <span className="text-[10px] font-bold uppercase tracking-wider">Correos Admin</span>
+                                        </div>
+                                        <p className="text-xs font-semibold text-white truncate">contacto@tuweb.cl</p>
+                                        <p className="text-[10px] text-gray-500">Gestionar Cuentas</p>
+                                    </div>
+                                </div>
+
+                                {/* Looker Studio / Analytics Highlight */}
+                                <div className="bg-gradient-to-br from-primary-500/10 via-purple-500/10 to-transparent border border-white/10 rounded-xl p-6 relative overflow-hidden group">
+                                    <div className="relative z-10">
+                                        <div className="flex justify-between items-start mb-4">
+                                            <div>
+                                                <div className="flex items-center gap-2 mb-1">
+                                                    <PieChart className="w-4 h-4 text-primary-400" />
+                                                    <span className="text-[10px] font-bold uppercase tracking-wider text-gray-400">Google Looker Studio</span>
+                                                </div>
+                                                <h4 className="text-lg font-bold text-white">Informe de Métricas 360</h4>
+                                            </div>
+                                            <div className="px-2 py-1 bg-primary-500/20 rounded text-[10px] font-bold text-primary-400 uppercase tracking-wide">Actualizado</div>
+                                        </div>
+
+                                        <div className="flex items-end gap-4">
+                                            <div>
+                                                <p className="text-2xl font-bold text-white">1,247</p>
+                                                <p className="text-[10px] text-gray-500">Visitas únicas / mes</p>
+                                            </div>
+                                            <div className="h-10 flex-grow flex items-end gap-1 pb-1">
+                                                {[30, 45, 35, 60, 55, 80, 70].map((h, i) => (
+                                                    <div key={i} className="flex-grow bg-primary-500/30 rounded-t-sm" style={{ height: `${h}%` }}></div>
+                                                ))}
+                                            </div>
+                                            <TrendingUp className="w-5 h-5 text-green-400 mb-2" />
                                         </div>
                                     </div>
+                                    {/* Abstract glow */}
+                                    <div className="absolute top-0 right-0 w-32 h-32 bg-primary-500/10 blur-3xl -translate-y-1/2 translate-x-1/2"></div>
                                 </div>
                             </div>
                         </motion.div>
