@@ -22,3 +22,9 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Archivos Sensibles e Innecesarios
+.env
+.cache
+escritorio.ini
+Desktop.ini
