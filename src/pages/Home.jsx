@@ -70,7 +70,7 @@ const Home = () => {
                         <div className="relative z-10 glass-card p-2 rounded-3xl border-t border-l border-white/20 overflow-hidden group shadow-2xl">
                             <div className="h-80 md:h-[480px] rounded-2xl overflow-hidden relative flex items-center justify-center bg-black/20">
                                 <img
-                                    src="/hero_clean.png"
+                                    src="/hero_clean.jpg"
                                     alt="Google Security & Tech Ecosystem"
                                     className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700"
                                     fetchpriority="high"
