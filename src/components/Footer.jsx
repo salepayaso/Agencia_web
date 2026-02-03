@@ -15,7 +15,7 @@ const Footer = () => {
                         <div className="flex items-center gap-3 mb-6">
                             <div className="relative">
                                 <div className="absolute inset-0 bg-primary-500/20 blur-xl rounded-full"></div>
-                                <img src="/logo sin fondo optimizado.png" alt="Logo" className="h-14 w-14 rounded-full object-cover relative z-10 border border-white/10" />
+                                <img src="/logo sin fondo optimizado.png" alt="Logo" className="h-14 w-14 rounded-full object-cover relative z-10 border border-white/10" loading="lazy" />
                             </div>
                             <img
                                 src="/brand-text-v2.png"
@@ -23,7 +23,7 @@ const Footer = () => {
                                 className="h-10 object-contain"
                             />
                         </div>
-                        <p className="text-gray-400 max-w-sm text-lg leading-relaxed">
+                        <p className="text-gray-300 max-w-sm text-lg leading-relaxed">
                             Agencia líder en <strong>Diseño Web y SEO en Chile</strong>. Transformamos marcas con experiencias digitales <span className="text-primary-400 font-medium">premium</span> y tecnología de vanguardia.
                         </p>
                     </div>
@@ -33,7 +33,7 @@ const Footer = () => {
                             <span className="w-1.5 h-1.5 rounded-full bg-primary-500"></span>
                             Navegación
                         </h4>
-                        <ul className="space-y-4 text-gray-400">
+                        <ul className="space-y-4 text-gray-300">
                             <li>
                                 <Link to="/" className="flex items-center gap-2 hover:text-primary-400 transition-colors group">
                                     <span className="w-0 group-hover:w-2 h-[1px] bg-primary-400 transition-all"></span>
@@ -65,7 +65,7 @@ const Footer = () => {
                                 href="https://facebook.com"
                                 target="_blank"
                                 rel="noreferrer"
-                                className="w-10 h-10 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center text-gray-400 hover:bg-[#1877F2]/10 hover:border-[#1877F2]/50 hover:text-[#1877F2] transition-all duration-300"
+                                className="w-10 h-10 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center text-gray-300 hover:bg-[#1877F2]/10 hover:border-[#1877F2]/50 hover:text-[#1877F2] transition-all duration-300"
                             >
                                 <Facebook size={20} />
                             </a>
@@ -73,7 +73,7 @@ const Footer = () => {
                                 href="https://www.instagram.com/interfaz360/"
                                 target="_blank"
                                 rel="noreferrer"
-                                className="w-10 h-10 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center text-gray-400 hover:bg-[#E4405F]/10 hover:border-[#E4405F]/50 hover:text-[#E4405F] transition-all duration-300"
+                                className="w-10 h-10 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center text-gray-300 hover:bg-[#E4405F]/10 hover:border-[#E4405F]/50 hover:text-[#E4405F] transition-all duration-300"
                             >
                                 <Instagram size={20} />
                             </a>
@@ -81,7 +81,7 @@ const Footer = () => {
                                 href="https://linkedin.com"
                                 target="_blank"
                                 rel="noreferrer"
-                                className="w-10 h-10 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center text-gray-400 hover:bg-[#0A66C2]/10 hover:border-[#0A66C2]/50 hover:text-[#0A66C2] transition-all duration-300"
+                                className="w-10 h-10 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center text-gray-300 hover:bg-[#0A66C2]/10 hover:border-[#0A66C2]/50 hover:text-[#0A66C2] transition-all duration-300"
                             >
                                 <Linkedin size={20} />
                             </a>

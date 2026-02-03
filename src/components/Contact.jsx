@@ -59,7 +59,7 @@ const Contact = () => {
                                 <h2 className="text-4xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-white to-gray-400">
                                     Hablemos de negocios.
                                 </h2>
-                                <p className="text-gray-400 mb-10 text-lg leading-relaxed">
+                                <p className="text-gray-300 mb-10 text-lg leading-relaxed">
                                     Completa el formulario y nos pondremos en contacto contigo dentro de 24 horas.
                                 </p>
 
@@ -79,13 +79,13 @@ const Contact = () => {
                                 <h4 className="text-sm font-bold text-gray-500 uppercase tracking-wider mb-6">Síguenos en redes</h4>
                                 <div className="flex gap-4">
                                     <a href="https://instagram.com" target="_blank" rel="noreferrer" className="p-4 bg-white/5 rounded-2xl hover:bg-gradient-to-br hover:from-purple-600 hover:to-pink-600 hover:text-white hover:scale-110 hover:-rotate-3 transition-all duration-300 group/social">
-                                        <Instagram className="text-gray-400 group-hover/social:text-white" size={24} />
+                                        <Instagram className="text-gray-300 group-hover/social:text-white" size={24} />
                                     </a>
                                     <a href="https://facebook.com" target="_blank" rel="noreferrer" className="p-4 bg-white/5 rounded-2xl hover:bg-[#1877F2] hover:text-white hover:scale-110 hover:-rotate-3 transition-all duration-300 group/social">
-                                        <Facebook className="text-gray-400 group-hover/social:text-white" size={24} />
+                                        <Facebook className="text-gray-300 group-hover/social:text-white" size={24} />
                                     </a>
                                     <a href="https://linkedin.com" target="_blank" rel="noreferrer" className="p-4 bg-white/5 rounded-2xl hover:bg-[#0A66C2] hover:text-white hover:scale-110 hover:-rotate-3 transition-all duration-300 group/social">
-                                        <Linkedin className="text-gray-400 group-hover/social:text-white" size={24} />
+                                        <Linkedin className="text-gray-300 group-hover/social:text-white" size={24} />
                                     </a>
                                 </div>
                             </div>
@@ -99,7 +99,7 @@ const Contact = () => {
                                         <CheckCircle size={40} />
                                     </div>
                                     <h3 className="text-3xl font-bold mb-3 text-white">¡Mensaje Enviado!</h3>
-                                    <p className="text-gray-400 text-lg">Estaremos en contacto pronto.</p>
+                                    <p className="text-gray-300 text-lg">Estaremos en contacto pronto.</p>
                                     <button
                                         onClick={() => setFormState('idle')}
                                         className="mt-8 px-6 py-2 rounded-full border border-white/10 text-gray-300 hover:bg-white/5 transition-colors"
@@ -110,7 +110,7 @@ const Contact = () => {
                             ) : (
                                 <form onSubmit={handleSubmit} className="space-y-6">
                                     <div>
-                                        <label className="block text-sm font-medium text-gray-400 mb-2 ml-1">Nombre</label>
+                                        <label className="block text-sm font-medium text-gray-300 mb-2 ml-1">Nombre</label>
                                         <input
                                             required
                                             name="name"
@@ -120,7 +120,7 @@ const Contact = () => {
                                         />
                                     </div>
                                     <div>
-                                        <label className="block text-sm font-medium text-gray-400 mb-2 ml-1">Email</label>
+                                        <label className="block text-sm font-medium text-gray-300 mb-2 ml-1">Email</label>
                                         <input
                                             required
                                             name="email"
@@ -130,7 +130,7 @@ const Contact = () => {
                                         />
                                     </div>
                                     <div>
-                                        <label className="block text-sm font-medium text-gray-400 mb-2 ml-1">Mensaje</label>
+                                        <label className="block text-sm font-medium text-gray-300 mb-2 ml-1">Mensaje</label>
                                         <textarea
                                             required
                                             name="message"
@@ -149,7 +149,7 @@ const Contact = () => {
                                             id="bot-check"
                                             className="w-5 h-5 rounded border-gray-600 text-primary-500 focus:ring-primary-500/50 bg-dark-bg"
                                         />
-                                        <label htmlFor="bot-check" className="text-sm text-gray-400 cursor-pointer select-none">
+                                        <label htmlFor="bot-check" className="text-sm text-gray-300 cursor-pointer select-none">
                                             Soy humano (Verificación de seguridad)
                                         </label>
                                     </div>
@@ -161,7 +161,7 @@ const Contact = () => {
                                         disabled={formState === 'submitting'}
                                         icon={formState === 'submitting' ? null : Send}
                                     >
-                                        {formState === 'submitting' ? 'Enviando...' : 'Enviar Mensaje'}
+                                        {formState === 'submitting' ? 'Enviando...' : 'Quiero mi asesoría gratuita'}
                                     </Button>
                                 </form>
                             )}

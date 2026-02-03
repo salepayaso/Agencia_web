@@ -46,13 +46,13 @@ const Home = () => {
                     >
                         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-sm text-primary-400 mb-6 font-medium">
                             <Rocket className="w-4 h-4" />
-                            <span>Agencia de Diseño Web & SEO en Chile</span>
+                            <span>Agencia de Diseño Web & SEO en Santiago</span>
                         </div>
                         <h1 className="text-5xl md:text-7xl font-bold leading-tight mb-6">
-                            ¿Tu negocio no aparece <br /><span className="text-gradient">en los primeros de Google?</span>
+                            ¿Tu negocio no aparece <br /><span className="text-gradient">primero en Google?</span>
                         </h1>
-                        <p className="text-gray-400 text-lg mb-8 max-w-lg">
-                            Desarrollamos <strong>infraestructuras digitales</strong> que impulsan tu crecimiento con un <strong>Estudio de Visibilidad</strong> y estrategias SEO de alto impacto.
+                        <p className="text-gray-300 text-lg mb-8 max-w-lg">
+                            Somos expertos en <strong>infraestructuras digitales</strong> que impulsan el crecimiento de tu negocio mediante estrategias SEO locales de alto impacto.
                         </p>
                         <div className="flex gap-4">
                             <Button href="/servicios" variant="primary" icon={ArrowRight} trackingLabel="Hero: Quiero Vender Mas">Quiero Vender Más</Button>
@@ -120,7 +120,7 @@ const Home = () => {
                                 <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
                             </span>
                         </div>
-                        <div className="text-gray-400 text-sm">Comunidad de <strong>+1,100 seguidores</strong></div>
+                        <div className="text-gray-300 text-sm">Comunidad de <strong>+1,100 seguidores</strong></div>
                     </div>
                     <div className="ml-4 w-8 h-8 rounded-full bg-white/5 flex items-center justify-center group-hover:bg-[#E4405F]/20 transition-colors">
                         <ArrowRight className="w-4 h-4 text-gray-500 group-hover:text-white" />
@@ -141,7 +141,7 @@ const Home = () => {
                         <h2 className="text-3xl md:text-4xl font-bold mb-4">
                             ¿Por Qué <span className="text-gradient">Elegirnos?</span>
                         </h2>
-                        <p className="text-gray-400 max-w-2xl mx-auto">
+                        <p className="text-gray-300 max-w-2xl mx-auto">
                             No somos una agencia más. Somos tu socio tecnológico integral.
                         </p>
                     </div>
@@ -199,7 +199,7 @@ const Home = () => {
                                 <h3 className="text-lg font-bold mb-2 group-hover:text-primary-400 transition-colors">
                                     {benefit.title}
                                 </h3>
-                                <p className="text-gray-400 text-sm leading-relaxed">
+                                <p className="text-gray-300 text-sm leading-relaxed">
                                     {benefit.desc}
                                 </p>
                             </motion.div>
@@ -215,7 +215,7 @@ const Home = () => {
                         <h2 className="text-3xl md:text-4xl font-bold mb-4">
                             Soluciones <span className="text-gradient">Integrales</span>
                         </h2>
-                        <p className="text-gray-400 max-w-2xl mx-auto mb-8">
+                        <p className="text-gray-300 max-w-2xl mx-auto mb-8">
                             Desde tu primera web hasta sistemas empresariales complejos. Todo bajo un mismo techo.
                         </p>
                     </div>
@@ -263,7 +263,7 @@ const Home = () => {
                                 <h3 className="text-xl font-bold mb-2 group-hover:text-primary-400 transition-colors">
                                     {service.title}
                                 </h3>
-                                <p className="text-gray-400 text-sm mb-4">
+                                <p className="text-gray-300 text-sm mb-4">
                                     {service.desc}
                                 </p>
                                 <span className="text-primary-400 text-sm font-medium inline-flex items-center gap-2 group-hover:gap-3 transition-all">
@@ -304,7 +304,7 @@ const Home = () => {
                         <h2 className="text-4xl md:text-5xl font-bold mb-4">
                             Planes <span className="text-gradient">Hechos para PYMES</span>
                         </h2>
-                        <p className="text-gray-400 max-w-2xl mx-auto text-lg text-balance">
+                        <p className="text-gray-300 max-w-2xl mx-auto text-lg text-balance">
                             Desde tu primera presencia digital hasta el motor completo de tu empresa.
                             Tecnología de punta aplicada a tu crecimiento.
                         </p>
@@ -326,7 +326,7 @@ const Home = () => {
                             <div className="mb-8">
                                 <h3 className="text-2xl font-bold mb-2">Plan Pyme Digital</h3>
                                 <div className="text-blue-400 text-sm font-medium mb-6">Tu Carta de Presentación Digital</div>
-                                <p className="text-gray-400 text-sm leading-relaxed mb-4">
+                                <p className="text-gray-300 text-sm leading-relaxed mb-4">
                                     Ideal para emprendedores que necesitan una imagen impecable y aparecer en Google de inmediato.
                                 </p>
                             </div>
@@ -342,7 +342,7 @@ const Home = () => {
                                 ].map((item, i) => (
                                     <div key={i} className="flex items-start gap-3">
                                         <Zap className="w-4 h-4 text-blue-500 mt-0.5 shrink-0" />
-                                        <span className={`${item.bold ? 'text-white' : 'text-gray-400'} text-sm`}>{item.text}</span>
+                                        <span className={`${item.bold ? 'text-white' : 'text-gray-300'} text-sm`}>{item.text}</span>
                                     </div>
                                 ))}
                             </div>
@@ -350,7 +350,7 @@ const Home = () => {
                             <div className="mt-auto">
                                 <div className="flex items-baseline gap-2 mb-6">
                                     <span className="text-4xl font-extrabold text-white">$250.000</span>
-                                    <span className="text-gray-400 text-xs">pago único CLP</span>
+                                    <span className="text-gray-300 text-xs">pago único CLP</span>
                                 </div>
                                 <Button
                                     href={`https://wa.me/56954146176?text=${encodeURIComponent("Hola Interfaz 360, me interesa contratar el Plan Pyme Digital. ¿Me podrían dar más información?")}`}
@@ -395,7 +395,7 @@ const Home = () => {
                                 ].map((item, i) => (
                                     <div key={i} className="flex items-start gap-3">
                                         <Zap className="w-4 h-4 text-purple-500 mt-0.5 shrink-0" />
-                                        <span className={`${item.bold ? 'text-white' : 'text-gray-400'} text-sm`}>{item.text}</span>
+                                        <span className={`${item.bold ? 'text-white' : 'text-gray-300'} text-sm`}>{item.text}</span>
                                     </div>
                                 ))}
                             </div>
@@ -403,7 +403,7 @@ const Home = () => {
                             <div className="mt-auto">
                                 <div className="flex items-baseline gap-2 mb-6">
                                     <span className="text-4xl font-extrabold text-white">$350.000</span>
-                                    <span className="text-gray-400 text-xs">pago único CLP</span>
+                                    <span className="text-gray-300 text-xs">pago único CLP</span>
                                 </div>
                                 <Button
                                     href={`https://wa.me/56954146176?text=${encodeURIComponent("Hola Interfaz 360, me interesa contratar el Ecosistema Google 360. ¿Me podrían dar más información?")}`}
@@ -445,7 +445,7 @@ const Home = () => {
                                 Tu Perfil de <br />
                                 <span className="text-gradient">Gestión 360</span>
                             </h2>
-                            <p className="text-gray-400 text-base mb-6 leading-relaxed">
+                            <p className="text-gray-300 text-base mb-6 leading-relaxed">
                                 Nuestros clientes con Ecosistema Google 360 tienen acceso a un panel exclusivo donde pueden ver y gestionar sus servicios activos las 24 horas. Transparencia total.
                             </p>
 
@@ -485,7 +485,7 @@ const Home = () => {
                                 <div className="flex items-center gap-4 mb-8 border-b border-white/5 pb-6">
                                     <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary-500 to-purple-600 p-[2px]">
                                         <div className="w-full h-full rounded-full bg-gray-900 flex items-center justify-center">
-                                            <User className="w-6 h-6 text-gray-400" />
+                                            <User className="w-6 h-6 text-gray-300" />
                                         </div>
                                     </div>
                                     <div>
@@ -543,7 +543,7 @@ const Home = () => {
                                             <div>
                                                 <div className="flex items-center gap-2 mb-1">
                                                     <PieChart className="w-4 h-4 text-primary-400" />
-                                                    <span className="text-[10px] font-bold uppercase tracking-wider text-gray-400">Google Looker Studio</span>
+                                                    <span className="text-[10px] font-bold uppercase tracking-wider text-gray-300">Google Looker Studio</span>
                                                 </div>
                                                 <h4 className="text-lg font-bold text-white">Informe de Métricas 360</h4>
                                             </div>
