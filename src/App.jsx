@@ -16,6 +16,7 @@ import UpdatePassword from './pages/UpdatePassword';
 import BusinessCard from './components/BusinessCard';
 import GTMTracker from './components/GTMTracker';
 import SessionManager from './components/SessionManager';
+import { SpeedInsights } from '@vercel/speed-insights/react';
 
 const AuthHandler = () => {
   const navigate = useNavigate();
@@ -44,6 +45,7 @@ function App() {
       <SessionManager />
       <ScrollToTop />
       <ScrollProgress />
+      <SpeedInsights />
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/servicios" element={<Services />} />
