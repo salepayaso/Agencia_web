@@ -15,7 +15,7 @@ const MagneticParticles = () => {
         let mouse = { x: null, y: null };
 
         // Configuration
-        const particleCount = 60;
+        const particleCount = 40;
         const colorPalette = ['#06b6d4', '#8b5cf6', '#ffffff']; // cyan, purple, white
         const connectionDistance = 100;
         const mouseRange = 200;

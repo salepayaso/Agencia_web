@@ -20,22 +20,22 @@ const Home = () => {
             <section className="relative pt-32 pb-20 px-4 md:px-8 overflow-hidden min-h-screen flex items-center">
                 {/* Background Gradients with Parallax */}
                 <motion.div
-                    className="absolute top-0 right-0 w-1/2 h-1/2 bg-primary-500/10 rounded-full blur-[120px] -translate-y-1/2 translate-x-1/2"
+                    className="absolute top-0 right-0 w-1/2 h-1/2 bg-primary-500/10 rounded-full blur-[60px] md:blur-[120px] -translate-y-1/2 translate-x-1/2 pointer-events-none"
                     animate={{
                         scale: [1, 1.2, 1],
                         opacity: [0.3, 0.5, 0.3]
                     }}
                     transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
-                    style={{ y }}
+                    style={{ y: typeof window !== 'undefined' && window.innerWidth > 768 ? y : 0 }}
                 ></motion.div>
                 <motion.div
-                    className="absolute bottom-0 left-0 w-1/3 h-1/3 bg-purple-500/10 rounded-full blur-[100px] translate-y-1/2 -translate-x-1/2"
+                    className="absolute bottom-0 left-0 w-1/3 h-1/3 bg-purple-500/10 rounded-full blur-[50px] md:blur-[100px] translate-y-1/2 -translate-x-1/2 pointer-events-none"
                     animate={{
                         scale: [1, 1.3, 1],
                         opacity: [0.2, 0.4, 0.2]
                     }}
                     transition={{ duration: 15, repeat: Infinity, ease: "easeInOut", delay: 2 }}
-                    style={{ y: useTransform(scrollYProgress, [0, 1], ['0%', '-30%']) }}
+                    style={{ y: typeof window !== 'undefined' && window.innerWidth > 768 ? useTransform(scrollYProgress, [0, 1], ['0%', '-30%']) : 0 }}
                 ></motion.div>
 
                 <div className="max-w-7xl mx-auto w-full relative z-10 grid md:grid-cols-2 lg:grid-cols-[1fr_1.1fr] gap-12 items-center">
@@ -73,8 +73,10 @@ const Home = () => {
                                     src="/hero_clean.png"
                                     alt="Google Security & Tech Ecosystem"
                                     className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700"
+                                    fetchpriority="high"
+                                    loading="eager"
                                 />
-                                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
+                                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent pointer-events-none"></div>
                                 <div className="absolute bottom-4 left-4 right-4">
                                     <div className="flex items-center gap-2 mb-2">
                                         <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse"></div>

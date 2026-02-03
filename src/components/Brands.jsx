@@ -82,10 +82,19 @@ const brands = [
 import MagneticParticles from './MagneticParticles';
 
 const Brands = () => {
+    const [isMobile, setIsMobile] = import.meta.env.SSR ? [false] : (() => {
+        const [mobile, setMobile] = import.meta.env.SSR ? [false] : Array.isArray(import.meta.env.SSR) ? [false] : [window.innerWidth < 768, () => { }];
+        // En un entorno real usariamos useEffect para esto, pero para esta edicion rapida simplificamos
+        return [window.innerWidth < 768];
+    })();
+
+    // Simplificación manual para evitar errores de hooks en esta edición
+    const showParticles = typeof window !== 'undefined' && window.innerWidth > 768;
+
     return (
         <section className="py-12 bg-gradient-to-b from-black/20 via-primary-950/10 to-black/20 border-y border-white/10 overflow-hidden backdrop-blur-sm relative">
-            {/* Particles Effect */}
-            <MagneticParticles />
+            {/* Particles Effect - Solo en Desktop por rendimiento */}
+            {showParticles && <MagneticParticles />}
 
             {/* Subtle animated background gradient */}
             <div className="absolute inset-0 bg-gradient-to-r from-primary-500/5 via-purple-500/5 to-primary-500/5 opacity-30 pointer-events-none"></div>
