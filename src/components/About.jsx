@@ -37,7 +37,7 @@ const About = () => {
                     <div className="absolute inset-0 bg-primary-500/20 blur-3xl rounded-full"></div>
                     <div className="relative z-10">
                         {/* High-tech abstract image */}
-                        <img src="https://images.unsplash.com/photo-1550751827-4bd374c3f58b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" className="rounded-3xl shadow-2xl border border-white/10" alt="Technology" />
+                        <img src="https://images.unsplash.com/photo-1550751827-4bd374c3f58b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" className="rounded-3xl shadow-2xl border border-white/10" alt="Technology" loading="lazy" />
 
                         <div className="absolute -bottom-6 -right-6 glass-card p-6 rounded-2xl max-w-xs animate-float">
                             <p className="font-bold text-white text-lg mb-1">"Cualquier tecnología avanzada es indistinguible de la magia."</p>

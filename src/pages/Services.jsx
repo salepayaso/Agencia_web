@@ -83,12 +83,12 @@ const Services = () => {
                         <span className="font-semibold">¿Qué Hacemos?</span>
                     </div>
                     <h1 className="text-4xl md:text-6xl font-bold mb-6 leading-tight">
-                        Llevamos tu Negocio <br className="hidden md:block" />
-                        <span className="text-gradient">al Mundo Digital</span>
+                        Servicios Digitales <br className="hidden md:block" />
+                        <span className="text-gradient">en Santiago y Todo Chile</span>
                     </h1>
-                    <p className="text-xl text-gray-400 leading-relaxed">
-                        Desde tu primera página web hasta sistemas completos. <br className="hidden md:block" />
-                        <span className="text-white font-medium">Todo en un solo lugar, explicado de forma simple.</span>
+                    <p className="text-xl text-gray-300 leading-relaxed">
+                        Desde tu primera página web hasta sistemas complejos. <br className="hidden md:block" />
+                        <span className="text-white font-medium">Todo en un solo lugar, con soporte local garantizado.</span>
                     </p>
                 </div>
             </Section>
@@ -129,7 +129,7 @@ const Services = () => {
 
                             <div className="space-y-3 pt-4 border-t border-white/10 mb-8">
                                 {service.benefits.map((benefit, idx) => (
-                                    <div key={idx} className="flex items-start gap-3 text-sm text-gray-400">
+                                    <div key={idx} className="flex items-start gap-3 text-sm text-gray-300">
                                         <CheckCircle2 className="w-4 h-4 text-primary-400 mt-0.5 shrink-0" />
                                         <span>{benefit}</span>
                                     </div>
@@ -183,7 +183,7 @@ const Services = () => {
                                 Tu Perfil de <br />
                                 <span className="text-gradient">Gestión 360</span>
                             </h2>
-                            <p className="text-gray-400 text-base mb-6 leading-relaxed">
+                            <p className="text-gray-300 text-base mb-6 leading-relaxed">
                                 Nuestros clientes con Ecosistema Google 360 tienen acceso a un panel exclusivo donde pueden ver y gestionar sus servicios activos las 24 horas. Transparencia total.
                             </p>
 
@@ -222,7 +222,7 @@ const Services = () => {
                                 <div className="flex items-center gap-4 mb-8 border-b border-white/5 pb-6">
                                     <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary-500 to-purple-600 p-[2px]">
                                         <div className="w-full h-full rounded-full bg-gray-900 flex items-center justify-center">
-                                            <User className="w-6 h-6 text-gray-400" />
+                                            <User className="w-6 h-6 text-gray-300" />
                                         </div>
                                     </div>
                                     <div>
@@ -280,7 +280,7 @@ const Services = () => {
                                             <div>
                                                 <div className="flex items-center gap-2 mb-1">
                                                     <PieChart className="w-4 h-4 text-primary-400" />
-                                                    <span className="text-[10px] font-bold uppercase tracking-wider text-gray-400">Google Looker Studio</span>
+                                                    <span className="text-[10px] font-bold uppercase tracking-wider text-gray-300">Google Looker Studio</span>
                                                 </div>
                                                 <h4 className="text-lg font-bold text-white">Informe de Métricas 360</h4>
                                             </div>
