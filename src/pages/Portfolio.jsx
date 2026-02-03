@@ -15,7 +15,7 @@ const Portfolio = () => {
             title: "Sistema de Inventarios",
             category: "SaaS / Sistema a Medida",
             type: "app",
-            image: "/portfolio_supplytech_inventory.png",
+            image: "/portfolio_supplytech_inventory.jpg",
             tags: ["React", "Supabase", "Stock Control"],
             icon: Database,
             link: null
@@ -24,7 +24,7 @@ const Portfolio = () => {
             title: "Portal de Clientes",
             category: "CRM & Dashboard",
             type: "app",
-            image: "/portfolio_interfaz360_crm.png",
+            image: "/portfolio_interfaz360_crm.jpg",
             tags: ["React", "Auth", "Security"],
             icon: Layout,
             link: null
@@ -33,7 +33,7 @@ const Portfolio = () => {
             title: "Contabilidad CMP",
             category: "Web Corporativa",
             type: "web",
-            image: "/portfolio_cmp_accounting.png",
+            image: "/portfolio_cmp_accounting.jpg",
             tags: ["SEO", "Conversion", "Design"],
             icon: BarChart3,
             link: "https://www.contabilidadcmp.cl"
@@ -42,7 +42,7 @@ const Portfolio = () => {
             title: "E-Commerce Luxury",
             category: "Tienda Online",
             type: "web",
-            image: "/portfolio_ecommerce_luxury_human.png",
+            image: "/portfolio_ecommerce_luxury_human.jpg",
             tags: ["Stripe", "Next.js", "Sales"],
             icon: ShoppingBag,
             link: null
@@ -51,7 +51,7 @@ const Portfolio = () => {
             title: "Campañas Google Ads",
             category: "Marketing & Performance",
             type: "web",
-            image: "/portfolio_google_ads.png",
+            image: "/portfolio_google_ads.jpg",
             tags: ["ROAS", "Leads", "Analytics"],
             icon: BarChart3,
             link: null
@@ -60,7 +60,7 @@ const Portfolio = () => {
             title: "SEO Local & Maps",
             category: "Google Business",
             type: "web",
-            image: "/portfolio_seo_maps_human.png",
+            image: "/portfolio_seo_maps_human.jpg",
             tags: ["Maps", "Reviews", "Growth"],
             icon: Search,
             link: null
@@ -169,7 +169,7 @@ const Portfolio = () => {
                                             </p>
 
                                             {p.link ? (
-                                                <a 
+                                                <a
                                                     href={p.link}
                                                     target="_blank"
                                                     rel="noopener noreferrer"
