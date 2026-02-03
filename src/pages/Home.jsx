@@ -55,8 +55,8 @@ const Home = () => {
                             Desarrollamos <strong>infraestructuras digitales</strong> que impulsan tu crecimiento con un <strong>Estudio de Visibilidad</strong> y estrategias SEO de alto impacto.
                         </p>
                         <div className="flex gap-4">
-                            <Button href="/servicios" variant="primary" icon={ArrowRight}>Quiero Vender Más</Button>
-                            <Button href="/portafolio" variant="glass">Ver portafolio</Button>
+                            <Button href="/servicios" variant="primary" icon={ArrowRight} trackingLabel="Hero: Quiero Vender Mas">Quiero Vender Más</Button>
+                            <Button href="/portafolio" variant="glass" trackingLabel="Hero: Ver Portafolio">Ver portafolio</Button>
                         </div>
                     </motion.div>
 
@@ -358,6 +358,7 @@ const Home = () => {
                                     rel="noopener noreferrer"
                                     variant="glass"
                                     className="w-full !py-4 hover:bg-blue-600/20"
+                                    trackingLabel="Contratar: Plan Pyme Digital"
                                 >
                                     Empezar Hoy
                                 </Button>
@@ -410,6 +411,7 @@ const Home = () => {
                                     rel="noopener noreferrer"
                                     variant="primary"
                                     className="w-full !py-4 shadow-lg bg-purple-600 hover:bg-purple-700 shadow-purple-500/20 border-none relative z-20"
+                                    trackingLabel="Contratar: Ecosistema Google 360"
                                 >
                                     Activar Mi Ecosistema 360
                                 </Button>
@@ -464,7 +466,7 @@ const Home = () => {
                             </div>
 
                             <div className="mt-8">
-                                <Button href="/login" variant="primary" icon={ArrowRight} className="!py-3 !px-6 text-sm">
+                                <Button href="/login" variant="primary" icon={ArrowRight} className="!py-3 !px-6 text-sm" trackingLabel="Acceso Clientes: Seccion Info">
                                     Acceso Clientes
                                 </Button>
                             </div>
@@ -594,10 +596,10 @@ const Home = () => {
                             transformar tu presencia digital con tecnología de punta.
                         </p>
                         <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                            <Button href="/contacto" variant="primary" icon={ArrowRight} className="!py-4 !px-8 text-lg">
+                            <Button href="/contacto" variant="primary" icon={ArrowRight} className="!py-4 !px-8 text-lg" trackingLabel="CTA Final: Agenda Consultoria">
                                 Agenda tu Consultoría Gratis
                             </Button>
-                            <Button href="/portafolio" variant="glass" className="!py-4 !px-8 text-lg">
+                            <Button href="/portafolio" variant="glass" className="!py-4 !px-8 text-lg" trackingLabel="CTA Final: Ver Casos Exito">
                                 Ver Casos de Éxito
                             </Button>
                         </div>

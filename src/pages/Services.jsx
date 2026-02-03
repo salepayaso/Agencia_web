@@ -20,7 +20,8 @@ const Services = () => {
             benefits: ["Desarrollo Pagina Web", "2 Correos Corporativos", "Dominio & Hosting 1 año GRATIS", "Google Business + SEO Local", "Tecnología React Alta Interactividad", "Certificado SSL de Seguridad"],
             price: "$250.000",
             whatsappMsg: "Hola Interfaz 360, me interesa contratar el Plan Pyme Digital. ¿Me podrían dar más información?",
-            badge: "NUEVO"
+            badge: "NUEVO",
+            trackingLabel: "Contratar: Plan Pyme Digital"
         },
         {
             icon: Rocket,
@@ -30,7 +31,8 @@ const Services = () => {
             desc: "Para empresas que buscan mayor potencia, gestión de clientes y una infraestructura Google completa.",
             benefits: ["Desarrollo Pagina Web Multi-Sección", "4 Correos Corporativos", "Dominio & Hosting 1 año GRATIS", "Google Business + SEO Local", "GTM, Analytics & Search Console", "Google Looker Studio (Métricas)", "Perfil de Gestión INTERFAZ 360", "Tecnología React Alta Interactividad", "Certificado SSL de Seguridad"],
             price: "$350.000",
-            whatsappMsg: "Hola Interfaz 360, me interesa contratar el Ecosistema Google 360. ¿Me podrían dar más información?"
+            whatsappMsg: "Hola Interfaz 360, me interesa contratar el Ecosistema Google 360. ¿Me podrían dar más información?",
+            trackingLabel: "Contratar: Ecosistema Google 360"
         },
         {
             icon: ShoppingBag,
@@ -39,7 +41,8 @@ const Services = () => {
             tagline: "Vende 24/7 sin límites",
             desc: "Creamos tu tienda online para que vendas en internet las 24 horas. Recibe pagos seguros y administra todo desde tu celular.",
             benefits: ["Acepta pagos con tarjeta", "Control total de inventario", "Tus clientes compran fácil y rápido"],
-            price: "Por Cotizar"
+            price: "Por Cotizar",
+            trackingLabel: "Cotizar: Tiendas Online"
         },
         {
             icon: () => (
@@ -52,7 +55,8 @@ const Services = () => {
             tagline: "Que te encuentren tus clientes",
             desc: "Potencia tu presencia con Google Search Console, Analytics y Google Maps (Business). Te ayudamos a aparecer primero en Google y atraer más clientes.",
             benefits: ["Tu negocio en Google Maps (Business)", "Métricas reales con Google Analytics", "Posicionamiento SEO Técnico"],
-            price: "Por Cotizar"
+            price: "Por Cotizar",
+            trackingLabel: "Cotizar: Ecosistema Google & Marketing"
         },
         {
             icon: Server,
@@ -62,7 +66,8 @@ const Services = () => {
             desc: "¿Necesitas un dominio nuevo o ya tienes uno? Gestionamos tu infraestructura cPanel y aseguramos que tu web vuele.",
             benefits: ["Gestión Integral de Dominios", "Correos Profesionales Ilimitados", "Hosting Low-Latency Optimizado"],
             price: "Por Cotizar",
-            badge: "SOPORTE"
+            badge: "SOPORTE",
+            trackingLabel: "Cotizar: Dominios Correos & Hosting"
         }
     ];
 
@@ -144,6 +149,7 @@ const Services = () => {
                                     target={service.price === "Por Cotizar" ? undefined : "_blank"}
                                     variant={service.price === "Por Cotizar" ? "glass" : "primary"}
                                     className="w-full"
+                                    trackingLabel={service.trackingLabel}
                                     onClick={(e) => {
                                         if (service.price === "Por Cotizar") {
                                             navigate('/contacto', { state: { subject: service.title } });

@@ -6,12 +6,24 @@ const variants = {
     outline: "border border-primary-500 text-primary-500 hover:bg-primary-500/10",
 };
 
-const Button = ({ children, variant = "primary", className = "", icon: Icon, href, ...props }) => {
+const Button = ({ children, variant = "primary", className = "", icon: Icon, href, trackingLabel, onClick, ...props }) => {
     const Component = href ? motion.a : motion.button;
+
+    const handleClick = (e) => {
+        if (trackingLabel && window.dataLayer) {
+            window.dataLayer.push({
+                event: 'interest_click',
+                service_name: trackingLabel,
+                click_url: href || 'button'
+            });
+        }
+        if (onClick) onClick(e);
+    };
 
     return (
         <Component
             href={href}
+            onClick={handleClick}
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             className={`cursor-pointer relative px-6 py-3 rounded-xl font-medium transition-colors flex items-center justify-center gap-2 ${variants[variant]} ${className}`}
