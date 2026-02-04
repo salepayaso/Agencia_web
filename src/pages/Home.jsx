@@ -2,6 +2,7 @@ import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import WhatsAppButton from '../components/WhatsAppButton';
 import Brands from '../components/Brands';
+import SEO from '../components/SEO';
 
 import Button from '../components/ui/Button';
 import { Rocket, ArrowRight, Zap, ShieldCheck, Headphones, TrendingUp, MonitorSmartphone, ShoppingBag, Globe, Activity, BarChart3, Mail, MessageSquare, User, Lock, Server, Search, MapPin, PieChart, Instagram } from 'lucide-react';
@@ -13,6 +14,10 @@ const Home = () => {
 
     return (
         <div className="min-h-screen bg-dark-bg text-white font-sans selection:bg-primary-500/30" style={{ scrollBehavior: 'smooth' }}>
+            <SEO
+                title="Agencia de Diseño Web & SEO en Santiago"
+                description="Desarrollamos sitios web a medida, rápidos y seguros. Expertos en Ecosistema Google para potenciar tu visibilidad digital en Chile."
+            />
             <Navbar />
             <WhatsAppButton />
 
