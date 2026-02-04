@@ -18,22 +18,22 @@ const Home = () => {
 
             {/* Hero Section */}
             <section className="relative pt-32 pb-20 px-4 md:px-8 overflow-hidden min-h-screen flex items-center">
-                {/* Background Gradients with Parallax */}
+                {/* Background Gradients with Parallax - Solo en Desktop para reducir INP */}
                 <motion.div
                     className="absolute top-0 right-0 w-1/2 h-1/2 bg-primary-500/10 rounded-full blur-[60px] md:blur-[120px] -translate-y-1/2 translate-x-1/2 pointer-events-none"
-                    animate={{
+                    animate={typeof window !== 'undefined' && window.innerWidth > 768 ? {
                         scale: [1, 1.2, 1],
                         opacity: [0.3, 0.5, 0.3]
-                    }}
+                    } : {}}
                     transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
                     style={{ y: typeof window !== 'undefined' && window.innerWidth > 768 ? y : 0 }}
                 ></motion.div>
                 <motion.div
                     className="absolute bottom-0 left-0 w-1/3 h-1/3 bg-purple-500/10 rounded-full blur-[50px] md:blur-[100px] translate-y-1/2 -translate-x-1/2 pointer-events-none"
-                    animate={{
+                    animate={typeof window !== 'undefined' && window.innerWidth > 768 ? {
                         scale: [1, 1.3, 1],
                         opacity: [0.2, 0.4, 0.2]
-                    }}
+                    } : {}}
                     transition={{ duration: 15, repeat: Infinity, ease: "easeInOut", delay: 2 }}
                     style={{ y: typeof window !== 'undefined' && window.innerWidth > 768 ? useTransform(scrollYProgress, [0, 1], ['0%', '-30%']) : 0 }}
                 ></motion.div>
@@ -185,8 +185,8 @@ const Home = () => {
                                 whileInView={{ opacity: 1, y: 0 }}
                                 viewport={{ once: true, margin: "-100px" }}
                                 transition={{
-                                    duration: 0.8,
-                                    delay: i * 0.15,
+                                    duration: typeof window !== 'undefined' && window.innerWidth > 768 ? 0.8 : 0.4,
+                                    delay: typeof window !== 'undefined' && window.innerWidth > 768 ? i * 0.15 : 0,
                                     ease: [0.21, 0.47, 0.32, 0.98]
                                 }}
                                 whileHover={{
@@ -253,8 +253,8 @@ const Home = () => {
                                 whileInView={{ opacity: 1, y: 0 }}
                                 viewport={{ once: true, margin: "-100px" }}
                                 transition={{
-                                    duration: 0.8,
-                                    delay: i * 0.1,
+                                    duration: typeof window !== 'undefined' && window.innerWidth > 768 ? 0.8 : 0.4,
+                                    delay: typeof window !== 'undefined' && window.innerWidth > 768 ? i * 0.1 : 0,
                                     ease: [0.21, 0.47, 0.32, 0.98]
                                 }}
                                 className="glass-card p-6 rounded-2xl border border-white/10 hover:border-primary-500 transition-all duration-300 group cursor-pointer"
@@ -285,8 +285,8 @@ const Home = () => {
 
             {/* Pricing Section */}
             <section className="py-24 px-4 md:px-8 bg-dark-bg relative overflow-hidden">
-                {/* Simple Visible Particles */}
-                <div className="absolute inset-0 pointer-events-none overflow-hidden">
+                {/* Simple Visible Particles - Ocultas en móvil para mejorar INP */}
+                <div className="absolute inset-0 pointer-events-none hidden md:block overflow-hidden">
                     {/* Large visible particles */}
                     <div className="absolute top-10 left-20 w-4 h-4 bg-blue-500 rounded-full animate-pulse shadow-[0_0_20px_rgba(59,130,246,1)]"></div>
                     <div className="absolute top-32 right-32 w-3 h-3 bg-purple-500 rounded-full animate-bounce shadow-[0_0_15px_rgba(168,85,247,1)]"></div>
