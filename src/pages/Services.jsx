@@ -3,6 +3,7 @@ import Footer from '../components/Footer';
 import WhatsAppButton from '../components/WhatsAppButton';
 import Section from '../components/ui/Section';
 import Button from '../components/ui/Button';
+import SEO from '../components/SEO';
 import { Layout, Rocket, Mail, Zap, Code, ArrowRight, MonitorSmartphone, ShoppingBag, Megaphone, Server, CheckCircle2, Activity, BarChart3, MessageSquare, User, Lock, TrendingUp, Search, MapPin, ShieldCheck, PieChart } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
