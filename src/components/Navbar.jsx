@@ -79,25 +79,26 @@ const Navbar = () => {
                     {isOpen ? <X size={28} /> : <Menu size={28} />}
                 </button>
 
-                {/* Mobile Menu Overlay */}
+                {/* Mobile Menu Overlay - Optimizado para evitar LAG */}
                 <AnimatePresence>
                     {isOpen && (
                         <motion.div
-                            initial={{ opacity: 0, height: 0 }}
-                            animate={{ opacity: 1, height: '100vh' }}
-                            exit={{ opacity: 0, height: 0 }}
-                            className="fixed inset-0 bg-dark-bg/95 backdrop-blur-xl z-40 md:hidden flex flex-col justify-center items-center overflow-hidden"
+                            initial={{ opacity: 0, y: -20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: -20 }}
+                            transition={{ duration: 0.2, ease: "easeOut" }}
+                            className="fixed inset-0 bg-dark-bg/98 backdrop-blur-md z-40 md:hidden flex flex-col justify-center items-center overflow-hidden"
                         >
-                            <div className="flex flex-col items-center gap-8 p-8 w-full max-w-sm pt-24">
+                            <div className="flex flex-col items-center gap-6 p-8 w-full max-w-sm pt-24">
                                 {['Inicio', 'Servicios', 'Portafolio', 'Nosotros'].map((item, i) => {
                                     const path = item === 'Inicio' ? '/' : `/${item.toLowerCase().replace(' ', '-')}`;
                                     const active = isActive(path);
                                     return (
                                         <motion.div
                                             key={item}
-                                            initial={{ opacity: 0, y: 20 }}
+                                            initial={{ opacity: 0, y: 10 }}
                                             animate={{ opacity: 1, y: 0 }}
-                                            transition={{ delay: i * 0.1 }}
+                                            transition={{ delay: i * 0.05 }}
                                             className="w-full text-center"
                                         >
                                             <Link
@@ -112,9 +113,9 @@ const Navbar = () => {
                                 })}
 
                                 <motion.div
-                                    initial={{ opacity: 0, y: 20 }}
+                                    initial={{ opacity: 0, y: 10 }}
                                     animate={{ opacity: 1, y: 0 }}
-                                    transition={{ delay: 0.4 }}
+                                    transition={{ delay: 0.25 }}
                                     className="w-full space-y-4 pt-8 border-t border-white/10 mt-4"
                                 >
                                     <Link
