@@ -124,7 +124,7 @@ const Brands = () => {
                         x: {
                             repeat: Infinity,
                             repeatType: "loop",
-                            duration: 35,
+                            duration: typeof window !== 'undefined' && window.innerWidth > 768 ? 35 : 20,
                             ease: "linear",
                         },
                     }}
