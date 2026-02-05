@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { supabase } from '../supabase';
 import { useNavigate } from 'react-router-dom';
 import Button from '../components/ui/Button';
+import SEO from '../components/SEO';
 import { Lock, Mail, Loader2, ArrowLeft } from 'lucide-react';
 import { motion } from 'framer-motion';
 
@@ -43,6 +44,10 @@ const Login = () => {
 
     return (
         <div className="min-h-screen bg-dark-bg flex items-center justify-center p-4 relative overflow-hidden">
+            <SEO
+                title="Acceso Clientes"
+                description="Portal de gestión exclusivo para clientes de Interfaz 360."
+            />
             {/* Background Decor */}
             <div className="absolute top-0 right-0 w-1/2 h-1/2 bg-primary-500/10 rounded-full blur-[120px] -translate-y-1/2 translate-x-1/2"></div>
             <div className="absolute bottom-0 left-0 w-1/3 h-1/3 bg-purple-500/10 rounded-full blur-[100px] translate-y-1/2 -translate-x-1/2"></div>

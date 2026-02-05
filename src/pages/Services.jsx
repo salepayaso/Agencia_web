@@ -74,6 +74,10 @@ const Services = () => {
 
     return (
         <div className="min-h-screen bg-dark-bg text-white font-sans selection:bg-primary-500/30">
+            <SEO
+                title="Servicios y Planes Digitales"
+                description="Descubre nuestros planes de diseño web, SEO local, y ecosistema Google. Precios transparentes y tecnología de punta."
+            />
             <Navbar />
             <WhatsAppButton />
 

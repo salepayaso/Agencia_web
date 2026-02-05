@@ -74,6 +74,10 @@ const Portfolio = () => {
 
     return (
         <div className="min-h-screen bg-dark-bg text-white font-sans selection:bg-primary-500/30">
+            <SEO
+                title="Portafolio y Casos de Éxito"
+                description="Revisa nuestros proyectos de diseño web, sistemas a medida y estrategias de marketing digital."
+            />
             <Navbar />
             <WhatsAppButton />
 
