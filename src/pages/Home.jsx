@@ -60,7 +60,16 @@ const Home = () => {
                             Somos expertos en <strong>infraestructuras digitales</strong> que impulsan el crecimiento de tu negocio mediante estrategias SEO locales de alto impacto.
                         </p>
                         <div className="flex gap-4">
-                            <Button href="/servicios" variant="primary" icon={ArrowRight} trackingLabel="Hero: Quiero Vender Mas">Quiero Vender Más</Button>
+                            <Button
+                                href={`https://wa.me/56954146176?text=${encodeURIComponent("Hola Interfaz 360, vengo desde la web y me gustaría profesionalizar mi negocio. Necesito asesoría para mi proyecto digital.")}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                variant="primary"
+                                icon={ArrowRight}
+                                trackingLabel="Hero: Habla con nosotros"
+                            >
+                                Habla con nosotros
+                            </Button>
                             <Button href="/portafolio" variant="glass" trackingLabel="Hero: Ver Portafolio">Ver portafolio</Button>
                         </div>
                     </motion.div>
