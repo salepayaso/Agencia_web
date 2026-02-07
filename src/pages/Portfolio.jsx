@@ -13,6 +13,15 @@ const Portfolio = () => {
     // Mapped Dedicated Images
     const projects = [
         {
+            title: "Panadería Santa Lucía",
+            category: "E-Commerce & SEO Local",
+            type: "web",
+            image: "/portfolio_panaderia_santa_lucia2.jpg",
+            tags: ["SEO", "Google Business", "Analytics"],
+            icon: ShoppingBag,
+            link: "https://www.panaderiasantalucia.cl/"
+        },
+        {
             title: "Sistema de Inventarios",
             category: "SaaS / Sistema a Medida",
             type: "app",
