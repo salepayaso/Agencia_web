@@ -57,10 +57,12 @@ const SEO = ({ title, description, image = '/seo_imagen.jpg' }) => {
 
         pathSegments.forEach((segment, index) => {
             const url = `https://www.interfaz360.cl/${pathSegments.slice(0, index + 1).join('/')}`;
+            let name = segment.charAt(0).toUpperCase() + segment.slice(1);
+            if (name === 'Nosotros') name = 'Nosotros'; // Keep consistent
             breadcrumbList.itemListElement.push({
                 "@type": "ListItem",
                 "position": index + 2,
-                "name": segment.charAt(0).toUpperCase() + segment.slice(1),
+                "name": name,
                 "item": url
             });
         });
