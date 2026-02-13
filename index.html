@@ -50,13 +50,18 @@
   <script type="application/ld+json">
     {
       "@context": "https://schema.org",
-      "@type": "ProfessionalService",
+      "@type": "WebDesignCompany",
       "name": "Interfaz 360",
       "image": "https://www.interfaz360.cl/seo_imagen.jpg",
-      "@id": "https://www.interfaz360.cl",
+      "@id": "https://www.interfaz360.cl#organization",
       "url": "https://www.interfaz360.cl/",
       "telephone": "+56954146176",
       "priceRange": "$$",
+      "hasMap": "https://share.google/A8CTJPzLE01x784C8",
+      "areaServed": {
+        "@type": "Country",
+        "name": "CL"
+      },
       "address": {
         "@type": "PostalAddress",
         "streetAddress": "Santiago",
@@ -96,11 +101,46 @@
       "@type": "WebSite",
       "name": "Interfaz 360",
       "url": "https://www.interfaz360.cl/",
+      "publisher": {
+        "@id": "https://www.interfaz360.cl#organization"
+      },
       "potentialAction": {
         "@type": "SearchAction",
         "target": "https://www.interfaz360.cl/search?q={search_term_string}",
         "query-input": "required name=search_term_string"
       }
+    }
+  </script>
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "ItemList",
+      "itemListElement": [
+        {
+          "@type": "SiteNavigationElement",
+          "position": 1,
+          "name": "Servicios",
+          "url": "https://www.interfaz360.cl/servicios"
+        },
+        {
+          "@type": "SiteNavigationElement",
+          "position": 2,
+          "name": "Portafolio",
+          "url": "https://www.interfaz360.cl/portafolio"
+        },
+        {
+          "@type": "SiteNavigationElement",
+          "position": 3,
+          "name": "Nosotros",
+          "url": "https://www.interfaz360.cl/nosotros"
+        },
+        {
+          "@type": "SiteNavigationElement",
+          "position": 4,
+          "name": "Contacto",
+          "url": "https://www.interfaz360.cl/contacto"
+        }
+      ]
     }
   </script>
 
