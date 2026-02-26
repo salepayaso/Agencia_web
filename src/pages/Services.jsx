@@ -18,7 +18,7 @@ const Services = () => {
             title: "Plan Pyme Digital",
             tagline: "Tu Carta de Presentación Digital",
             desc: "Ideal para emprendedores que necesitan una imagen impecable y aparecer en Google de inmediato.",
-            benefits: ["Desarrollo Pagina Web", "2 Correos Corporativos", "Dominio & Hosting 1 año GRATIS", "Google Business + SEO Local", "Tecnología React Alta Interactividad", "Certificado SSL de Seguridad"],
+            benefits: ["Landing Page Profesional", "2 Correos Corporativos", "Dominio & Hosting 1 año GRATIS", "Google Business + SEO Local", "Tecnología React Alta Interactividad", "Certificado SSL de Seguridad"],
             price: "$250.000",
             whatsappMsg: "Hola Interfaz 360, me interesa contratar el Plan Pyme Digital. ¿Me podrían dar más información?",
             badge: "NUEVO",
