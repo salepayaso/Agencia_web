@@ -51,7 +51,7 @@ const Home = () => {
                     >
                         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-sm text-primary-400 mb-6 font-medium">
                             <Rocket className="w-4 h-4" />
-                            <span>Agencia de Diseño Web & SEO en Santiago</span>
+                            <span>Agencia de Diseño Web & Software en Chile</span>
                         </div>
                         <h1 className="text-5xl md:text-7xl font-bold leading-tight mb-6">
                             ¿Tu negocio no aparece <br /><span className="text-gradient">primero en Google?</span>
@@ -349,7 +349,7 @@ const Home = () => {
 
                             <div className="space-y-4 mb-10">
                                 {[
-                                    { text: "Desarrollo Pagina Web", bold: true },
+                                    { text: "Landing Page Profesional", bold: true },
                                     { text: "2 Correos Corporativos", bold: true },
                                     { text: "Dominio & Hosting 1 año GRATIS", bold: true },
                                     { text: "Google Business + SEO Local", bold: true },
