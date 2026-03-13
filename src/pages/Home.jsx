@@ -51,7 +51,7 @@ const Home = () => {
                     >
                         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-sm text-primary-400 mb-6 font-medium">
                             <Rocket className="w-4 h-4" />
-                            <span>Agencia de Diseño Web & Software en Chile</span>
+                            <span>Agencia de Diseño Web & Software en Santiago</span>
                         </div>
                         <h1 className="text-5xl md:text-7xl font-bold leading-tight mb-6">
                             ¿Tu negocio no aparece <br /><span className="text-gradient">primero en Google?</span>
