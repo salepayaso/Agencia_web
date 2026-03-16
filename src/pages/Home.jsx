@@ -83,13 +83,18 @@ const Home = () => {
                         {/* Modern Tech Visual */}
                         <div className="relative z-10 glass-card p-2 rounded-3xl border-t border-l border-white/20 overflow-hidden group shadow-2xl">
                             <div className="h-80 md:h-[480px] rounded-2xl overflow-hidden relative flex items-center justify-center bg-black/20">
-                                <img
-                                    src="/hero_clean.jpg"
-                                    alt="Google Security & Tech Ecosystem"
-                                    className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700"
-                                    fetchpriority="high"
-                                    loading="eager"
-                                />
+                                <picture>
+                                    <source srcSet="/hero_clean.webp" type="image/webp" />
+                                    <img
+                                        src="/hero_clean.jpg"
+                                        alt="Google Security & Tech Ecosystem"
+                                        className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700"
+                                        width={512}
+                                        height={512}
+                                        fetchpriority="high"
+                                        loading="eager"
+                                    />
+                                </picture>
                                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent pointer-events-none"></div>
                                 <div className="absolute bottom-4 left-4 right-4">
                                     <div className="flex items-center gap-2 mb-2">
