@@ -2,10 +2,12 @@ import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import WhatsAppButton from '../components/WhatsAppButton';
 import Brands from '../components/Brands';
+import VentajasCompetitivas from '../components/VentajasCompetitivas';
 import SEO from '../components/SEO';
 
 import Button from '../components/ui/Button';
-import { Rocket, ArrowRight, Zap, ShieldCheck, Headphones, TrendingUp, MonitorSmartphone, ShoppingBag, Globe, Activity, BarChart3, Mail, MessageSquare, User, Lock, Server, Search, MapPin, PieChart, Instagram } from 'lucide-react';
+import SpotlightCard from '../components/SpotlightCard';
+import { Rocket, ArrowRight, Zap, ShieldCheck, Headphones, TrendingUp, MonitorSmartphone, Activity, BarChart3, Mail, MessageSquare, User, Lock, Search, MapPin, PieChart, Instagram, Bot, Code2 } from 'lucide-react';
 import { motion, useScroll, useTransform } from 'framer-motion';
 
 const Home = () => {
@@ -15,8 +17,8 @@ const Home = () => {
     return (
         <div className="min-h-screen bg-dark-bg text-white font-sans selection:bg-primary-500/30" style={{ scrollBehavior: 'smooth' }}>
             <SEO
-                title="Agencia de Diseño Web & SEO en Santiago"
-                description="Desarrollamos sitios web a medida, rápidos y seguros. Expertos en Ecosistema Google para potenciar tu visibilidad digital en Chile."
+                title="Interfaz360 — Agencia Digital IA en Chile | Web, Software y Agentes IA para Pymes"
+                description="Automatiza tu negocio con agentes IA. Chat web 24/7, clasificador de correos y software a medida. Más diseño web, Google Business y SEO local para pymes en todo Chile."
             />
             <Navbar />
             <WhatsAppButton />
@@ -51,13 +53,13 @@ const Home = () => {
                     >
                         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-sm text-primary-400 mb-6 font-medium">
                             <Rocket className="w-4 h-4" />
-                            <span>Agencia de Diseño Web & Software en Santiago</span>
+                            <span>✦ Web · Google · Software · Agentes IA</span>
                         </div>
                         <h1 className="text-5xl md:text-7xl font-bold leading-tight mb-6">
-                            ¿Tu negocio no aparece <br /><span className="text-gradient">primero en Google?</span>
+                            Tu negocio automatizado con <span className="text-gradient">Inteligencia Artificial.</span>
                         </h1>
                         <p className="text-gray-300 text-lg mb-8 max-w-lg">
-                            Somos expertos en <strong>infraestructuras digitales</strong> que impulsan el crecimiento de tu negocio mediante estrategias SEO locales de alto impacto.
+                            Interfaz360 automatiza la atención de tu negocio con agentes IA — responde mensajes, clasifica correos y atiende tu sitio web las 24 horas. Soluciones digitales completas para pymes en Chile.
                         </p>
                         <div className="flex gap-4">
                             <Button
@@ -68,7 +70,7 @@ const Home = () => {
                                 icon={ArrowRight}
                                 trackingLabel="Hero: Habla con nosotros"
                             >
-                                Habla con nosotros
+                                Solicitar asesoría
                             </Button>
                             <Button href="/portafolio" variant="glass" trackingLabel="Hero: Ver Portafolio">Ver portafolio</Button>
                         </div>
@@ -81,30 +83,30 @@ const Home = () => {
                         className="relative hidden md:block"
                     >
                         {/* Modern Tech Visual */}
-                        <div className="relative z-10 glass-card p-2 rounded-3xl border-t border-l border-white/20 overflow-hidden group shadow-2xl">
-                            <div className="h-80 md:h-[480px] rounded-2xl overflow-hidden relative flex items-center justify-center bg-black/20">
-                                <picture>
-                                    <source srcSet="/hero_clean.webp" type="image/webp" />
-                                    <img
-                                        src="/hero_clean.jpg"
-                                        alt="Google Security & Tech Ecosystem"
-                                        className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700"
-                                        width={512}
-                                        height={512}
-                                        fetchpriority="high"
-                                        loading="eager"
-                                    />
-                                </picture>
+                        <div className="relative z-10 glass-card rounded-3xl border border-white/20 overflow-hidden group shadow-2xl" style={{ boxShadow: '0 0 40px rgba(255,255,255,0.25), 0 0 80px rgba(200,200,255,0.15), 0 0 140px rgba(150,150,255,0.1), 0 30px 60px rgba(0,0,0,0.6)' }}>
+                            <div className="h-80 md:h-[480px] overflow-hidden relative flex items-center justify-center">
+                                <img
+                                    src="/Imagen HERO 01.jpg"
+                                    alt="Agentes IA para pymes en Chile — Interfaz360"
+                                    className="w-full h-full object-cover object-center transform group-hover:scale-105 transition-transform duration-700"
+                                    width={512}
+                                    height={512}
+                                    fetchpriority="high"
+                                    loading="eager"
+                                />
                                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent pointer-events-none"></div>
                                 <div className="absolute bottom-4 left-4 right-4">
-                                    <div className="flex items-center gap-2 mb-2">
-                                        <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse"></div>
-                                        <span className="text-green-400 text-sm font-medium">Google Certified</span>
+                                    <div className="flex items-center gap-2 mb-3">
+                                        <span className="relative flex h-2 w-2">
+                                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75"></span>
+                                            <span className="relative inline-flex rounded-full h-2 w-2 bg-cyan-400"></span>
+                                        </span>
+                                        <span className="text-cyan-300 text-sm font-semibold tracking-wide">IA Activa 24/7</span>
                                     </div>
-                                    <div className="flex gap-2">
-                                        <div className="px-3 py-1.5 rounded-full bg-blue-500/20 border border-blue-500/30 text-xs text-blue-300 backdrop-blur-sm">Secure SSL</div>
-                                        <div className="px-3 py-1.5 rounded-full bg-orange-500/20 border border-orange-500/30 text-xs text-orange-300 backdrop-blur-sm">Google Cloud</div>
-                                        <div className="px-3 py-1.5 rounded-full bg-yellow-500/20 border border-yellow-500/30 text-xs text-yellow-300 backdrop-blur-sm">Analytics</div>
+                                    <div className="flex flex-wrap gap-2">
+                                        <div className="px-3 py-1.5 rounded-full bg-cyan-500/15 border border-cyan-500/30 text-xs text-cyan-300 backdrop-blur-sm font-medium">Agentes IA</div>
+                                        <div className="px-3 py-1.5 rounded-full bg-violet-500/15 border border-violet-500/30 text-xs text-violet-300 backdrop-blur-sm font-medium">Chat Web</div>
+                                        <div className="px-3 py-1.5 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-xs text-emerald-300 backdrop-blur-sm font-medium">WhatsApp Bot</div>
                                     </div>
                                 </div>
                             </div>
@@ -113,6 +115,8 @@ const Home = () => {
                     </motion.div>
                 </div>
             </section>
+
+            <VentajasCompetitivas />
 
             <Brands />
 
@@ -150,147 +154,61 @@ const Home = () => {
             </div>
 
 
-            {/* Benefits Section - Por Qué Elegirnos */}
-            <section className="py-20 px-4 md:px-8 bg-dark-bg relative overflow-hidden">
-                <div className="absolute top-0 left-1/2 w-96 h-96 bg-primary-500/10 rounded-full blur-[120px] -translate-x-1/2"></div>
-
-                <div className="max-w-7xl mx-auto relative z-10">
-                    <div className="text-center mb-12">
-                        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-xs text-primary-400 mb-4">
-                            <span className="font-semibold uppercase tracking-wider">Ventajas Competitivas</span>
-                        </div>
-                        <h2 className="text-3xl md:text-4xl font-bold mb-4">
-                            ¿Por Qué <span className="text-gradient">Elegirnos?</span>
-                        </h2>
-                        <p className="text-gray-300 max-w-2xl mx-auto">
-                            No somos una agencia más. Somos tu socio tecnológico integral.
-                        </p>
-                    </div>
-
-                    <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-                        {[
-                            {
-                                icon: MonitorSmartphone,
-                                gradient: "from-amber-500 to-orange-600 shadow-orange-500/20",
-                                title: "Estudio de Visibilidad & Web",
-                                desc: "Análisis de métricas y sitios de última generación con React. Sin plantillas, pura estrategia digital."
-                            },
-                            {
-                                icon: Lock,
-                                gradient: "from-blue-500 to-cyan-600 shadow-cyan-500/20",
-                                title: "Servidor & SSL Google",
-                                desc: "Incluye hosting, dominios y Certificado SSL (candado seguro) de Google."
-                            },
-                            {
-                                icon: () => (
-                                    <svg viewBox="0 0 24 24" fill="currentColor" className="w-full h-full text-white">
-                                        <path d="M12.48 10.92v3.28h7.84c-.24 1.84-.853 3.187-1.787 4.133-1.147 1.147-2.933 2.4-6.053 2.4-4.827 0-8.6-3.893-8.6-8.72s3.773-8.72 8.6-8.72c2.6 0 4.507 1.027 5.907 2.347l2.307-2.307C18.747 1.44 16.133 0 12.48 0 5.867 0 .533 5.333 .533 12S5.867 24 12.48 24c3.44 0 6.013-1.147 8.027-3.24 2.053-2.08 2.667-5.013 2.667-7.467 0-.747-.053-1.467-.16-2.133H12.48z" />
-                                    </svg>
-                                ),
-                                gradient: "from-blue-500 via-red-500 to-yellow-500 shadow-blue-500/20",
-                                title: "Ecosistema Google",
-                                desc: "Potencia tu presencia con Google Search Console, Analytics y Google Maps (Business). Te ayudamos a aparecer primero."
-                            },
-                            {
-                                icon: Headphones,
-                                gradient: "from-emerald-500 to-green-600 shadow-emerald-500/20",
-                                title: "Soporte Dedicado",
-                                desc: "Equipo real para ayudarte con correos, claves y dudas técnicas."
-                            }
-                        ].map((benefit, i) => (
-                            <motion.div
-                                key={i}
-                                initial={{ opacity: 0, y: 30 }}
-                                whileInView={{ opacity: 1, y: 0 }}
-                                viewport={{ once: true, margin: "-100px" }}
-                                transition={{
-                                    duration: typeof window !== 'undefined' && window.innerWidth > 768 ? 0.8 : 0.4,
-                                    delay: typeof window !== 'undefined' && window.innerWidth > 768 ? i * 0.15 : 0,
-                                    ease: [0.21, 0.47, 0.32, 0.98]
-                                }}
-                                whileHover={{
-                                    y: -8,
-                                    transition: { duration: 0.3 }
-                                }}
-                                className="glass-card p-6 rounded-2xl border border-white/10 hover:border-primary-500/50 transition-all duration-300 group perspective-1000"
-                            >
-                                <div className={`w-12 h-12 rounded-lg bg-gradient-to-br ${benefit.gradient} p-2.5 mb-4 group-hover:scale-110 transition-transform duration-300 shadow-lg`}>
-                                    <benefit.icon className="w-full h-full text-white" />
-                                </div>
-                                <h3 className="text-lg font-bold mb-2 group-hover:text-primary-400 transition-colors">
-                                    {benefit.title}
-                                </h3>
-                                <p className="text-gray-300 text-sm leading-relaxed">
-                                    {benefit.desc}
-                                </p>
-                            </motion.div>
-                        ))}
-                    </div>
-                </div>
-            </section>
 
             {/* Services Teaser Section */}
             <section className="py-20 px-4 md:px-8 bg-gradient-to-b from-black/20 to-dark-bg">
                 <div className="max-w-7xl mx-auto">
                     <div className="text-center mb-12">
+                        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-xs text-primary-400 mb-4">
+                            <span className="font-semibold uppercase tracking-wider">Lo que hacemos</span>
+                        </div>
                         <h2 className="text-3xl md:text-4xl font-bold mb-4">
-                            Soluciones <span className="text-gradient">Integrales</span>
+                            Tecnología que <span className="text-gradient">trabaja por ti</span>
                         </h2>
                         <p className="text-gray-300 max-w-2xl mx-auto mb-8">
-                            Desde tu primera web hasta sistemas empresariales complejos. Todo bajo un mismo techo.
+                            Automatizamos, desarrollamos y posicionamos tu negocio en el mundo digital. Sin complicaciones.
                         </p>
                     </div>
 
-                    <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+                    <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
                         {[
                             {
+                                icon: Bot,
+                                iconColor: '#38BDF8',
+                                glowColor: '#38BDF8',
+                                tag: 'Nuevo',
+                                title: 'Agentes IA',
+                                desc: 'Automatizamos la atención de tu negocio con inteligencia artificial. Responden mensajes en WhatsApp, Instagram y tu sitio web las 24 horas, sin que tengas que estar presente.',
+                                link: '/servicios'
+                            },
+                            {
+                                icon: Code2,
+                                iconColor: '#A78BFA',
+                                glowColor: '#A78BFA',
+                                tag: 'Popular',
+                                title: 'Software a Medida',
+                                desc: 'Sistemas digitales hechos para tu operación: paneles de control, automatizaciones e integraciones con tus herramientas actuales. Sin plantillas, sin límites.',
+                                link: '/servicios'
+                            },
+                            {
                                 icon: MonitorSmartphone,
-                                gradient: "from-pink-500 to-rose-600 shadow-pink-500/20",
-                                title: "Ecosistema Google 360",
-                                desc: "Infraestructura completa: Maps, Search Console y Analytics 4.",
-                                link: "/servicios"
-                            },
-                            {
-                                icon: ShoppingBag,
-                                gradient: "from-violet-500 to-purple-600 shadow-purple-500/20",
-                                title: "E-Commerce",
-                                desc: "Tiendas online rápidas y seguras. Vende 24/7.",
-                                link: "/servicios"
-                            },
-                            {
-                                icon: Globe,
-                                gradient: "from-cyan-500 to-blue-600 shadow-cyan-500/20",
-                                title: "Dominios, Correos & Hosting",
-                                desc: "Tu identidad digital completa. Dominios, correos corporativos y hosting seguro.",
-                                link: "/servicios"
+                                iconColor: '#34D399',
+                                glowColor: '#34D399',
+                                tag: 'Esencial',
+                                title: 'Diseño Web',
+                                desc: 'Sitios web en React que cargan rápido, se ven increíbles y convierten visitantes en clientes. Sin WordPress, sin plugins que se rompen. Tu sitio, tuyo para siempre.',
+                                link: '/servicios'
                             }
                         ].map((service, i) => (
-                            <motion.a
+                            <motion.div
                                 key={i}
-                                href={service.link}
                                 initial={{ opacity: 0, y: 30 }}
                                 whileInView={{ opacity: 1, y: 0 }}
-                                viewport={{ once: true, margin: "-100px" }}
-                                transition={{
-                                    duration: typeof window !== 'undefined' && window.innerWidth > 768 ? 0.8 : 0.4,
-                                    delay: typeof window !== 'undefined' && window.innerWidth > 768 ? i * 0.1 : 0,
-                                    ease: [0.21, 0.47, 0.32, 0.98]
-                                }}
-                                className="glass-card p-6 rounded-2xl border border-white/10 hover:border-primary-500 transition-all duration-300 group cursor-pointer"
+                                viewport={{ once: true, margin: '-80px' }}
+                                transition={{ duration: 0.5, delay: i * 0.1 }}
                             >
-                                <div className={`w-12 h-12 rounded-lg bg-gradient-to-br ${service.gradient} p-2.5 mb-4 group-hover:scale-110 transition-transform duration-300 shadow-lg`}>
-                                    <service.icon className="w-full h-full text-white" />
-                                </div>
-                                <h3 className="text-xl font-bold mb-2 group-hover:text-primary-400 transition-colors">
-                                    {service.title}
-                                </h3>
-                                <p className="text-gray-300 text-sm mb-4">
-                                    {service.desc}
-                                </p>
-                                <span className="text-primary-400 text-sm font-medium inline-flex items-center gap-2 group-hover:gap-3 transition-all">
-                                    Ver más <ArrowRight className="w-4 h-4" />
-                                </span>
-                            </motion.a>
+                                <SpotlightCard {...service} />
+                            </motion.div>
                         ))}
                     </div>
 
