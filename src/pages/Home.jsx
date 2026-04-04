@@ -313,7 +313,7 @@ const Home = () => {
                             className="glass-card rounded-3xl border-2 border-purple-500 p-8 md:p-10 relative overflow-hidden group shadow-[0_0_50px_rgba(168,85,247,0.15)] flex flex-col bg-gradient-to-b from-purple-900/20 to-transparent"
                         >
                             <div className="mb-8 relative z-20">
-                                <h3 className="text-2xl font-bold mb-2">Ecosistema Google 360</h3>
+                                <h3 className="text-2xl font-bold mb-2">Suite Digital 360</h3>
                                 <div className="text-purple-400 text-sm font-medium mb-6">El Motor Digital de tu Negocio</div>
                                 <p className="text-gray-300 text-sm leading-relaxed mb-4">
                                     Para empresas que buscan mayor potencia, gestión de clientes y una infraestructura Google completa.
@@ -323,11 +323,10 @@ const Home = () => {
                             <div className="space-y-4 mb-10 flex-grow">
                                 {[
                                     { text: "Desarrollo Pagina Web Multi-Sección", bold: true },
-                                    { text: "4 Correos Corporativos", bold: true },
+                                    { text: "5 Correos Corporativos", bold: true },
                                     { text: "Dominio & Hosting 1 año GRATIS", bold: true },
                                     { text: "Google Business + SEO Local", bold: true },
                                     { text: "GTM, Analytics & Search Console", bold: true },
-                                    { text: "Google Looker Studio (Métricas)", bold: true },
                                     { text: "Perfil de Gestión INTERFAZ 360", bold: true },
                                     { text: "Tecnología React Alta Interactividad", bold: true },
                                     { text: "Certificado SSL de Seguridad", bold: true }
@@ -345,12 +344,12 @@ const Home = () => {
                                     <span className="text-gray-300 text-xs">pago único CLP</span>
                                 </div>
                                 <Button
-                                    href={`https://wa.me/56954146176?text=${encodeURIComponent("Hola Interfaz 360, me interesa contratar el Ecosistema Google 360. ¿Me podrían dar más información?")}`}
+                                    href={`https://wa.me/56954146176?text=${encodeURIComponent("Hola Interfaz 360, me interesa contratar la Suite Digital 360. ¿Me podrían dar más información?")}`}
                                     target="_blank"
                                     rel="noopener noreferrer"
                                     variant="primary"
                                     className="w-full !py-4 shadow-lg bg-purple-600 hover:bg-purple-700 shadow-purple-500/20 border-none relative z-20"
-                                    trackingLabel="Contratar: Ecosistema Google 360"
+                                    trackingLabel="Contratar: Suite Digital 360"
                                 >
                                     Activar Mi Ecosistema 360
                                 </Button>
@@ -385,7 +384,7 @@ const Home = () => {
                                 <span className="text-gradient">Gestión 360</span>
                             </h2>
                             <p className="text-gray-300 text-base mb-6 leading-relaxed">
-                                Nuestros clientes con Ecosistema Google 360 tienen acceso a un panel exclusivo donde pueden ver y gestionar sus servicios activos las 24 horas. Transparencia total.
+                                Nuestros clientes con Suite Digital 360 tienen acceso a un panel exclusivo donde pueden ver y gestionar sus servicios activos las 24 horas. Transparencia total.
                             </p>
 
                             <div className="space-y-4">
