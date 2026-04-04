@@ -56,10 +56,10 @@ const Home = () => {
                             <span>✦ Web · Google · Software · Agentes IA</span>
                         </div>
                         <h1 className="text-5xl md:text-7xl font-bold leading-tight mb-6">
-                            Tecnología de grandes empresas, <span className="text-gradient">al alcance de tu pyme.</span>
+                            La agencia digital que <span className="text-gradient">hace crecer tu pyme.</span>
                         </h1>
                         <p className="text-gray-300 text-lg mb-8 max-w-lg">
-                            Interfaz360 es tu agencia digital en Chile. Creamos sitios web, ecosistemas Google, software a medida y agentes IA que atienden tu negocio por WhatsApp o tu sitio web — sin intermediarios, trato directo con el desarrollador.
+                            ¿Cuántos clientes perdiste hoy por no aparecer en Google? En Interfaz360 creamos tu sitio web, te posicionamos en los buscadores y configuramos un agente IA que responde por WhatsApp y tu web las 24 horas. Tecnología de grandes empresas, al precio de una pyme.
                         </p>
                         <div className="flex gap-4">
                             <Button
@@ -67,12 +67,11 @@ const Home = () => {
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 variant="primary"
-                                icon={ArrowRight}
                                 trackingLabel="Hero: Habla con nosotros"
                             >
-                                Solicitar asesoría
+                                Habla con nosotros
                             </Button>
-                            <Button href="/portafolio" variant="glass" trackingLabel="Hero: Ver Portafolio">Ver portafolio</Button>
+                            <Button href="/servicios" variant="glass" trackingLabel="Hero: Ver Servicios">Ver servicios</Button>
                         </div>
                     </motion.div>
 
@@ -222,17 +221,10 @@ const Home = () => {
 
             {/* Pricing Section */}
             <section className="py-24 px-4 md:px-8 bg-dark-bg relative overflow-hidden">
-                {/* Simple Visible Particles - Ocultas en móvil para mejorar INP */}
-                <div className="absolute inset-0 pointer-events-none hidden md:block overflow-hidden">
-                    {/* Large visible particles */}
-                    <div className="absolute top-10 left-20 w-4 h-4 bg-blue-500 rounded-full animate-pulse shadow-[0_0_20px_rgba(59,130,246,1)]"></div>
-                    <div className="absolute top-32 right-32 w-3 h-3 bg-purple-500 rounded-full animate-bounce shadow-[0_0_15px_rgba(168,85,247,1)]"></div>
-                    <div className="absolute bottom-40 left-40 w-4 h-4 bg-white rounded-full animate-ping shadow-[0_0_15px_white]"></div>
-                    <div className="absolute top-60 right-20 w-3 h-3 bg-blue-400 rounded-full animate-pulse shadow-[0_0_12px_rgba(96,165,250,1)]" style={{ animationDelay: '1s' }}></div>
-                    <div className="absolute bottom-20 right-60 w-2 h-2 bg-purple-400 rounded-full animate-bounce shadow-[0_0_10px_rgba(192,132,252,1)]" style={{ animationDelay: '0.5s' }}></div>
-                    <div className="absolute top-24 left-60 w-3 h-3 bg-white rounded-full animate-pulse shadow-[0_0_15px_white]" style={{ animationDelay: '1.5s' }}></div>
-                    <div className="absolute bottom-60 left-24 w-2 h-2 bg-blue-300 rounded-full animate-ping shadow-[0_0_10px_rgba(147,197,253,1)]"></div>
-                    <div className="absolute top-48 right-48 w-2 h-2 bg-purple-300 rounded-full animate-bounce shadow-[0_0_10px_rgba(216,180,254,1)]" style={{ animationDelay: '0.7s' }}></div>
+                {/* Gradientes suaves cerca de las tarjetas */}
+                <div className="absolute inset-0 pointer-events-none overflow-hidden">
+                    <div className="absolute bottom-0 left-1/4 w-80 h-80 bg-blue-500/10 rounded-full blur-[80px]"></div>
+                    <div className="absolute bottom-0 right-1/4 w-80 h-80 bg-purple-500/10 rounded-full blur-[80px]"></div>
                 </div>
 
                 <div className="max-w-7xl mx-auto relative z-10">
@@ -256,10 +248,10 @@ const Home = () => {
                             whileInView={{ opacity: 1, y: 0 }}
                             viewport={{ once: true, margin: "-100px" }}
                             transition={{ duration: 0.8, ease: [0.21, 0.47, 0.32, 0.98] }}
-                            className="glass-card rounded-3xl border border-blue-500/20 p-8 md:p-10 relative overflow-hidden group hover:border-blue-500 transition-all duration-500 flex flex-col bg-gradient-to-b from-blue-900/10 to-transparent h-full"
+                            className="glass-card rounded-3xl border-2 border-blue-500 p-8 md:p-10 relative overflow-hidden group flex flex-col bg-gradient-to-b from-blue-900/20 to-transparent h-full" style={{boxShadow: '0 0 40px rgba(255,255,255,0.15), 0 0 80px rgba(59,130,246,0.3), 0 20px 60px rgba(0,0,0,0.4)'}}
                         >
                             <div className="absolute top-4 right-4 bg-gradient-to-r from-blue-500 to-indigo-600 text-white px-4 py-1 rounded-full font-bold text-[10px] tracking-widest shadow-lg uppercase">
-                                NUEVO
+                                MÁS POPULAR
                             </div>
 
                             <div className="mb-8">
@@ -287,19 +279,15 @@ const Home = () => {
                             </div>
 
                             <div className="mt-auto">
-                                <div className="flex items-baseline gap-2 mb-6">
-                                    <span className="text-4xl font-extrabold text-white">$250.000</span>
-                                    <span className="text-gray-300 text-xs">pago único CLP</span>
-                                </div>
                                 <Button
                                     href={`https://wa.me/56954146176?text=${encodeURIComponent("Hola Interfaz 360, me interesa contratar el Plan Pyme Digital. ¿Me podrían dar más información?")}`}
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    variant="glass"
-                                    className="w-full !py-4 hover:bg-blue-600/20"
+                                    variant="primary"
+                                    className="w-full !py-4"
                                     trackingLabel="Contratar: Plan Pyme Digital"
                                 >
-                                    Empezar Hoy
+                                    Solicitar Asesoría
                                 </Button>
                             </div>
                         </motion.div>
@@ -310,48 +298,46 @@ const Home = () => {
                             whileInView={{ opacity: 1, y: 0 }}
                             viewport={{ once: true, margin: "-100px" }}
                             transition={{ duration: 0.8, delay: 0.2, ease: [0.21, 0.47, 0.32, 0.98] }}
-                            className="glass-card rounded-3xl border-2 border-purple-500 p-8 md:p-10 relative overflow-hidden group shadow-[0_0_50px_rgba(168,85,247,0.15)] flex flex-col bg-gradient-to-b from-purple-900/20 to-transparent"
+                            className="glass-card rounded-3xl border-2 border-purple-500 p-8 md:p-10 relative overflow-hidden group flex flex-col bg-gradient-to-b from-purple-900/20 to-transparent" style={{boxShadow: '0 0 40px rgba(255,255,255,0.15), 0 0 80px rgba(168,85,247,0.3), 0 20px 60px rgba(0,0,0,0.4)'}}
                         >
+                            <div className="absolute top-4 right-4 bg-gradient-to-r from-purple-500 to-pink-600 text-white px-4 py-1 rounded-full font-bold text-[10px] tracking-widest shadow-lg uppercase">
+                                NUEVO
+                            </div>
                             <div className="mb-8 relative z-20">
-                                <h3 className="text-2xl font-bold mb-2">Suite Digital 360</h3>
-                                <div className="text-purple-400 text-sm font-medium mb-6">El Motor Digital de tu Negocio</div>
+                                <h3 className="text-2xl font-bold mb-2">Agente IA 24/7</h3>
+                                <div className="text-purple-400 text-sm font-medium mb-6">Tu negocio nunca deja de atender</div>
                                 <p className="text-gray-300 text-sm leading-relaxed mb-4">
-                                    Para empresas que buscan mayor potencia, gestión de clientes y una infraestructura Google completa.
+                                    Automatiza la atención de tu negocio con inteligencia artificial. Responde clientes por WhatsApp o tu sitio web — incluso mientras duermes.
                                 </p>
                             </div>
 
                             <div className="space-y-4 mb-10 flex-grow">
                                 {[
-                                    { text: "Desarrollo Pagina Web Multi-Sección", bold: true },
-                                    { text: "5 Correos Corporativos", bold: true },
-                                    { text: "Dominio & Hosting 1 año GRATIS", bold: true },
-                                    { text: "Google Business + SEO Local", bold: true },
-                                    { text: "GTM, Analytics & Search Console", bold: true },
-                                    { text: "Perfil de Gestión INTERFAZ 360", bold: true },
-                                    { text: "Tecnología React Alta Interactividad", bold: true },
-                                    { text: "Certificado SSL de Seguridad", bold: true }
-                                ].map((item, i) => (
+                                    "Agente IA para WhatsApp Business",
+                                    "Chat IA integrado en tu sitio web",
+                                    "Respuestas automáticas 24/7",
+                                    "Configurado con la info de tu negocio",
+                                    "Sin costo fijo elevado de personal",
+                                    "Cotización a medida según tu rubro"
+                                ].map((text, i) => (
                                     <div key={i} className="flex items-start gap-3">
                                         <Zap className="w-4 h-4 text-purple-500 mt-0.5 shrink-0" />
-                                        <span className={`${item.bold ? 'text-white' : 'text-gray-300'} text-sm`}>{item.text}</span>
+                                        <span className="text-white text-sm">{text}</span>
                                     </div>
                                 ))}
                             </div>
 
                             <div className="mt-auto">
-                                <div className="flex items-baseline gap-2 mb-6">
-                                    <span className="text-4xl font-extrabold text-white">$350.000</span>
-                                    <span className="text-gray-300 text-xs">pago único CLP</span>
-                                </div>
+                                <p className="text-purple-300 text-sm font-medium mb-4">Precio según tu negocio y necesidades</p>
                                 <Button
-                                    href={`https://wa.me/56954146176?text=${encodeURIComponent("Hola Interfaz 360, me interesa contratar la Suite Digital 360. ¿Me podrían dar más información?")}`}
+                                    href={`https://wa.me/56954146176?text=${encodeURIComponent("Hola Interfaz 360, me interesa un Agente IA para mi negocio. ¿Me podrían dar más información?")}`}
                                     target="_blank"
                                     rel="noopener noreferrer"
                                     variant="primary"
                                     className="w-full !py-4 shadow-lg bg-purple-600 hover:bg-purple-700 shadow-purple-500/20 border-none relative z-20"
-                                    trackingLabel="Contratar: Suite Digital 360"
+                                    trackingLabel="Contratar: Agente IA 24/7"
                                 >
-                                    Activar Mi Ecosistema 360
+                                    Quiero mi Agente IA
                                 </Button>
                             </div>
                         </motion.div>

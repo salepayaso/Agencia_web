@@ -1,18 +1,18 @@
 import { motion } from 'framer-motion';
-import { Bot, MessageCircle, MapPin, BarChart3, ShieldCheck, Code2 } from 'lucide-react';
+import { Briefcase, MessageCircle, MapPin, BarChart3, ShieldCheck, Code2 } from 'lucide-react';
 import FlipCard from './FlipCard';
 
 const WA_ASESORIA = `https://wa.me/56954146176?text=${encodeURIComponent('Hola Interfaz360, vengo desde la web y me gustaría solicitar asesoría para un proyecto digital.')}`;
 
 const tarjetas = [
     {
-        icon: Bot,
+        icon: Briefcase,
         iconColor: '#378ADD',
         iconBg: '#378ADD1A',
-        frontTitle: 'Agentes IA para tu negocio',
-        frontDesc: 'Automatiza WhatsApp, correo y chat web. Tu negocio responde 24/7 con inteligencia artificial.',
-        backTitle: 'IA que trabaja mientras duermes',
-        backDesc: 'Configuramos agentes IA a medida para tu pyme — responden mensajes, clasifican correos y atienden visitantes del sitio sin costo fijo elevado.',
+        frontTitle: 'Experiencia real en procesos empresariales',
+        frontDesc: 'No solo desarrollamos webs — entendemos cómo funciona un negocio por dentro. Eso hace la diferencia.',
+        backTitle: 'Soluciones que se adaptan a tu negocio',
+        backDesc: 'Tenemos experiencia directa en logística y procesos empresariales reales. Eso nos permite diseñar soluciones digitales que realmente encajan con cómo opera tu negocio.',
     },
     {
         icon: MessageCircle,
