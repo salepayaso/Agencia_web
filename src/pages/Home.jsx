@@ -18,7 +18,7 @@ const Home = () => {
         <div className="min-h-screen bg-dark-bg text-white font-sans selection:bg-primary-500/30" style={{ scrollBehavior: 'smooth' }}>
             <SEO
                 title="Interfaz360 — Agencia Digital IA en Chile | Web, Software y Agentes IA para Pymes"
-                description="Automatiza tu negocio con agentes IA. Chat web 24/7, clasificador de correos y software a medida. Más diseño web, Google Business y SEO local para pymes en todo Chile."
+                description="Agencia digital en Chile para pymes. Sitios web, ecosistemas Google, software a medida y agentes IA por WhatsApp o web. Tecnología de grandes empresas al alcance de tu negocio."
             />
             <Navbar />
             <WhatsAppButton />
@@ -56,10 +56,10 @@ const Home = () => {
                             <span>✦ Web · Google · Software · Agentes IA</span>
                         </div>
                         <h1 className="text-5xl md:text-7xl font-bold leading-tight mb-6">
-                            Tu negocio automatizado con <span className="text-gradient">Inteligencia Artificial.</span>
+                            Tecnología de grandes empresas, <span className="text-gradient">al alcance de tu pyme.</span>
                         </h1>
                         <p className="text-gray-300 text-lg mb-8 max-w-lg">
-                            Interfaz360 automatiza la atención de tu negocio con agentes IA — responde mensajes, clasifica correos y atiende tu sitio web las 24 horas. Soluciones digitales completas para pymes en Chile.
+                            Interfaz360 es tu agencia digital en Chile. Creamos sitios web, ecosistemas Google, software a medida y agentes IA que atienden tu negocio por WhatsApp o tu sitio web — sin intermediarios, trato directo con el desarrollador.
                         </p>
                         <div className="flex gap-4">
                             <Button
