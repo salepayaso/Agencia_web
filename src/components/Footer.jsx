@@ -24,7 +24,7 @@ const Footer = () => {
                             />
                         </div>
                         <p className="text-gray-300 max-w-sm text-lg leading-relaxed">
-                            Agencia líder en <strong>Diseño Web y SEO en Chile</strong>. Transformamos marcas con experiencias digitales <span className="text-primary-400 font-medium">premium</span> y tecnología de vanguardia.
+                            Tu socio digital en Chile. Creamos webs, gestionamos tu Google y automatizamos tu negocio con IA — para que crezcas sin complicarte.
                         </p>
                     </div>
 
