@@ -30,6 +30,9 @@ escritorio.ini
 Desktop.ini
 PROYECTO_MEMORIA.md
 
+# Claude Code
+.claude/
+
 # AI/Antigravity Artifacts
 implementation_plan.md*
 walkthrough.md*
