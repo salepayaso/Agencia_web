@@ -85,7 +85,7 @@ const Home = () => {
                         <div className="relative z-10 glass-card rounded-3xl border border-white/20 overflow-hidden group shadow-2xl" style={{ boxShadow: '0 0 40px rgba(255,255,255,0.25), 0 0 80px rgba(200,200,255,0.15), 0 0 140px rgba(150,150,255,0.1), 0 30px 60px rgba(0,0,0,0.6)' }}>
                             <div className="h-80 md:h-[480px] overflow-hidden relative flex items-center justify-center">
                                 <img
-                                    src="/Imagen HERO 01.jpg"
+                                    src="/Imagen HERO 01.png"
                                     alt="Agentes IA para pymes en Chile — Interfaz360"
                                     className="w-full h-full object-cover object-center transform group-hover:scale-105 transition-transform duration-700"
                                     width={512}
