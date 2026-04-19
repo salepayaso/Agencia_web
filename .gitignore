@@ -37,3 +37,8 @@ PROYECTO_MEMORIA.md
 implementation_plan.md*
 walkthrough.md*
 task.md*
+
+# Documentación interna e infraestructura
+guia_entrega_looker.md
+supabase_scripts/
+card-preview.html
