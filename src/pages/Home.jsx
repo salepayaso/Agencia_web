@@ -56,10 +56,10 @@ const Home = () => {
                             <span>✦ Web · Google · Software · Agentes IA</span>
                         </div>
                         <h1 className="text-5xl md:text-7xl font-bold leading-tight mb-6">
-                            La agencia digital que <span className="text-gradient">hace crecer tu pyme.</span>
+                            Potencia tu negocio con <span className="text-gradient">Inteligencia Artificial.</span>
                         </h1>
                         <p className="text-gray-300 text-lg mb-8 max-w-lg">
-                            ¿Cuántos clientes perdiste hoy por no aparecer en Google? En Interfaz360 creamos tu sitio web, te posicionamos en los buscadores y configuramos un agente IA que responde por WhatsApp y tu web las 24 horas. Tecnología de grandes empresas, al precio de una pyme.
+                            No solo creamos sitios web; construimos ecosistemas inteligentes. Automatizamos tu atención al cliente con agentes IA y optimizamos tu presencia en Google para que tu negocio crezca sin límites. Soluciones de vanguardia para tu negocio.
                         </p>
                         <div className="flex gap-4">
                             <Button
@@ -85,8 +85,8 @@ const Home = () => {
                         <div className="relative z-10 glass-card rounded-3xl border border-white/20 overflow-hidden group shadow-2xl" style={{ boxShadow: '0 0 40px rgba(255,255,255,0.25), 0 0 80px rgba(200,200,255,0.15), 0 0 140px rgba(150,150,255,0.1), 0 30px 60px rgba(0,0,0,0.6)' }}>
                             <div className="h-80 md:h-[480px] overflow-hidden relative flex items-center justify-center">
                                 <img
-                                    src="/Imagen HERO 01.png"
-                                    alt="Agentes IA para pymes en Chile — Interfaz360"
+                                    src="/hero-ai-tech.png"
+                                    alt="Potencia tu Pyme con Agentes IA — Interfaz360"
                                     className="w-full h-full object-cover object-center transform group-hover:scale-105 transition-transform duration-700"
                                     width={512}
                                     height={512}
@@ -265,7 +265,7 @@ const Home = () => {
                             <div className="space-y-4 mb-10">
                                 {[
                                     { text: "Landing Page Profesional", bold: true },
-                                    { text: "2 Correos Corporativos", bold: true },
+                                    { text: "5 Correos Corporativos", bold: true },
                                     { text: "Dominio & Hosting 1 año GRATIS", bold: true },
                                     { text: "Google Business + SEO Local", bold: true },
                                     { text: "Tecnología React Alta Interactividad", bold: true },
