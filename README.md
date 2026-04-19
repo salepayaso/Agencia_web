@@ -4,7 +4,7 @@
 
 > **Transformamos visibilidad en conversión con tecnología de vanguardia.**
 
-Este repositorio contiene el código fuente de la plataforma oficial de **Interfaz 360**, una agencia especializada en soluciones digitales de alto rendimiento en Santiago, Chile.
+Este repositorio contiene el código fuente de la plataforma oficial de **Interfaz 360**, una agencia especializada en soluciones digitales de alto rendimiento.
 
 ---
 
@@ -32,7 +32,7 @@ Hemos implementado mejoras críticas para asegurar una carga ultra rápida, logr
 ## 🔒 Seguridad y Mantenimiento
 
 - **Gestión de Secretos**: El archivo `.env` está estrictamente ignorado en Git para proteger las claves de API y base de datos.
-- **Scripts de Base de Datos**: Los procedimientos de Supabase y SQL se encuentran organizados en la carpeta `/supabase_scripts`.
+- **Gestión de Datos**: Uso de variables de entorno seguras para la conexión con el backend y base de datos.
 - **Archivos Estáticos**: Ubicados en `/public` para ser servidos directamente (sitemap, robots.txt, assets).
 
 ---
@@ -55,8 +55,6 @@ npm run build
 ## 📞 Conectemos
 
 - **Web**: [www.interfaz360.cl](https://www.interfaz360.cl)
-- **WhatsApp**: [+56 9 5414 6176](https://wa.me/56954146176)
-- **Email**: contacto@interfaz360.cl
 
 ---
 *Desarrollado con ❤️ por Interfaz 360.*
