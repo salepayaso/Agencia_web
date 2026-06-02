@@ -23,7 +23,7 @@ export default async function handler(req, res) {
             },
             body: JSON.stringify({
                 from: 'Interfaz360 <onboarding@resend.dev>',
-                to: ['contacto@interfaz360.cl'],
+                to: ['oss.maturana@gmail.com'],
                 reply_to: email,
                 subject: `Nuevo contacto desde interfaz360.cl — ${name}`,
                 html: `
