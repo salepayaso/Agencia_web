@@ -20,28 +20,31 @@ const Contact = () => {
         setFormState('submitting');
 
         const formData = new FormData(e.target);
+        const data = {
+            name: formData.get('name'),
+            email: formData.get('email'),
+            message: formData.get('message'),
+        };
 
         try {
-            const response = await fetch("https://formspree.io/f/mojvoerb", {
-                method: "POST",
-                body: formData,
-                headers: {
-                    'Accept': 'application/json'
-                }
+            const response = await fetch('/api/contact', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data),
             });
 
             if (response.ok) {
                 setFormState('success');
                 e.target.reset();
-                setMessage(''); // Reset message state too
+                setMessage('');
             } else {
-                console.error("Form error:", response);
-                alert("Hubo un error al enviar el mensaje. Por favor intenta nuevamente.");
+                console.error('Form error:', response);
+                alert('Hubo un error al enviar el mensaje. Por favor intenta nuevamente.');
                 setFormState('idle');
             }
         } catch (error) {
-            console.error("Network error:", error);
-            alert("Hubo un error al enviar el mensaje. Por favor revisa tu conexión.");
+            console.error('Network error:', error);
+            alert('Hubo un error al enviar el mensaje. Por favor revisa tu conexión.');
             setFormState('idle');
         }
     };
