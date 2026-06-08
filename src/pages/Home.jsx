@@ -4,6 +4,7 @@ import WhatsAppButton from '../components/WhatsAppButton';
 import Brands from '../components/Brands';
 import VentajasCompetitivas from '../components/VentajasCompetitivas';
 import SEO from '../components/SEO';
+import HeroVisual from '../components/HeroVisual';
 
 import Button from '../components/ui/Button';
 import SpotlightCard from '../components/SpotlightCard';
@@ -56,10 +57,10 @@ const Home = () => {
                             <span>✦ Web · Google · Software · Agentes IA</span>
                         </div>
                         <h1 className="text-5xl md:text-7xl font-bold leading-tight mb-6">
-                            Potencia tu negocio con <span className="text-gradient">Inteligencia Artificial.</span>
+                            Presencia digital. <span className="text-gradient">Sin complicaciones.</span>
                         </h1>
                         <p className="text-gray-300 text-lg mb-8 max-w-lg">
-                            No solo creamos sitios web; construimos ecosistemas inteligentes. Automatizamos tu atención al cliente con agentes IA y optimizamos tu presencia en Google para que tu negocio crezca sin límites. Soluciones de vanguardia para tu negocio.
+                            Creamos tu sitio web, automatizamos tu atención y mejoramos tu posicionamiento en Google. Tú enfócate en tu negocio.
                         </p>
                         <div className="flex gap-4">
                             <Button
@@ -76,41 +77,12 @@ const Home = () => {
                     </motion.div>
 
                     <motion.div
-                        initial={{ opacity: 0, scale: 0.8 }}
+                        initial={{ opacity: 0, scale: 0.95 }}
                         animate={{ opacity: 1, scale: 1 }}
                         transition={{ duration: 0.8, delay: 0.2 }}
                         className="relative hidden md:block"
                     >
-                        {/* Modern Tech Visual */}
-                        <div className="relative z-10 glass-card rounded-3xl border border-white/20 overflow-hidden group shadow-2xl" style={{ boxShadow: '0 0 40px rgba(255,255,255,0.25), 0 0 80px rgba(200,200,255,0.15), 0 0 140px rgba(150,150,255,0.1), 0 30px 60px rgba(0,0,0,0.6)' }}>
-                            <div className="h-80 md:h-[480px] overflow-hidden relative flex items-center justify-center">
-                                <img
-                                    src="/hero-ai-tech.png"
-                                    alt="Potencia tu Pyme con Agentes IA — Interfaz360"
-                                    className="w-full h-full object-cover object-center transform group-hover:scale-105 transition-transform duration-700"
-                                    width={512}
-                                    height={512}
-                                    fetchpriority="high"
-                                    loading="eager"
-                                />
-                                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent pointer-events-none"></div>
-                                <div className="absolute bottom-4 left-4 right-4">
-                                    <div className="flex items-center gap-2 mb-3">
-                                        <span className="relative flex h-2 w-2">
-                                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75"></span>
-                                            <span className="relative inline-flex rounded-full h-2 w-2 bg-cyan-400"></span>
-                                        </span>
-                                        <span className="text-cyan-300 text-sm font-semibold tracking-wide">IA Activa 24/7</span>
-                                    </div>
-                                    <div className="flex flex-wrap gap-2">
-                                        <div className="px-3 py-1.5 rounded-full bg-cyan-500/15 border border-cyan-500/30 text-xs text-cyan-300 backdrop-blur-sm font-medium">Agentes IA</div>
-                                        <div className="px-3 py-1.5 rounded-full bg-violet-500/15 border border-violet-500/30 text-xs text-violet-300 backdrop-blur-sm font-medium">Chat Web</div>
-                                        <div className="px-3 py-1.5 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-xs text-emerald-300 backdrop-blur-sm font-medium">WhatsApp Bot</div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div className="absolute -top-10 -right-10 w-32 h-32 bg-primary-500 rounded-full blur-3xl opacity-40"></div>
+                        <HeroVisual />
                     </motion.div>
                 </div>
             </section>
@@ -248,7 +220,7 @@ const Home = () => {
                             whileInView={{ opacity: 1, y: 0 }}
                             viewport={{ once: true, margin: "-100px" }}
                             transition={{ duration: 0.8, ease: [0.21, 0.47, 0.32, 0.98] }}
-                            className="glass-card rounded-3xl border-2 border-blue-500 p-8 md:p-10 relative overflow-hidden group flex flex-col bg-gradient-to-b from-blue-900/20 to-transparent h-full" style={{boxShadow: '0 0 40px rgba(255,255,255,0.15), 0 0 80px rgba(59,130,246,0.3), 0 20px 60px rgba(0,0,0,0.4)'}}
+                            className="glass-card rounded-3xl border-2 border-blue-500 p-8 md:p-10 relative overflow-hidden group flex flex-col bg-gradient-to-b from-blue-900/20 to-transparent h-full" style={{ boxShadow: '0 0 40px rgba(255,255,255,0.15), 0 0 80px rgba(59,130,246,0.3), 0 20px 60px rgba(0,0,0,0.4)' }}
                         >
                             <div className="absolute top-4 right-4 bg-gradient-to-r from-blue-500 to-indigo-600 text-white px-4 py-1 rounded-full font-bold text-[10px] tracking-widest shadow-lg uppercase">
                                 MÁS POPULAR
@@ -298,7 +270,7 @@ const Home = () => {
                             whileInView={{ opacity: 1, y: 0 }}
                             viewport={{ once: true, margin: "-100px" }}
                             transition={{ duration: 0.8, delay: 0.2, ease: [0.21, 0.47, 0.32, 0.98] }}
-                            className="glass-card rounded-3xl border-2 border-purple-500 p-8 md:p-10 relative overflow-hidden group flex flex-col bg-gradient-to-b from-purple-900/20 to-transparent" style={{boxShadow: '0 0 40px rgba(255,255,255,0.15), 0 0 80px rgba(168,85,247,0.3), 0 20px 60px rgba(0,0,0,0.4)'}}
+                            className="glass-card rounded-3xl border-2 border-purple-500 p-8 md:p-10 relative overflow-hidden group flex flex-col bg-gradient-to-b from-purple-900/20 to-transparent" style={{ boxShadow: '0 0 40px rgba(255,255,255,0.15), 0 0 80px rgba(168,85,247,0.3), 0 20px 60px rgba(0,0,0,0.4)' }}
                         >
                             <div className="absolute top-4 right-4 bg-gradient-to-r from-purple-500 to-pink-600 text-white px-4 py-1 rounded-full font-bold text-[10px] tracking-widest shadow-lg uppercase">
                                 NUEVO

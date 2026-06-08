@@ -24,7 +24,7 @@ const Footer = () => {
                             />
                         </div>
                         <p className="text-gray-300 max-w-sm text-lg leading-relaxed">
-                            Tu socio digital en Chile. Creamos webs, gestionamos tu Google y automatizamos tu negocio con IA — para que crezcas sin complicarte.
+                            Interfaz360 es una agencia digital especializada en desarrollo web, gestión de Google y automatización con inteligencia artificial — construida con tecnología propia, pensada para negocios chilenos.
                         </p>
                     </div>
 
@@ -94,8 +94,8 @@ const Footer = () => {
                         &copy; {new Date().getFullYear()} Interfaz 360. Todos los derechos reservados.
                     </p>
                     <div className="flex gap-6 text-sm text-gray-500">
-                        <a href="#" className="hover:text-white transition-colors">Privacidad</a>
-                        <a href="#" className="hover:text-white transition-colors">Términos</a>
+                        <Link to="/privacidad" className="hover:text-white transition-colors">Privacidad</Link>
+                        <Link to="/terminos" className="hover:text-white transition-colors">Términos</Link>
                     </div>
                 </div>
             </div>

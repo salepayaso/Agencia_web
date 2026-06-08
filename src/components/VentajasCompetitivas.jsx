@@ -1,65 +1,38 @@
 import { motion } from 'framer-motion';
-import { Briefcase, MessageCircle, MapPin, BarChart3, ShieldCheck, Code2 } from 'lucide-react';
+import { Search, Users, BarChart3 } from 'lucide-react';
 import FlipCard from './FlipCard';
 
 const WA_ASESORIA = `https://wa.me/56954146176?text=${encodeURIComponent('Hola Interfaz360, vengo desde la web y me gustaría solicitar asesoría para un proyecto digital.')}`;
 
 const tarjetas = [
     {
-        icon: Briefcase,
+        icon: Search,
         iconColor: '#378ADD',
         iconBg: '#378ADD1A',
-        frontTitle: 'Experiencia real en procesos empresariales',
-        frontDesc: 'No solo desarrollamos webs — entendemos cómo funciona un negocio por dentro. Eso hace la diferencia.',
-        backTitle: 'Soluciones que se adaptan a tu negocio',
-        backDesc: 'Tenemos experiencia directa en logística y procesos empresariales reales. Eso nos permite diseñar soluciones digitales que realmente encajan con cómo opera tu negocio.',
+        frontTitle: 'Más clientes te encuentran online',
+        frontDesc: 'Posicionamos tu negocio en Google y optimizamos tu Google Business Profile para que aparezcas primero cuando alguien busca lo que ofreces.',
+        backTitle: 'Tu negocio, visible donde importa',
+        backDesc: 'Estrategia SEO local + Google Business Profile optimizado, para que estés entre los primeros resultados cuando alguien busca tu rubro en Chile.',
     },
     {
-        icon: MessageCircle,
+        icon: Users,
         iconColor: '#1D9E75',
         iconBg: '#1D9E751A',
-        frontTitle: 'Respuesta rápida y trato directo',
-        frontDesc: 'Hablas directo con el desarrollador. Sin ejecutivos ni intermediarios. Respuesta el mismo día.',
-        backTitle: 'Atención real, no un ticket',
-        backDesc: 'Soporte por WhatsApp, correo y videollamada. Tiempo de respuesta mismo día hábil. Trato cercano y soluciones concretas sin vueltas.',
+        frontTitle: 'Entendemos tu negocio, no solo el código',
+        frontDesc: 'No llegamos a vender una web — llegamos a entender cómo opera tu negocio, para construir algo que realmente te sirva en el día a día.',
+        backTitle: 'Trato directo, sin intermediarios',
+        backDesc: 'Hablas con quien construye tu proyecto. Escríbenos por WhatsApp y conversemos sobre tu idea, sin formularios ni intermediarios de por medio.',
         waButton: true,
         waLink: WA_ASESORIA,
-    },
-    {
-        icon: MapPin,
-        iconColor: '#D85A30',
-        iconBg: '#D85A301A',
-        frontTitle: 'Posicionamiento Google en Chile',
-        frontDesc: 'SEO local para que aparezcas primero cuando te busquen. Google Business Profile optimizado.',
-        backTitle: 'Tu negocio visible en Google',
-        backDesc: 'Optimizamos tu Google Business Profile, implementamos estrategia SEO local y te ayudamos a aparecer en los primeros resultados cuando buscan tu rubro en Chile.',
     },
     {
         icon: BarChart3,
         iconColor: '#BA7517',
         iconBg: '#BA75171A',
-        frontTitle: 'Ecosistema Google completo',
-        frontDesc: 'Analytics, Tag Manager y Google Business para tomar decisiones con datos reales de tu negocio.',
-        backTitle: 'Datos que se convierten en clientes',
-        backDesc: 'Implementamos Google Analytics 4, Tag Manager y Search Console para que veas de dónde vienen tus clientes, qué buscan y cómo convertirlos. Todo conectado.',
-    },
-    {
-        icon: ShieldCheck,
-        iconColor: '#534AB7',
-        iconBg: '#534AB71A',
-        frontTitle: 'Servidores top + SSL A+',
-        frontDesc: 'Infraestructura de alto rendimiento mundial. Certificado SSL A+ y uptime garantizado.',
-        backTitle: 'Tu sitio siempre rápido y seguro',
-        backDesc: 'Desplegamos en servidores con posicionamiento mundial top tier, certificado SSL A+ verificado y velocidad de carga optimizada. Tu sitio seguro y disponible siempre.',
-    },
-    {
-        icon: Code2,
-        iconColor: '#0F6E56',
-        iconBg: '#0F6E561A',
-        frontTitle: 'Código puro, sin WordPress',
-        frontDesc: 'React sin plugins que se rompen. Tu sitio rápido, escalable y actualizable desde GitHub.',
-        backTitle: 'Propiedad total de tu sitio',
-        backDesc: 'Desarrollamos con React + Vite — sin depender de plugins de terceros que se desactualizan. Tu sitio es tuyo: rápido, seguro y con historial completo de cambios en GitHub.',
+        frontTitle: 'Decisiones con datos reales, no intuición',
+        frontDesc: 'Te dejamos viendo qué funciona y qué no — visitas, conversiones, comportamiento — para que tu negocio mejore con información, no con suposiciones.',
+        backTitle: 'Tu negocio, medido y entendido',
+        backDesc: 'Implementamos Google Analytics 4, Tag Manager y Search Console conectados, para que sepas de dónde vienen tus clientes y cómo convertirlos.',
     },
 ];
 
@@ -81,7 +54,7 @@ const VentajasCompetitivas = () => {
                     </p>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 max-w-5xl mx-auto">
                     {tarjetas.map((card, i) => (
                         <motion.div
                             key={i}

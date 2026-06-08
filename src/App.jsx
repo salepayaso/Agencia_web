@@ -18,6 +18,8 @@ const Login = lazy(() => import('./pages/Login'));
 const Dashboard = lazy(() => import('./pages/Dashboard'));
 const UpdatePassword = lazy(() => import('./pages/UpdatePassword'));
 const BusinessCard = lazy(() => import('./components/BusinessCard'));
+const PrivacyPage = lazy(() => import('./pages/PrivacyPage'));
+const TermsPage = lazy(() => import('./pages/TermsPage'));
 
 const AuthHandler = () => {
   const navigate = useNavigate();
@@ -57,6 +59,8 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/update-password" element={<UpdatePassword />} />
           <Route path="/tarjeta" element={<BusinessCard />} />
+          <Route path="/privacidad" element={<PrivacyPage />} />
+          <Route path="/terminos" element={<TermsPage />} />
           <Route
             path="/dashboard"
             element={
