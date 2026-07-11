@@ -5,6 +5,7 @@ import Brands from '../components/Brands';
 import VentajasCompetitivas from '../components/VentajasCompetitivas';
 import SEO from '../components/SEO';
 import HeroVisual from '../components/HeroVisual';
+import DomainSearch from '../components/DomainSearch';
 
 import Button from '../components/ui/Button';
 import SpotlightCard from '../components/SpotlightCard';
@@ -86,6 +87,9 @@ const Home = () => {
                     </motion.div>
                 </div>
             </section>
+
+            {/* Domain Search Section */}
+            <DomainSearch />
 
             <VentajasCompetitivas />
 

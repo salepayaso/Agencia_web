@@ -4,6 +4,7 @@ import WhatsAppButton from '../components/WhatsAppButton';
 import Section from '../components/ui/Section';
 import Button from '../components/ui/Button';
 import SEO from '../components/SEO';
+import DomainSearch from '../components/DomainSearch';
 import { Layout, Rocket, Mail, Zap, Code, ArrowRight, MonitorSmartphone, ShoppingBag, Megaphone, Server, Activity, BarChart3, MessageSquare, User, Lock, TrendingUp, Search, MapPin, ShieldCheck, PieChart, Bot } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useState } from 'react';
@@ -249,6 +250,9 @@ const Services = () => {
                     ))}
                 </div>
             </Section>
+
+            {/* Domain Search Section */}
+            <DomainSearch />
 
             {/* Client Panel Preview Section */}
             <section className="py-16 px-4 md:px-8 bg-dark-bg/50 relative overflow-hidden">
