@@ -5,13 +5,22 @@ import Section from '../components/ui/Section';
 import SEO from '../components/SEO';
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ExternalLink, ArrowUpRight, Code, Layout, ShoppingBag, BarChart3, Search, Database } from 'lucide-react';
+import { ExternalLink, ArrowUpRight, Code, Layout, ShoppingBag, BarChart3, Search, Database, Recycle } from 'lucide-react';
 
 const Portfolio = () => {
     const [activeCategory, setActiveCategory] = useState('all');
 
     // Mapped Dedicated Images
     const projects = [
+        {
+            title: "Ciclo Sur",
+            category: "Web Corporativa & Sustentabilidad",
+            type: "web",
+            image: "/portfolio_ciclo_sur.png",
+            tags: ["Ley 20.920", "Scrollytelling", "Reciclaje"],
+            icon: Recycle,
+            link: "https://salepayaso.github.io/ciclo-sur/"
+        },
         {
             title: "Panadería Santa Lucía",
             category: "E-Commerce & SEO Local",
@@ -153,6 +162,7 @@ const Portfolio = () => {
                                             src={p.image}
                                             alt={p.title}
                                             className="w-full h-full object-cover group-hover:scale-105 transition-all duration-1000 ease-out"
+                                            onError={(e) => { e.currentTarget.style.display = 'none'; }}
                                         />
                                     </div>
 
