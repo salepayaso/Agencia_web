@@ -61,7 +61,7 @@ const Home = () => {
                             Presencia digital. <span className="text-gradient">Hecha para crecer.</span>
                         </h1>
                         <p className="text-gray-300 text-lg mb-8 max-w-lg">
-                            Diseñamos y desarrollamos tu sitio web con código propio, lo posicionamos en Google y lo dejamos listo para crecer. Tú enfócate en tu negocio.
+                            Diseñamos y desarrollamos tu sitio web, lo posicionamos en Google y lo dejamos listo para crecer. Tú enfócate en tu negocio.
                         </p>
                         <div className="flex gap-4">
                             <Button
