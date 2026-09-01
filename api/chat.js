@@ -29,7 +29,15 @@ export default async function handler(req, res) {
         return res.status(status).json(payload);
     }
 
-    const check = validateRequest(req.body);
+    // Si el filtro previo no puede configurarse, no atendemos: es preferible
+    // caerse a responder sin Capa 3.
+    let check;
+    try {
+        check = validateRequest(req.body);
+    } catch (error) {
+        console.error('Guardrails mal configurados:', error);
+        return res.status(500).json({ error: 'El chat no está disponible por ahora.' });
+    }
 
     // Bloqueado por el filtro previo: respondemos sin llamar a la API.
     if (!check.ok && check.blocked) {
