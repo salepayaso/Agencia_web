@@ -25,6 +25,7 @@ dist-ssr
 
 # Archivos Sensibles e Innecesarios
 .env
+agent_prompt.json
 .cache
 escritorio.ini
 Desktop.ini
