@@ -1,6 +1,6 @@
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
-import WhatsAppButton from '../components/WhatsAppButton';
+import ChatAgent from '../components/ChatAgent';
 import SEO from '../components/SEO';
 
 const TermsPage = () => {
@@ -11,7 +11,7 @@ const TermsPage = () => {
                 description="Condiciones de uso del sitio y de los servicios ofrecidos por Interfaz 360."
             />
             <Navbar />
-            <WhatsAppButton />
+            <ChatAgent />
 
             <div className="pt-32 pb-20 px-6">
                 <div className="max-w-3xl mx-auto">

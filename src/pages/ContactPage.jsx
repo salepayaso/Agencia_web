@@ -1,6 +1,6 @@
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
-import WhatsAppButton from '../components/WhatsAppButton';
+import ChatAgent from '../components/ChatAgent';
 import Contact from '../components/Contact';
 import SEO from '../components/SEO';
 
@@ -12,7 +12,7 @@ const ContactPage = () => {
                 description="Contáctanos hoy mismo para una consultoría gratuita de 30 minutos y transforma tu presencia digital con tecnología de punta."
             />
             <Navbar />
-            <WhatsAppButton />
+            <ChatAgent />
 
             <div className="pt-20">
                 <Contact />

@@ -1,6 +1,6 @@
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
-import WhatsAppButton from '../components/WhatsAppButton';
+import ChatAgent from '../components/ChatAgent';
 import About from '../components/About';
 import SEO from '../components/SEO';
 
@@ -12,7 +12,7 @@ const AboutPage = () => {
                 description="Conoce al equipo de Interfaz 360. Expertos en desarrollo web, SEO y ecosistema Google, dedicados a transformar negocios en Chile."
             />
             <Navbar />
-            <WhatsAppButton />
+            <ChatAgent />
 
             <div className="pt-20">
                 <About />

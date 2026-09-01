@@ -1,6 +1,6 @@
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
-import WhatsAppButton from '../components/WhatsAppButton';
+import ChatAgent from '../components/ChatAgent';
 import Brands from '../components/Brands';
 import VentajasCompetitivas from '../components/VentajasCompetitivas';
 import SEO from '../components/SEO';
@@ -23,7 +23,7 @@ const Home = () => {
                 description="Agencia digital en Chile para pymes. Sitios web, ecosistemas Google, software a medida y agentes IA por WhatsApp o web. Tecnología de grandes empresas al alcance de tu negocio."
             />
             <Navbar />
-            <WhatsAppButton />
+            <ChatAgent />
 
             {/* Hero Section */}
             <section className="relative pt-32 pb-20 px-4 md:px-8 overflow-hidden min-h-screen flex items-center">

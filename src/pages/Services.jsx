@@ -1,6 +1,6 @@
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
-import WhatsAppButton from '../components/WhatsAppButton';
+import ChatAgent from '../components/ChatAgent';
 import Section from '../components/ui/Section';
 import Button from '../components/ui/Button';
 import SEO from '../components/SEO';
@@ -223,7 +223,7 @@ const Services = () => {
                 description="Descubre nuestros servicios de diseño web, agentes IA, SEO local y ecosistema Google. Tecnología de punta para tu negocio."
             />
             <Navbar />
-            <WhatsAppButton />
+            <ChatAgent />
 
             {/* Hero Section */}
             <Section className="pt-32 pb-20">

@@ -1,6 +1,6 @@
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
-import WhatsAppButton from '../components/WhatsAppButton';
+import ChatAgent from '../components/ChatAgent';
 import SEO from '../components/SEO';
 
 const PrivacyPage = () => {
@@ -11,7 +11,7 @@ const PrivacyPage = () => {
                 description="Cómo Interfaz 360 recolecta, usa y protege tus datos personales."
             />
             <Navbar />
-            <WhatsAppButton />
+            <ChatAgent />
 
             <div className="pt-32 pb-20 px-6">
                 <div className="max-w-3xl mx-auto">

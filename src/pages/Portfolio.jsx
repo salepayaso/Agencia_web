@@ -1,6 +1,6 @@
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
-import WhatsAppButton from '../components/WhatsAppButton';
+import ChatAgent from '../components/ChatAgent';
 import Section from '../components/ui/Section';
 import SEO from '../components/SEO';
 import { useState } from 'react';
@@ -97,7 +97,7 @@ const Portfolio = () => {
                 description="Revisa nuestros proyectos de diseño web, sistemas a medida y estrategias de marketing digital."
             />
             <Navbar />
-            <WhatsAppButton />
+            <ChatAgent />
 
             <Section className="pt-32 pb-20 relative overflow-hidden">
                 {/* Background Decor */}

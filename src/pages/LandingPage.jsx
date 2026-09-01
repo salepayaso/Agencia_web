@@ -2,7 +2,7 @@ import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import About from '../components/About';
 import Contact from '../components/Contact';
-import WhatsAppButton from '../components/WhatsAppButton';
+import ChatAgent from '../components/ChatAgent';
 import Brands from '../components/Brands';
 import Section from '../components/ui/Section';
 import Button from '../components/ui/Button';
@@ -73,7 +73,7 @@ const LandingPage = () => {
     return (
         <div className="min-h-screen bg-dark-bg text-white font-sans selection:bg-primary-500/30">
             <Navbar />
-            <WhatsAppButton />
+            <ChatAgent />
 
             {/* Hero Section - Unchanged */}
             <section className="relative pt-32 pb-20 px-4 md:px-8 overflow-hidden min-h-screen flex items-center">
