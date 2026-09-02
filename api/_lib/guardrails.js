@@ -178,6 +178,15 @@ export function registerStrike(ip) {
     return false;
 }
 
+/**
+ * Momento (epoch ms) hasta el que la IP está bloqueada, o 0 si puede pasar.
+ * El front lo usa para cerrar la ventana y dejar el botón apagado ese rato.
+ */
+export function blockedUntil(ip) {
+    const until = blocked.get(ip);
+    return until && until > Date.now() ? until : 0;
+}
+
 /** Devuelve null si puede pasar, o un mensaje de error si superó el límite. */
 export function checkRateLimit(ip) {
     const until = blocked.get(ip);

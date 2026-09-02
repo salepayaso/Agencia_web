@@ -28,10 +28,22 @@ const TEASERS = [
 const TEASER_INDEX_KEY = 'if360_teaser_index';
 const VISITOR_KEY = 'if360_visitor';
 const CHAT_KEY = 'if360_chat';
+const BLOCK_KEY = 'if360_blocked';
 
 // Tope de mensajes guardados: el mismo que acepta el backend, así no guardamos
 // un historial que después se va a recortar igual.
 const MAX_STORED = 24;
+
+// El formulario de datos se ofrece dos veces como máximo. Insistir en cada
+// mensaje espanta al cliente; ofrecerlo una segunda vez es normal.
+const MAX_IDENTITY_OFFERS = 2;
+
+// Cuánto alcanza a leerse el mensaje de despedida antes de cerrar la ventana.
+const CLOSE_DELAY_MS = 6000;
+
+const DECLINE_REPLY =
+    'Sin problema 👍 Igual te puedo contar qué incluye cada plan y cómo trabajamos. ' +
+    'Y si prefieres los precios directo, escríbenos por WhatsApp al +56 9 5414 6176.';
 
 const readVisitor = () => {
     try {
@@ -53,10 +65,26 @@ const readChat = () => {
             .slice(-MAX_STORED);
 
         return messages.length
-            ? { messages, isOpen: saved.isOpen === true, showForm: saved.showForm === true }
+            ? {
+                  messages,
+                  isOpen: saved.isOpen === true,
+                  showForm: saved.showForm === true,
+                  offers: Number(saved.offers) || 0,
+              }
             : null;
     } catch {
         return null;
+    }
+};
+
+// Bloqueo por reincidencia. Se guarda para que no baste con cambiar de página
+// para volver a tener el chat disponible.
+const readBlock = () => {
+    try {
+        const until = Number(sessionStorage.getItem(BLOCK_KEY) || 0);
+        return until > Date.now() ? until : 0;
+    } catch {
+        return 0;
     }
 };
 
@@ -131,13 +159,22 @@ const ChatAgent = () => {
     const [showForm, setShowForm] = useState(restored?.showForm ?? false);
     const needsIdentity = showForm && !visitor;
 
+    // El formulario puede cerrarse, así que su estado se lee también desde el
+    // stream, donde el valor del render ya puede estar viejo.
+    const showFormRef = useRef(restored?.showForm ?? false);
+    const offersRef = useRef(restored?.offers ?? 0);
+
+    // Bloqueo por insistir en manipular al agente.
+    const [blockedUntil, setBlockedUntil] = useState(readBlock);
+    const isBlocked = blockedUntil > Date.now();
+
     // ---- Globo de invitación --------------------------------------------
     // Aparece en cada página: el widget se monta de nuevo en cada ruta, así que
     // este efecto corre en cada navegación y también al recargar.
     // Solo se calla si el chat está abierto o si la persona ya dejó sus datos:
     // insistirle a alguien que ya es lead solo molesta.
     useEffect(() => {
-        if (isOpen || visitor) return;
+        if (isOpen || visitor || blockedUntil) return;
 
         const show = () => {
             setTeaser(TEASERS[teaserIndex.current % TEASERS.length]);
@@ -163,9 +200,37 @@ const ChatAgent = () => {
                 // Ídem.
             }
         };
-    }, [isOpen, visitor]);
+    }, [isOpen, visitor, blockedUntil]);
 
     const dismissTeaser = useCallback(() => setTeaser(null), []);
+
+    // ---- Cierre por bloqueo ---------------------------------------------
+    // El backend ya cerró la puerta: acá cerramos la ventana para no dejar a
+    // la persona escribiendo al vacío contra el mismo mensaje seco.
+    useEffect(() => {
+        try {
+            if (blockedUntil) sessionStorage.setItem(BLOCK_KEY, String(blockedUntil));
+            else sessionStorage.removeItem(BLOCK_KEY);
+        } catch {
+            // Sin sessionStorage el bloqueo dura solo esta página. El backend
+            // igual lo mantiene: la puerta de verdad está allá.
+        }
+
+        if (!blockedUntil) return;
+
+        const restante = blockedUntil - Date.now();
+        if (restante <= 0) {
+            setBlockedUntil(0);
+            return;
+        }
+
+        const cierre = setTimeout(() => setIsOpen(false), CLOSE_DELAY_MS);
+        const fin = setTimeout(() => setBlockedUntil(0), restante);
+        return () => {
+            clearTimeout(cierre);
+            clearTimeout(fin);
+        };
+    }, [blockedUntil]);
 
     useEffect(() => {
         if (isOpen) {
@@ -183,7 +248,12 @@ const ChatAgent = () => {
         try {
             sessionStorage.setItem(
                 CHAT_KEY,
-                JSON.stringify({ messages: messages.slice(-MAX_STORED), isOpen, showForm }),
+                JSON.stringify({
+                    messages: messages.slice(-MAX_STORED),
+                    isOpen,
+                    showForm,
+                    offers: offersRef.current,
+                }),
             );
         } catch {
             // Sin sessionStorage el chat sigue funcionando, solo no sobrevive
@@ -191,10 +261,29 @@ const ChatAgent = () => {
         }
     }, [messages, isOpen, showForm, isTyping]);
 
+    // ---- Formulario de datos ---------------------------------------------
+    // Se puede cerrar: nadie está obligado a dejar sus datos para conversar.
+    const offerIdentity = () => {
+        if (showFormRef.current) return;
+        if (offersRef.current >= MAX_IDENTITY_OFFERS) return;
+
+        offersRef.current += 1;
+        showFormRef.current = true;
+        setShowForm(true);
+    };
+
+    const declineIdentity = () => {
+        showFormRef.current = false;
+        setShowForm(false);
+        setFormError('');
+        setMessages((prev) => [...prev, { role: 'assistant', content: DECLINE_REPLY }]);
+        inputRef.current?.focus();
+    };
+
     // ---- Envío -----------------------------------------------------------
     const send = async (text, visitorOverride = null) => {
         const content = text.trim();
-        if (!content || isTyping) return;
+        if (!content || isTyping || isBlocked) return;
 
         // El saludo inicial no viaja a la API. Se filtra por contenido y no por
         // posición: al restaurar una conversación larga puede no ir primero.
@@ -223,6 +312,13 @@ const ChatAgent = () => {
                     ...prev,
                     { role: 'assistant', content: data.reply || data.error || 'No pude responder.' },
                 ]);
+
+                // Bloqueo por reincidencia: se despide y la ventana se cierra.
+                if (data.blockedUntil) {
+                    showFormRef.current = false;
+                    setShowForm(false);
+                    setBlockedUntil(data.blockedUntil);
+                }
                 return;
             }
 
@@ -266,7 +362,7 @@ const ChatAgent = () => {
                     }
 
                     if (event.type === 'identify') {
-                        setShowForm(true);
+                        offerIdentity();
                     }
 
                     if (event.type === 'error') {
@@ -313,6 +409,7 @@ const ChatAgent = () => {
             // Sin sessionStorage se pierde al recargar. El chat igual funciona.
         }
 
+        showFormRef.current = false;
         setShowForm(false);
 
         // El lead se avisa al instante: si se va sin escribir más, igual quedó.
@@ -407,9 +504,19 @@ const ChatAgent = () => {
                                     initial={{ opacity: 0, y: 8 }}
                                     animate={{ opacity: 1, y: 0 }}
                                     onSubmit={submitIdentity}
-                                    className="bg-white/[0.07] border border-primary-500/30 rounded-2xl p-4 space-y-2.5"
+                                    className="relative bg-white/[0.07] border border-primary-500/30 rounded-2xl p-4 space-y-2.5"
                                 >
-                                    <p className="text-sm text-white font-medium leading-snug">
+                                    <button
+                                        type="button"
+                                        onClick={declineIdentity}
+                                        aria-label="Cerrar el formulario y seguir conversando"
+                                        className="absolute top-2.5 right-2.5 w-7 h-7 rounded-full flex items-center justify-center text-slate-400 hover:text-white hover:bg-white/10 transition-colors"
+                                    >
+                                        <svg viewBox="0 0 24 24" className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+                                            <path d="M6 6l12 12M18 6L6 18" />
+                                        </svg>
+                                    </button>
+                                    <p className="text-sm text-white font-medium leading-snug pr-7">
                                         Déjame tus datos y te muestro precios y detalles 👇
                                     </p>
                                     <p className="text-xs text-slate-400 leading-snug -mt-1">
@@ -448,13 +555,20 @@ const ChatAgent = () => {
                                     >
                                         Empezar a conversar
                                     </button>
+                                    <button
+                                        type="button"
+                                        onClick={declineIdentity}
+                                        className="w-full text-xs text-slate-400 hover:text-white py-1 transition-colors"
+                                    >
+                                        Ahora no, gracias
+                                    </button>
                                     <p className="text-[11px] text-slate-500 text-center leading-snug">
                                         Solo lo usamos para contactarte. Nada de spam.
                                     </p>
                                 </motion.form>
                             )}
 
-                            {!hasChatted && !isTyping && !needsIdentity && (
+                            {!hasChatted && !isTyping && !needsIdentity && !isBlocked && (
                                 <div className="flex flex-wrap gap-2 pt-1">
                                     {SUGGESTIONS.map((suggestion) => (
                                         <button
@@ -483,12 +597,13 @@ const ChatAgent = () => {
                                     value={input}
                                     onChange={(e) => setInput(e.target.value)}
                                     maxLength={800}
-                                    placeholder="Escribe tu consulta…"
+                                    disabled={isBlocked}
+                                    placeholder={isBlocked ? 'Chat cerrado por ahora' : 'Escribe tu consulta…'}
                                     className="flex-1 min-w-0 bg-white/5 border border-white/10 rounded-full px-4 py-2.5 text-sm text-white placeholder:text-slate-500 outline-none focus:border-primary-500/60 disabled:opacity-50 transition-colors"
                                 />
                                 <button
                                     type="submit"
-                                    disabled={!input.trim() || isTyping}
+                                    disabled={!input.trim() || isTyping || isBlocked}
                                     aria-label="Enviar mensaje"
                                     className="w-10 h-10 shrink-0 rounded-full bg-primary-600 hover:bg-primary-500 disabled:opacity-40 disabled:hover:bg-primary-600 flex items-center justify-center transition-colors"
                                 >
@@ -543,15 +658,24 @@ const ChatAgent = () => {
             {/* ---- Botón flotante ---- */}
             <motion.button
                 onClick={() => setIsOpen((prev) => !prev)}
-                aria-label={isOpen ? 'Cerrar chat' : 'Abrir chat con el asistente'}
-                className="group relative w-16 h-16 flex items-center justify-center"
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
+                disabled={isBlocked}
+                aria-label={
+                    isBlocked
+                        ? 'Chat cerrado por ahora'
+                        : isOpen
+                          ? 'Cerrar chat'
+                          : 'Abrir chat con el asistente'
+                }
+                className="group relative w-16 h-16 flex items-center justify-center disabled:cursor-not-allowed"
+                whileHover={isBlocked ? undefined : { scale: 1.05 }}
+                whileTap={isBlocked ? undefined : { scale: 0.95 }}
                 initial={{ opacity: 0, scale: 0 }}
-                animate={{ opacity: 1, scale: 1 }}
+                // La opacidad va acá y no en una clase: framer escribe el estilo
+                // en línea y le gana a cualquier `disabled:opacity-*` de Tailwind.
+                animate={{ opacity: isBlocked ? 0.4 : 1, scale: 1 }}
                 transition={{ type: 'spring', stiffness: 260, damping: 20 }}
             >
-                {!isOpen && (
+                {!isOpen && !isBlocked && (
                     <>
                         <span className="absolute inset-0 rounded-full bg-primary-500 opacity-25 animate-ping" />
                         <span className="absolute inset-0 rounded-full bg-primary-500 opacity-10 animate-ping delay-75" />

@@ -4,6 +4,7 @@ import {
     validateRequest,
     checkRateLimit,
     registerStrike,
+    blockedUntil,
     getClientIp,
     isAllowedOrigin,
 } from './_lib/guardrails.js';
@@ -20,7 +21,9 @@ export default async function handler(req, res) {
     const ip = getClientIp(req);
     const limitError = checkRateLimit(ip);
     if (limitError) {
-        return res.status(429).json({ error: limitError });
+        // blockedUntil solo viene si es un bloqueo por reincidencia. El tope
+        // por hora o por día no cierra la ventana: es gente que solo insistió.
+        return res.status(429).json({ error: limitError, blockedUntil: blockedUntil(ip) });
     }
 
     // Registro inicial del visitante: no llama al modelo.
@@ -46,6 +49,9 @@ export default async function handler(req, res) {
             reply: nowBlocked
                 ? 'Listo, hasta acá llegamos. Si necesitas algo de verdad, escríbenos por WhatsApp al +56 9 5414 6176.'
                 : check.reply,
+            // Con esto el front se despide y cierra la ventana en vez de dejar
+            // a la persona escribiendo al vacío contra el mismo mensaje seco.
+            blockedUntil: nowBlocked ? blockedUntil(ip) : 0,
         });
     }
 
