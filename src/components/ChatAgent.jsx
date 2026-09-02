@@ -520,7 +520,7 @@ const ChatAgent = () => {
                                         Déjame tus datos y te muestro precios y detalles 👇
                                     </p>
                                     <p className="text-xs text-slate-400 leading-snug -mt-1">
-                                        Un asesor te va a contactar por correo o WhatsApp, mantente atento.
+                                        Con tus datos seguimos la conversación acá mismo y te muestro los planes con sus precios.
                                     </p>
                                     <input
                                         value={form.nombre}
@@ -563,7 +563,7 @@ const ChatAgent = () => {
                                         Ahora no, gracias
                                     </button>
                                     <p className="text-[11px] text-slate-500 text-center leading-snug">
-                                        Solo lo usamos para contactarte. Nada de spam.
+                                        Solo los usamos para continuar tu atención y responderte si lo necesitas.
                                     </p>
                                 </motion.form>
                             )}
