@@ -1,7 +1,7 @@
 // Envío del lead capturado por el agente al correo interno, vía Resend.
 // Reusa la misma cuenta y API key que api/contact.js.
 
-const escapeHtml = (value = '') =>
+export const escapeHtml = (value = '') =>
     String(value)
         .replace(/&/g, '&amp;')
         .replace(/</g, '&lt;')

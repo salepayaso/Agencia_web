@@ -204,6 +204,19 @@ export function checkRateLimit(ip) {
     return null;
 }
 
+// Formulario de contacto: contadores propios para no mezclarse con el chat.
+// Cada envío gasta un correo de la cuota de Resend que comparte con los leads.
+const contactHourly = new Map();
+const contactDaily = new Map();
+
+/** Devuelve null si puede pasar, o un mensaje de error si superó el límite. */
+export function checkContactLimit(ip) {
+    if (track(contactHourly, ip, LIMITS.HOUR_MS, 3) || track(contactDaily, ip, LIMITS.DAY_MS, 5)) {
+        return 'Ya recibimos tus mensajes. Si es urgente, escríbenos por WhatsApp al +56 9 5414 6176.';
+    }
+    return null;
+}
+
 const ALLOWED_HOSTS = [
     'interfaz360.cl',
     'www.interfaz360.cl',

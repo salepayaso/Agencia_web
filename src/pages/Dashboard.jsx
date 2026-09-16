@@ -550,17 +550,22 @@ const TicketsView = ({ user, profile }) => {
 
             if (error) throw error;
 
-            // 2. Notify Admin via Formspree
-            const formData = new FormData();
-            formData.append('email', user.email);
-            formData.append('subject', `Nuevo Ticket de Soporte: ${newTicket.title}`);
-            formData.append('message', `Cliente: ${profile?.client_name || 'Desconocido'}\n\nDescripción:\n${newTicket.description}`);
+            // 2. Notify Admin via Formspree. El ticket ya quedó guardado: si el
+            // aviso falla, no se le muestra error al cliente.
+            try {
+                const formData = new FormData();
+                formData.append('email', user.email);
+                formData.append('subject', `Nuevo Ticket de Soporte: ${newTicket.title}`);
+                formData.append('message', `Cliente: ${profile?.client_name || 'Desconocido'}\n\nDescripción:\n${newTicket.description}`);
 
-            await fetch("https://formspree.io/f/mojvoerb", {
-                method: "POST",
-                body: formData,
-                headers: { 'Accept': 'application/json' }
-            });
+                await fetch("https://formspree.io/f/mojvoerb", {
+                    method: "POST",
+                    body: formData,
+                    headers: { 'Accept': 'application/json' }
+                });
+            } catch (notifyError) {
+                console.error("Ticket guardado, pero falló el aviso:", notifyError);
+            }
 
             setIsModalOpen(false);
             setNewTicket({ title: '', description: '' });

@@ -39,7 +39,10 @@ const Contact = () => {
                 setMessage('');
             } else {
                 console.error('Form error:', response);
-                alert('Hubo un error al enviar el mensaje. Por favor intenta nuevamente.');
+                const { error } = await response.json().catch(() => ({}));
+                alert(response.status === 429 && error
+                    ? error
+                    : 'Hubo un error al enviar el mensaje. Por favor intenta nuevamente.');
                 setFormState('idle');
             }
         } catch (error) {
@@ -118,6 +121,7 @@ const Contact = () => {
                                             required
                                             name="name"
                                             type="text"
+                                            maxLength={100}
                                             className="w-full bg-dark-bg/50 border border-white/10 rounded-xl px-5 py-4 text-white placeholder-gray-600 focus:outline-none focus:border-primary-500/50 focus:ring-2 focus:ring-primary-500/20 transition-all duration-300"
                                             placeholder="Juan Pérez"
                                         />
@@ -128,6 +132,7 @@ const Contact = () => {
                                             required
                                             name="email"
                                             type="email"
+                                            maxLength={254}
                                             className="w-full bg-dark-bg/50 border border-white/10 rounded-xl px-5 py-4 text-white placeholder-gray-600 focus:outline-none focus:border-primary-500/50 focus:ring-2 focus:ring-primary-500/20 transition-all duration-300"
                                             placeholder="juan@ejemplo.com"
                                         />
@@ -140,6 +145,7 @@ const Contact = () => {
                                             value={message}
                                             onChange={(e) => setMessage(e.target.value)}
                                             rows="4"
+                                            maxLength={3000}
                                             className="w-full bg-dark-bg/50 border border-white/10 rounded-xl px-5 py-4 text-white placeholder-gray-600 focus:outline-none focus:border-primary-500/50 focus:ring-2 focus:ring-primary-500/20 transition-all duration-300 resize-none"
                                             placeholder="Cuéntanos sobre tu proyecto..."
                                         ></textarea>

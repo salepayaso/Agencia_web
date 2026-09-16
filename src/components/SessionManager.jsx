@@ -9,6 +9,11 @@ const SessionManager = () => {
     const timeoutRef = useRef(null);
 
     const logout = async () => {
+        // El temporizador corre en todo el sitio: un visitante sin sesión
+        // no tiene nada que cerrar y no debe terminar en /login.
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session) return;
+
         const { error } = await supabase.auth.signOut();
         if (!error) {
             navigate('/login');

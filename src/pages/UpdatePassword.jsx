@@ -142,15 +142,6 @@ const UpdatePassword = () => {
                         {loading ? <Loader2 className="animate-spin" /> : 'Actualizar Contraseña'}
                     </Button>
                 </form>
-
-                {/* DEBUG SECTION - Eliminar en producción */}
-                <div className="mt-8 p-4 bg-black/50 rounded-lg text-xs font-mono text-gray-400 break-all">
-                    <p className="font-bold text-gray-300 mb-2">🔧 DEBUG INFO (Captura esto si falla)</p>
-                    <p>URL: {window.location.href}</p>
-                    <p>Hash: {window.location.hash || '(vacio)'}</p>
-                    <p>Search: {window.location.search || '(vacio)'}</p>
-                    <p>Session: {message?.type === 'success' ? 'Active' : 'Checking...'}</p>
-                </div>
             </div>
         </div>
     );
