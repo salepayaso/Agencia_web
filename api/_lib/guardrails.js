@@ -4,6 +4,7 @@
 export const LIMITS = {
     MAX_MESSAGE_CHARS: 800,     // un mensaje más largo que esto no es una consulta comercial
     MAX_HISTORY_TURNS: 24,      // 12 idas y vueltas por conversación
+    MAX_HISTORY_CHARS: 12_000,  // tope total del historial (~3k tokens): el cliente lo manda y puede inflarlo
     MAX_OUTPUT_TOKENS: 700,     // respuestas cortas: es un chat, no un informe
     HOUR_MS: 3_600_000,
     MAX_PER_HOUR: 20,
@@ -94,14 +95,30 @@ export function validateRequest(body) {
     }
 
     // Solo aceptamos roles válidos y recortamos por si acaso.
-    const cleanHistory = history
+    const recentTurns = history
         .filter((turn) => turn && (turn.role === 'user' || turn.role === 'assistant'))
         .filter((turn) => typeof turn.content === 'string' && turn.content.trim())
         .slice(-LIMITS.MAX_HISTORY_TURNS)
         .map((turn) => ({
             role: turn.role,
-            content: turn.content.slice(0, LIMITS.MAX_MESSAGE_CHARS * 4),
+            // Un mensaje real del visitante nunca supera el límite del input.
+            content: turn.content.slice(
+                0,
+                turn.role === 'user' ? LIMITS.MAX_MESSAGE_CHARS : LIMITS.MAX_MESSAGE_CHARS * 4,
+            ),
         }));
+
+    // El historial lo arma el cliente: se conservan los turnos más recientes
+    // hasta el tope total, para que no se pueda inflar el costo de cada request.
+    const cleanHistory = [];
+    let budget = LIMITS.MAX_HISTORY_CHARS;
+    for (let i = recentTurns.length - 1; i >= 0; i -= 1) {
+        budget -= recentTurns[i].content.length;
+        if (budget < 0) break;
+        cleanHistory.unshift(recentTurns[i]);
+    }
+    // La API exige que la conversación empiece con un turno del usuario.
+    while (cleanHistory.length && cleanHistory[0].role !== 'user') cleanHistory.shift();
 
     return { ok: true, message, history: cleanHistory, visitor };
 }
@@ -171,6 +188,7 @@ export function registerStrike(ip) {
     strikes.set(ip, recent);
 
     if (recent.length >= LIMITS.MAX_STRIKES) {
+        console.warn(`[guardrails] IP bloqueada por reincidencia: ${ip}`);
         blocked.set(ip, now + LIMITS.BLOCK_MS);
         strikes.delete(ip);
         return true;
@@ -196,9 +214,11 @@ export function checkRateLimit(ip) {
     if (until) blocked.delete(ip);
 
     if (track(hourly, ip, LIMITS.HOUR_MS, LIMITS.MAX_PER_HOUR)) {
+        console.warn(`[guardrails] tope por hora del chat: ${ip}`);
         return 'Llevas varias consultas seguidas. Espera un rato o escríbenos por WhatsApp al +56 9 5414 6176.';
     }
     if (track(daily, ip, LIMITS.DAY_MS, LIMITS.MAX_PER_DAY)) {
+        console.warn(`[guardrails] tope diario del chat: ${ip}`);
         return 'Alcanzaste el límite de mensajes por hoy. Escríbenos por WhatsApp al +56 9 5414 6176 y te atendemos al tiro.';
     }
     return null;
@@ -212,9 +232,22 @@ const contactDaily = new Map();
 /** Devuelve null si puede pasar, o un mensaje de error si superó el límite. */
 export function checkContactLimit(ip) {
     if (track(contactHourly, ip, LIMITS.HOUR_MS, 3) || track(contactDaily, ip, LIMITS.DAY_MS, 5)) {
+        console.warn(`[guardrails] tope del formulario de contacto: ${ip}`);
         return 'Ya recibimos tus mensajes. Si es urgente, escríbenos por WhatsApp al +56 9 5414 6176.';
     }
     return null;
+}
+
+// Formulario del chat: cada identificación puede terminar en un correo.
+const identifyDaily = new Map();
+
+/** Devuelve true si la IP ya dejó demasiados datos hoy. */
+export function isIdentifyLimited(ip) {
+    if (track(identifyDaily, ip, LIMITS.DAY_MS, 3)) {
+        console.warn(`[guardrails] tope de identificaciones del chat: ${ip}`);
+        return true;
+    }
+    return false;
 }
 
 const ALLOWED_HOSTS = [
@@ -222,20 +255,31 @@ const ALLOWED_HOSTS = [
     'www.interfaz360.cl',
     'localhost',
     '127.0.0.1',
-];
+    // Dominios del propio despliegue, que Vercel expone como variables de sistema.
+    process.env.VERCEL_URL,
+    process.env.VERCEL_BRANCH_URL,
+    process.env.VERCEL_PROJECT_PRODUCTION_URL,
+].filter(Boolean);
 
-/** Bloquea el uso del endpoint desde otros sitios. */
+// Previews propios: <proyecto>-<hash>-salepayasos-projects.vercel.app
+const OWN_PREVIEW_SUFFIX = '-salepayasos-projects.vercel.app';
+
+/** Bloquea el uso del endpoint desde otros sitios y desde scripts sin navegador. */
 export function isAllowedOrigin(req) {
+    // Un POST desde el navegador siempre manda Origin; sin él es curl o un bot.
     const source = req.headers.origin || req.headers.referer;
-    if (!source) return true; // curl o navegación directa: lo frena el rate limit
+    if (!source) {
+        console.warn('[guardrails] request sin Origin ni Referer');
+        return false;
+    }
 
     try {
         const { hostname } = new URL(source);
-        return (
-            ALLOWED_HOSTS.includes(hostname) ||
-            hostname.endsWith('.vercel.app') // previews de Vercel
-        );
+        const allowed = ALLOWED_HOSTS.includes(hostname) || hostname.endsWith(OWN_PREVIEW_SUFFIX);
+        if (!allowed) console.warn(`[guardrails] origen no permitido: ${hostname}`);
+        return allowed;
     } catch {
+        console.warn('[guardrails] Origin inválido');
         return false;
     }
 }

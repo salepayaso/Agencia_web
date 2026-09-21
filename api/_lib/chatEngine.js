@@ -4,7 +4,7 @@
 import Anthropic from '@anthropic-ai/sdk';
 import { buildSystemPrompt } from './prompt.js';
 import { LIMITS, cleanPhone } from './guardrails.js';
-import { sendLeadEmail } from './leads.js';
+import { registerLead } from './leadStore.js';
 
 // Nivel 1 del catálogo de agentes: FAQ, precios y agendamiento.
 // Suficiente para este caso de uso y con el costo por conversación más bajo.
@@ -13,7 +13,7 @@ const MODEL = 'claude-haiku-4-5';
 const LEAD_TOOL = {
     name: 'registrar_lead',
     description:
-        'Registra los datos de un visitante interesado y los envía al equipo comercial por correo. ' +
+        'Registra los datos de un visitante interesado para que el equipo comercial lo contacte. ' +
         'Úsala solo cuando el visitante ya te dio su nombre y al menos un dato de contacto ' +
         '(correo o teléfono). Nunca inventes datos que el visitante no te haya dado.',
     input_schema: {
@@ -125,9 +125,14 @@ export async function runChatTurn({ message, history, visitor }, emit) {
                     .filter((turn) => typeof turn.content === 'string')
                     .map((turn) => ({ role: turn.role, content: turn.content }));
 
-                // El teléfono del formulario manda por sobre lo que informe el modelo.
-                const sent = await sendLeadEmail(
-                    { ...call.input, telefono: visitor?.telefono || cleanPhone(call.input?.contacto) },
+                // Los datos del formulario mandan por sobre lo que informe el modelo.
+                // Si ya se avisó por correo al identificarse, solo se completa el registro.
+                const sent = await registerLead(
+                    {
+                        ...call.input,
+                        email: visitor?.email,
+                        telefono: visitor?.telefono || cleanPhone(call.input?.contacto),
+                    },
                     transcript,
                 );
                 emit({ type: 'lead', ok: sent });

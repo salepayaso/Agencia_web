@@ -1,9 +1,10 @@
 // Registro del visitante al abrir la conversación.
-// No pasa por el modelo: es solo validar y avisar por correo, así que no gasta
-// tokens y garantiza que el lead quede aunque la persona no escriba nada más.
+// No pasa por el modelo: es solo validar, guardar el lead y avisar por correo,
+// así que no gasta tokens y garantiza que el lead quede aunque la persona no
+// escriba nada más.
 
 import { cleanVisitor } from './guardrails.js';
-import { sendLeadEmail } from './leads.js';
+import { registerLead } from './leadStore.js';
 
 export async function handleIdentify(body) {
     const visitor = cleanVisitor(body?.visitor);
@@ -11,8 +12,9 @@ export async function handleIdentify(body) {
         return { status: 400, payload: { error: 'Revisa tu nombre y correo.' } };
     }
 
-    const sent = await sendLeadEmail({
+    const ok = await registerLead({
         nombre: visitor.nombre,
+        email: visitor.email,
         contacto: visitor.email,
         telefono: visitor.telefono,
         interes: 'Abrió el chat del sitio web',
@@ -21,5 +23,5 @@ export async function handleIdentify(body) {
             : 'Entró al chat y dejó su correo. Todavía no escribe su consulta.',
     });
 
-    return { status: 200, payload: { ok: sent } };
+    return { status: 200, payload: { ok } };
 }

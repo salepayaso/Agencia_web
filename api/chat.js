@@ -7,6 +7,7 @@ import {
     blockedUntil,
     getClientIp,
     isAllowedOrigin,
+    isIdentifyLimited,
 } from './_lib/guardrails.js';
 
 export default async function handler(req, res) {
@@ -28,6 +29,10 @@ export default async function handler(req, res) {
 
     // Registro inicial del visitante: no llama al modelo.
     if (req.body?.action === 'identify') {
+        // El chat sigue funcionando: solo no se registra ni avisa otra vez.
+        if (isIdentifyLimited(ip)) {
+            return res.status(200).json({ ok: false });
+        }
         const { status, payload } = await handleIdentify(req.body);
         return res.status(status).json(payload);
     }
@@ -44,6 +49,7 @@ export default async function handler(req, res) {
 
     // Bloqueado por el filtro previo: respondemos sin llamar a la API.
     if (!check.ok && check.blocked) {
+        console.warn(`[guardrails] intento de manipulación bloqueado: ${ip}`);
         const nowBlocked = check.strike ? registerStrike(ip) : false;
         return res.status(200).json({
             reply: nowBlocked
