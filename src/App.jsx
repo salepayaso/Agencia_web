@@ -7,6 +7,7 @@ import ScrollProgress from './components/ScrollProgress';
 import GTMTracker from './components/GTMTracker';
 import SessionManager from './components/SessionManager';
 import { SpeedInsights } from '@vercel/speed-insights/react';
+import { Analytics } from '@vercel/analytics/react';
 
 // Lazy-loaded pages
 const Home = lazy(() => import('./pages/Home'));
@@ -49,6 +50,7 @@ function App() {
       <ScrollToTop />
       <ScrollProgress />
       <SpeedInsights />
+      <Analytics />
       <Suspense fallback={<div className="min-h-screen bg-dark-bg" />}>
         <Routes>
           <Route path="/" element={<Home />} />
