@@ -29,6 +29,13 @@ jobs:
       # Modo seguro: no manda correos, no crea leads, no gasta API de Claude.
       - name: Chequeo de todos los proyectos
         run: node checkup/run.mjs
+        # La suite supabase lee la tabla de leads (solo conteos) y prueba RLS.
+        # Se crean en GitHub → Settings → Secrets and variables → Actions.
+        # Si faltan, esa suite queda como observación y el resto corre igual.
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
 
       # El informe queda descargable desde la corrida, aunque el chequeo falle.
       - name: Guardar el informe

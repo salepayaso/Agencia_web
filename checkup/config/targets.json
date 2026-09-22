@@ -18,7 +18,7 @@
       "/terminos",
       "/login"
     ],
-    "suites": ["unidad", "infra", "paginas", "dominios", "agente", "enlaces", "seguridad"]
+    "suites": ["unidad", "infra", "paginas", "dominios", "agente", "enlaces", "seguridad", "supabase"]
   },
 
   "panaderia": {

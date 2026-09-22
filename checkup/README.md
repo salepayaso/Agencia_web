@@ -44,7 +44,7 @@ GitHub queda en rojo solo y te llega el correo.
 
 ---
 
-## Las siete suites
+## Las ocho suites
 
 | Suite | Qué revisa | Necesita el repo |
 |---|---|---|
@@ -55,6 +55,51 @@ GitHub queda en rojo solo y te llega el correo.
 | `agente` | Agente IA, formulario de contacto y cron: todos sus rechazos de seguridad | No |
 | `enlaces` | Botones internos, número de WhatsApp, correos, enlaces externos vivos | Sí |
 | `seguridad` | Huella del código, credenciales filtradas, `npm audit`, cabeceras en `vercel.json` | Sí |
+| `supabase` | Que los leads del chat lleguen a la base, leads recientes, correos de aviso que no salieron, y que un visitante anónimo no pueda leer datos privados (RLS) | No, pero necesita variables |
+
+### La suite `supabase`: que ningún lead se pierda en silencio
+
+La suite `agente` comprueba que `/api/chat` rechace lo que debe, pero no ve si
+un lead legítimo llega de verdad a la tabla `public.leads`. Si la clave de
+servicio vence, el proyecto se pausa o la tabla cambia de nombre, el chat sigue
+contestando y los leads se pierden sin que nadie lo note. Esta suite lo revisa.
+
+**Es solo lectura**: nunca escribe ni crea leads de prueba. De los leads solo
+muestra conteos, nunca nombres, correos ni teléfonos. Las claves no aparecen en
+el informe ni en la consola.
+
+| Verificación | Correcto | Para revisar | Requiere atención |
+|---|---|---|---|
+| El proyecto responde | La API REST contesta | | Pausado, caído o inalcanzable |
+| Tabla `leads` legible | La clave de servicio la lee | | No existe, o la clave fue rechazada |
+| Leads recientes | Entró al menos 1 en 24 h | 0 en 24 h (puede ser falta de tráfico) | |
+| Correo de aviso | Todos los leads tienen `notified_at` | Hay leads de hace más de 1 h sin correo | |
+| RLS en `leads`, `profiles`, `tickets`, `documents` | La clave pública recibe permiso denegado o 0 filas | La clave pública fue rechazada (prueba no concluyente) | **La clave pública lee filas: fuga de datos personales** |
+
+Variables que necesita:
+
+| Variable | Para qué |
+|---|---|
+| `SUPABASE_URL` | URL del proyecto. Si falta, usa `VITE_SUPABASE_URL` |
+| `SUPABASE_SERVICE_ROLE_KEY` | Leer la tabla de leads (solo conteos) |
+| `VITE_SUPABASE_ANON_KEY` | Probar que un visitante anónimo no ve nada |
+
+Primero toma las variables del entorno y, si no están, las lee de `.env` y
+`.env.local` en la raíz del repo. Si falta la URL o las dos claves, la suite
+queda como observación ("falta SUPABASE_SERVICE_ROLE_KEY") y la corrida sigue
+normal. Sin la clave de servicio, la prueba de RLS con la clave pública corre
+igual.
+
+**Para el cron de GitHub, Carlos tiene que crear estos 3 secretos** en el
+repositorio: **GitHub → Settings → Secrets and variables → Actions → New
+repository secret**, con los mismos valores que tienen en Vercel:
+
+- `SUPABASE_URL`
+- `SUPABASE_SERVICE_ROLE_KEY`
+- `VITE_SUPABASE_ANON_KEY`
+
+El repositorio es público, pero los secretos de Actions no se ven ni se
+imprimen en los logs. Mientras no existan, la suite sale como observación.
 
 ---
 

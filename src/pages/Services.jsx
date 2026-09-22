@@ -121,10 +121,10 @@ const Services = () => {
             tagline: "Tu negocio trabajando solo, 24/7",
             desc: "Implementamos agentes inteligentes que automatizan procesos, atienden clientes y conectan tus herramientas sin intervención humana.",
             benefits: [
-                "Automatización de tareas repetitivas",
-                "Atención al cliente IA 24/7",
-                "Integración con WhatsApp, CRM y Google",
-                "Reportes y métricas automáticas",
+                "Atención al cliente IA 24/7 en tu sitio web",
+                "Integración con tu software: app, base de datos y reportes",
+                "Opcional: WhatsApp Business e integración Google",
+                "IA local para datos sensibles (a cotizar)",
                 "Configuración personalizada a tu negocio"
             ],
             badge: "NUEVO",

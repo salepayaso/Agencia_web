@@ -17,6 +17,13 @@ export async function run(ctx) {
     // --- Dominio que sabemos tomado ---
     const tomado = await pedir(`${endpoint}?domain=interfaz360`);
     const datosTomado = tomado.json();
+    // 429 = el tope por IP de este mismo buscador está activo (p. ej. dos corridas
+    // seguidas). No es una falla del sitio y las demás pruebas saldrían igual.
+    if (tomado.status === 429) {
+        checks.push(aviso('dominios.tope', 'Chequeo del buscador inconcluso',
+            'El buscador respondió 429: su tope de consultas por IP está activo, probablemente por una corrida reciente. Repetir en unos minutos.'));
+        return checks;
+    }
     if (tomado.status !== 200 || !datosTomado) {
         checks.push(falla('dominios.tomado', 'El buscador no responde',
             `Status ${tomado.status}. ${tomado.error || tomado.cuerpo.slice(0, 200)}`));
@@ -65,7 +72,12 @@ export async function run(ctx) {
         const res = await pedir(`${endpoint}?domain=${encodeURIComponent(valor)}`);
         if (res.status !== 400) pasaronDeLargo.push(`${descripcion} → ${res.status}`);
     }
-    checks.push(esperar(pasaronDeLargo.length === 0, 'dominios.invalidos',
+    const soloTope = pasaronDeLargo.length > 0 && pasaronDeLargo.every((linea) => linea.endsWith('→ 429'));
+    if (soloTope) {
+        checks.push(aviso('dominios.invalidos', 'Rechazo de búsquedas basura inconcluso',
+            'El tope de consultas se activó a mitad de la prueba (429): no llegan a NIC.cl, pero no se pudo confirmar la validación.',
+            pasaronDeLargo));
+    } else checks.push(esperar(pasaronDeLargo.length === 0, 'dominios.invalidos',
         'Las búsquedas basura se rechazan antes de consultar NIC.cl',
         `${invalidos.length} entradas inválidas devuelven 400 sin gastar consultas.`,
         'Hay entradas inválidas que llegan al servidor WHOIS.', pasaronDeLargo.length ? pasaronDeLargo : null));

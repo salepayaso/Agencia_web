@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Globe, Search, Star, MapPin, CheckCheck, TrendingUp, MessageSquare, Bot, Sparkles } from 'lucide-react';
+import { Globe, Search, Star, MapPin, TrendingUp, MessageSquare, Bot, Sparkles } from 'lucide-react';
 
 const HeroVisual = () => {
     // Parallax mouse position
@@ -141,7 +141,7 @@ const HeroVisual = () => {
                 </div>
             </motion.div>
 
-            {/* Layer 3: WhatsApp Bot AI Agent (Top Layer, floating center-top) */}
+            {/* Layer 3: Chat web con Agente IA 24/7 (Top Layer, floating center-top) */}
             <motion.div
                 className="absolute w-[300px] md:w-[320px] bg-slate-900 border border-white/15 rounded-2xl shadow-[0_20px_50px_rgba(8,145,178,0.2)] overflow-hidden"
                 animate={{
@@ -154,42 +154,41 @@ const HeroVisual = () => {
                 transition={{ type: "spring", stiffness: 100, damping: 20 }}
                 style={{ transformStyle: "preserve-3d" }}
             >
-                {/* WhatsApp Chat Header */}
-                <div className="bg-emerald-600 px-4 py-3 flex items-center justify-between">
+                {/* Web Chat Header (mismo estilo que el chat real del sitio) */}
+                <div className="bg-gradient-to-r from-primary-600 to-primary-700 px-4 py-3 flex items-center justify-between">
                     <div className="flex items-center gap-3">
                         <div className="relative">
-                            <div className="w-8 h-8 rounded-full bg-emerald-800 flex items-center justify-center">
+                            <div className="w-8 h-8 rounded-full bg-white/15 flex items-center justify-center">
                                 <Bot className="w-4 h-4 text-white" />
                             </div>
-                            <span className="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-green-400 border border-emerald-600 animate-pulse" />
+                            <span className="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-green-400 border border-primary-700 animate-pulse" />
                         </div>
                         <div>
                             <div className="text-xs font-bold text-white flex items-center gap-1.5">
-                                Agente IA Interfaz360
+                                Asistente Interfaz360
                                 <Sparkles className="w-3 h-3 text-cyan-300" />
                             </div>
-                            <div className="text-[9px] text-emerald-100">Activo 24/7</div>
+                            <div className="text-[9px] text-white/70">En tu sitio web · 24/7</div>
                         </div>
                     </div>
-                    <div className="flex gap-1.5">
-                        <span className="w-1.5 h-1.5 rounded-full bg-white/40" />
-                        <span className="w-1.5 h-1.5 rounded-full bg-white/40" />
-                        <span className="w-1.5 h-1.5 rounded-full bg-white/40" />
+                    <div className="flex items-center gap-1 text-[9px] text-white/70">
+                        <Globe className="w-3 h-3" />
+                        <span>Chat web</span>
                     </div>
                 </div>
 
-                {/* WhatsApp Chat Content */}
-                <div className="p-4 space-y-3 bg-[#0b141a]/95 min-h-[160px] flex flex-col justify-end">
+                {/* Web Chat Content */}
+                <div className="p-4 space-y-3 bg-dark-card/95 min-h-[160px] flex flex-col justify-end">
                     
                     {/* User message (always visible after step 0) */}
                     {chatStep >= 1 && (
                         <motion.div 
                             initial={{ opacity: 0, y: 10 }}
                             animate={{ opacity: 1, y: 0 }}
-                            className="bg-emerald-950/80 border border-emerald-500/20 text-white rounded-lg p-2.5 text-xs max-w-[85%] self-end"
+                            className="bg-primary-600 text-white rounded-2xl rounded-br-md p-2.5 text-xs max-w-[85%] self-end"
                         >
-                            <div className="text-gray-400 text-[8px] mb-0.5">Cliente</div>
-                            Hola, ¿tienen disponibilidad para crear una página web y un bot?
+                            <div className="text-white/60 text-[8px] mb-0.5">Visitante</div>
+                            Hola, ¿pueden hacer una página web con un chat como este?
                         </motion.div>
                     )}
 
@@ -198,7 +197,7 @@ const HeroVisual = () => {
                         <motion.div 
                             initial={{ opacity: 0, y: 10 }}
                             animate={{ opacity: 1, y: 0 }}
-                            className="bg-slate-800 text-gray-300 rounded-lg p-2 text-xs max-w-[80%] self-start flex items-center gap-1"
+                            className="bg-white/10 text-gray-300 rounded-2xl rounded-bl-md p-2 text-xs max-w-[80%] self-start flex items-center gap-1"
                         >
                             <span className="w-1.5 h-1.5 rounded-full bg-gray-400 animate-bounce [animation-delay:-0.3s]" />
                             <span className="w-1.5 h-1.5 rounded-full bg-gray-400 animate-bounce [animation-delay:-0.15s]" />
@@ -211,12 +210,12 @@ const HeroVisual = () => {
                         <motion.div 
                             initial={{ opacity: 0, y: 10 }}
                             animate={{ opacity: 1, y: 0 }}
-                            className="bg-slate-800 text-white rounded-lg p-2.5 text-xs max-w-[85%] self-start"
+                            className="bg-white/10 text-slate-100 rounded-2xl rounded-bl-md p-2.5 text-xs max-w-[85%] self-start"
                         >
                             <div className="text-cyan-400 text-[8px] mb-0.5 flex items-center gap-1 font-semibold">
-                                <Bot className="w-2.5 h-2.5" /> AGENTE IA
+                                <Bot className="w-2.5 h-2.5" /> ASISTENTE IA
                             </div>
-                            ¡Hola! Sí, por supuesto. Desarrollamos webs profesionales en React y bots de WhatsApp automáticos.
+                            ¡Hola! Sí, por supuesto. Desarrollamos webs profesionales en React con un agente IA que atiende a tus clientes 24/7, como este chat.
                         </motion.div>
                     )}
 
@@ -225,12 +224,12 @@ const HeroVisual = () => {
                         <motion.div 
                             initial={{ opacity: 0, y: 10 }}
                             animate={{ opacity: 1, y: 0 }}
-                            className="bg-slate-800 text-white rounded-lg p-2.5 text-xs max-w-[85%] self-start flex flex-col gap-1"
+                            className="bg-white/10 text-slate-100 rounded-2xl rounded-bl-md p-2.5 text-xs max-w-[85%] self-start flex flex-col gap-1"
                         >
                             <span>¿De qué rubro es tu negocio para asesorarte mejor? 🚀</span>
                             <div className="flex items-center justify-end gap-0.5 text-[8px] text-cyan-300 mt-1">
-                                <CheckCheck className="w-3.5 h-3.5" />
-                                <span>Entregado</span>
+                                <Sparkles className="w-3 h-3" />
+                                <span>Respuesta al instante</span>
                             </div>
                         </motion.div>
                     )}

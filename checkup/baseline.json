@@ -1,5 +1,5 @@
 {
-  "generado": "2026-09-21T01:05:24.063Z",
+  "generado": "2026-09-22T00:24:03.278Z",
   "nota": "Visto bueno manual del código del sitio.",
   "total": 52,
   "archivos": {
@@ -24,7 +24,7 @@
     "src/components/FlipCard.jsx": "ac872431e9ba3f3c",
     "src/components/Footer.jsx": "77f38ad9fa638f3c",
     "src/components/GTMTracker.jsx": "1583552c0245a97f",
-    "src/components/HeroVisual.jsx": "7ee6f4a738e42eb3",
+    "src/components/HeroVisual.jsx": "0a66949c0b4ea741",
     "src/components/MagneticParticles.jsx": "a49020b27a1be1ca",
     "src/components/Navbar.jsx": "af303b70329417ef",
     "src/components/ProtectedRoute.jsx": "3dbb39619e06db4e",
@@ -42,18 +42,18 @@
     "src/pages/AboutPage.jsx": "083a42cdf4e2d344",
     "src/pages/ContactPage.jsx": "fc1dd3b83134fdca",
     "src/pages/Dashboard.jsx": "f98693ef7fc119dd",
-    "src/pages/Home.jsx": "518d4d1b625f781a",
+    "src/pages/Home.jsx": "0ca185cc4c97af07",
     "src/pages/LandingPage.jsx": "199b7ee6db0f38c9",
     "src/pages/Login.jsx": "061f17c98282eada",
     "src/pages/Portfolio.jsx": "1efeee61ea48a8d0",
     "src/pages/PrivacyPage.jsx": "074a2645e5a59ad1",
-    "src/pages/Services.jsx": "3382699cf13db030",
+    "src/pages/Services.jsx": "a99a6b65116eff26",
     "src/pages/TermsPage.jsx": "6d187aecfba54702",
     "src/pages/UpdatePassword.jsx": "3d7347f4e4eb1b4d",
     "src/supabase.js": "5a9ee4d290f048aa",
     "index.html": "5fb5dfc95b2245ea",
     "vercel.json": "2b9a5a188043bfc3",
-    "package.json": "730a2f7e93344103",
-    "package-lock.json": "379a5d34e6834fc1"
+    "package.json": "252f9d7caeae0992",
+    "package-lock.json": "961591b8b260851c"
   }
 }

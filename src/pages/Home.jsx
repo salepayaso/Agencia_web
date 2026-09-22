@@ -20,7 +20,7 @@ const Home = () => {
         <div className="min-h-screen bg-dark-bg text-white font-sans selection:bg-primary-500/30" style={{ scrollBehavior: 'smooth' }}>
             <SEO
                 title="Interfaz360 — Agencia Digital IA en Chile | Web, Software y Agentes IA para Pymes"
-                description="Agencia digital en Chile para pymes. Sitios web, ecosistemas Google, software a medida y agentes IA por WhatsApp o web. Tecnología de grandes empresas al alcance de tu negocio."
+                description="Agencia digital en Chile para pymes. Sitios web, ecosistemas Google, software a medida y agentes IA para tu sitio web. Tecnología de grandes empresas al alcance de tu negocio."
             />
             <Navbar />
             <ChatAgent />
@@ -153,7 +153,7 @@ const Home = () => {
                                 glowColor: '#38BDF8',
                                 tag: 'Nuevo',
                                 title: 'Agentes IA',
-                                desc: 'Automatizamos la atención de tu negocio con inteligencia artificial. Responden mensajes en WhatsApp, Instagram y tu sitio web las 24 horas, sin que tengas que estar presente.',
+                                desc: 'Automatizamos la atención de tu negocio con inteligencia artificial. Responden a tus clientes en tu sitio web las 24 horas, sin que tengas que estar presente. WhatsApp disponible como opcional.',
                                 link: '/servicios'
                             },
                             {
@@ -283,18 +283,18 @@ const Home = () => {
                                 <h3 className="text-2xl font-bold mb-2">Agente IA 24/7</h3>
                                 <div className="text-purple-400 text-sm font-medium mb-6">Tu negocio nunca deja de atender</div>
                                 <p className="text-gray-300 text-sm leading-relaxed mb-4">
-                                    Automatiza la atención de tu negocio con inteligencia artificial. Responde clientes por WhatsApp o tu sitio web — incluso mientras duermes.
+                                    Automatiza la atención de tu negocio con inteligencia artificial. Responde a tus clientes en tu sitio web — incluso mientras duermes. El chat de este sitio es un ejemplo en vivo.
                                 </p>
                             </div>
 
                             <div className="space-y-4 mb-10 flex-grow">
                                 {[
-                                    "Agente IA para WhatsApp Business",
                                     "Chat IA integrado en tu sitio web",
                                     "Respuestas automáticas 24/7",
                                     "Configurado con la info de tu negocio",
-                                    "Sin costo fijo elevado de personal",
-                                    "Cotización a medida según tu rubro"
+                                    "Integración con tu software (app, base de datos, reportes)",
+                                    "Opcional: WhatsApp Business e integración Google",
+                                    "Sin costo fijo elevado de personal"
                                 ].map((text, i) => (
                                     <div key={i} className="flex items-start gap-3">
                                         <Zap className="w-4 h-4 text-purple-500 mt-0.5 shrink-0" />

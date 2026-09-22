@@ -25,8 +25,9 @@ import * as dominios from './suites/dominios.mjs';
 import * as agente from './suites/agente.mjs';
 import * as enlaces from './suites/enlaces.mjs';
 import * as seguridad from './suites/seguridad.mjs';
+import * as supabase from './suites/supabase.mjs';
 
-const SUITES = { unidad, infra, paginas, dominios, agente, enlaces, seguridad };
+const SUITES = { unidad, infra, paginas, dominios, agente, enlaces, seguridad, supabase };
 
 const AQUI = path.dirname(fileURLToPath(import.meta.url));
 const RAIZ = path.resolve(AQUI, '..');
