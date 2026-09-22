@@ -110,7 +110,7 @@ const chatDevApi = () => ({
 
       try {
         const { runChatTurn } = await import('./api/_lib/chatEngine.js');
-        await runChatTurn(check, emit);
+        await runChatTurn({ ...check, ip }, emit);
       } catch (error) {
         console.error('Chat error (dev):', error);
         emit({ type: 'error', message: 'Error en el agente. Revisa ANTHROPIC_API_KEY en .env' });

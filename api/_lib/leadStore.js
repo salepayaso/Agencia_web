@@ -6,7 +6,7 @@ import { sendLeadEmail } from './leads.js';
 
 const RENOTIFY_MS = 24 * 60 * 60 * 1000;
 
-function supabaseConfig() {
+export function supabaseConfig() {
     const url = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL;
     const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
     return url && key ? { url, key } : null;

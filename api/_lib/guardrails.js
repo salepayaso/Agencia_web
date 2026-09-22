@@ -120,12 +120,17 @@ export function validateRequest(body) {
     // La API exige que la conversación empiece con un turno del usuario.
     while (cleanHistory.length && cleanHistory[0].role !== 'user') cleanHistory.shift();
 
-    return { ok: true, message, history: cleanHistory, visitor };
+    return { ok: true, message, history: cleanHistory, visitor, sessionId: cleanSessionId(body?.sessionId) };
 }
 
 // Validación simple y permisiva: filtra basura evidente sin rechazar correos
 // legítimos raros. Un correo falso igual llega como lead y se evalúa a mano.
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[a-z]{2,}$/i;
+
+/** El id de sesión lo genera el navegador: solo se acepta si tiene forma de id. */
+export function cleanSessionId(value) {
+    return typeof value === 'string' && /^[a-z0-9-]{8,64}$/i.test(value) ? value : null;
+}
 
 export function cleanVisitor(visitor) {
     const nombre = typeof visitor?.nombre === 'string' ? visitor.nombre.trim().slice(0, 80) : '';

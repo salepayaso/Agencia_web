@@ -5,6 +5,7 @@ import Anthropic from '@anthropic-ai/sdk';
 import { buildSystemPrompt } from './prompt.js';
 import { LIMITS, cleanPhone } from './guardrails.js';
 import { registerLead } from './leadStore.js';
+import { logChatTurn } from './chatLog.js';
 
 // Nivel 1 del catálogo de agentes: FAQ, precios y agendamiento.
 // Suficiente para este caso de uso y con el costo por conversación más bajo.
@@ -58,11 +59,26 @@ function buildClient() {
 }
 
 /**
- * Ejecuta el turno del agente y va emitiendo eventos por callback.
- * @param {{message: string, history: Array, visitor: object}} params
+ * Ejecuta el turno del agente, va emitiendo eventos por callback y al final
+ * guarda el turno en la conversación, aunque el visitante no se haya identificado.
+ * @param {{message: string, history: Array, visitor: object, sessionId?: string|null, ip?: string}} params
  * @param {(event: {type: string, [k: string]: unknown}) => void} emit
  */
-export async function runChatTurn({ message, history, visitor }, emit) {
+export async function runChatTurn(params, emit) {
+    let reply = '';
+    const tracked = (event) => {
+        if (event.type === 'delta') reply += event.text;
+        emit(event);
+    };
+
+    try {
+        await runAgent(params, tracked);
+    } finally {
+        await logChatTurn({ ...params, reply: reply.trim() });
+    }
+}
+
+async function runAgent({ message, history, visitor }, emit) {
     const client = buildClient();
 
     const system = buildSystemPrompt(visitor);

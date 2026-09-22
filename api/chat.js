@@ -84,7 +84,7 @@ export default async function handler(req, res) {
     const emit = (event) => res.write(`data: ${JSON.stringify(event)}\n\n`);
 
     try {
-        await runChatTurn(check, emit);
+        await runChatTurn({ ...check, ip }, emit);
     } catch (error) {
         console.error('Chat error:', error);
         emit({

@@ -29,6 +29,7 @@ const TEASER_INDEX_KEY = 'if360_teaser_index';
 const VISITOR_KEY = 'if360_visitor';
 const CHAT_KEY = 'if360_chat';
 const BLOCK_KEY = 'if360_blocked';
+const SESSION_KEY = 'if360_session';
 
 // Tope de mensajes guardados: el mismo que acepta el backend, así no guardamos
 // un historial que después se va a recortar igual.
@@ -44,6 +45,24 @@ const CLOSE_DELAY_MS = 6000;
 const DECLINE_REPLY =
     'Sin problema 👍 Igual te puedo contar qué incluye cada plan y cómo trabajamos. ' +
     'Y si prefieres los precios directo, escríbenos por WhatsApp al +56 9 5414 6176.';
+
+// Id aleatorio de la conversación: con él se guarda en Supabase aunque el
+// visitante no deje sus datos. Dura lo que dura la pestaña.
+const readSessionId = () => {
+    const fresh = () =>
+        crypto.randomUUID?.() ?? `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 12)}`;
+    try {
+        let id = sessionStorage.getItem(SESSION_KEY);
+        if (!id) {
+            id = fresh();
+            sessionStorage.setItem(SESSION_KEY, id);
+        }
+        return id;
+    } catch {
+        // Sin sessionStorage la conversación se registra solo mientras dure la página.
+        return fresh();
+    }
+};
 
 const readVisitor = () => {
     try {
@@ -152,6 +171,7 @@ const ChatAgent = () => {
     const [form, setForm] = useState({ nombre: '', email: '', telefono: '' });
     const [formError, setFormError] = useState('');
 
+    const [sessionId] = useState(readSessionId);
     const scrollRef = useRef(null);
     const inputRef = useRef(null);
     const teaserIndex = useRef(0);
@@ -300,6 +320,7 @@ const ChatAgent = () => {
                     message: content,
                     history,
                     visitor: visitorOverride ?? visitor,
+                    sessionId,
                 }),
             });
 
