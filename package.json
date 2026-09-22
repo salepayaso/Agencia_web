@@ -7,11 +7,7 @@
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint .",
-    "preview": "vite preview",
-    "checkup": "node checkup/run.mjs",
-    "checkup:local": "node checkup/run.mjs --local",
-    "checkup:profundo": "node checkup/run.mjs --profundo",
-    "checkup:baseline": "node checkup/run.mjs --baseline"
+    "preview": "vite preview"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.122.0",

@@ -46,5 +46,3 @@ guia_entrega_looker.md
 supabase_scripts/
 card-preview.html
 
-# Informes del chequeo automático (se regeneran en cada corrida)
-checkup/reports/
