@@ -1,0 +1,39 @@
+{
+  "interfaz360": {
+    "nombre": "Interfaz360 — sitio principal",
+    "base": "https://www.interfaz360.cl",
+    "local": "http://localhost:4173",
+    "repo": ".",
+    "spa": true,
+    "whatsapp": "56954146176",
+    "correos": ["contacto@interfaz360.cl", "oss.maturana@gmail.com"],
+    "rutas": [
+      "/",
+      "/servicios",
+      "/portafolio",
+      "/nosotros",
+      "/contacto",
+      "/tarjeta",
+      "/privacidad",
+      "/terminos",
+      "/login"
+    ],
+    "suites": ["unidad", "infra", "paginas", "dominios", "agente", "enlaces", "seguridad"]
+  },
+
+  "panaderia": {
+    "nombre": "Panificadora Valdivia — sitio web",
+    "base": "https://www.panaderiasantalucia.cl",
+    "spa": false,
+    "rutas": ["/"],
+    "suites": ["infra", "paginas"]
+  },
+
+  "panaderia-app": {
+    "nombre": "Panificadora Valdivia — Sistema de Reparto",
+    "base": "https://app.panaderiasantalucia.cl",
+    "spa": true,
+    "rutas": ["/"],
+    "suites": ["infra", "paginas"]
+  }
+}
