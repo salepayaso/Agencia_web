@@ -1,60 +1,51 @@
-# Interfaz 360 | Agencia de Diseño Web & SEO
+# Interfaz 360
 
-![Interfaz 360 Logo](public/logo%20sin%20fondo%20optimizado.png)
+Sitio web oficial de **Interfaz 360**, estudio de desarrollo web, software a medida y automatización con IA.
 
-> **Transformamos visibilidad en conversión con tecnología de vanguardia.**
+🌐 [www.interfaz360.cl](https://www.interfaz360.cl)
 
-Este repositorio contiene el código fuente de la plataforma oficial de **Interfaz 360**, una agencia especializada en soluciones digitales de alto rendimiento.
+## Funcionalidades
 
----
+- Sitio corporativo con servicios, portafolio y páginas legales.
+- Asistente virtual con IA integrado en el chat del sitio.
+- Formulario de contacto y búsqueda de dominios.
+- Portal de clientes con acceso autenticado.
+- Chequeo automático diario del estado del sitio.
 
-## 🚀 Tecnologías y Herramientas
+## Stack
 
-- **Frontend**: [React](https://reactjs.org/) + [Vite](https://vitejs.dev/) (Arquitectura rápida y modular).
-- **Estilos**: [Tailwind CSS](https://tailwindcss.com/) (Diseño responsivo y utilitario).
-- **Animaciones**: [Framer Motion](https://www.framer.com/motion/) (Experiencias interactivas premium).
-- **Despliegue**: [Vercel](https://vercel.com/) (Optimización automática y Edge Network).
-- **Infraestructura**: Cloudflare para la gestión de DNS y seguridad.
+| Área          | Tecnología                                  |
+| ------------- | ------------------------------------------- |
+| Frontend      | React 19, Vite, Tailwind CSS, Framer Motion |
+| Backend       | Funciones serverless en Vercel (`/api`)     |
+| Datos y auth  | Supabase                                    |
+| IA            | Claude API (Anthropic)                      |
+| Correo        | Resend                                      |
+| Infraestructura | Vercel, Cloudflare DNS                    |
 
----
+## Desarrollo local
 
-## ⚡ Optimización de Rendimiento (WPO)
-
-Hemos implementado mejoras críticas para asegurar una carga ultra rápida, logrando un **Largest Contentful Paint (LCP)** optimizado:
-
-- **Optimización de Imágenes**: Conversión masiva de assets pesados (.png) a formatos ligeros (.jpg) con reducciones de hasta el 90% en peso.
-- **Resource Preloading**: Implementación de etiquetas `preload` en el HTML para recursos críticos (Hero & Logo).
-- **DNS Directo**: Configuración de Cloudflare en modo "DNS Only" para permitir que Vercel gestione la seguridad y optimización de tráfico directamente.
-- **Lazy Loading**: Carga diferida de componentes e imágenes fuera del área visible.
-
----
-
-## 🔒 Seguridad y Mantenimiento
-
-- **Gestión de Secretos**: El archivo `.env` está estrictamente ignorado en Git para proteger las claves de API y base de datos.
-- **Gestión de Datos**: Uso de variables de entorno seguras para la conexión con el backend y base de datos.
-- **Archivos Estáticos**: Ubicados en `/public` para ser servidos directamente (sitemap, robots.txt, assets).
-
----
-
-## 💻 Desarrollo Local
+Requiere Node.js 20 o superior.
 
 ```bash
-# 1. Instalar dependencias
 npm install
-
-# 2. Iniciar servidor de desarrollo
-npm run dev
-
-# 3. Construir para producción
-npm run build
+npm run dev       # servidor de desarrollo
+npm run build     # build de producción
+npm run lint      # análisis estático
+npm run checkup   # chequeo de estado del sitio
 ```
 
----
+Las variables de entorno se configuran en un archivo `.env` local (excluido del repositorio) y en el panel de Vercel para producción.
 
-## 📞 Conectemos
+## Estructura
 
-- **Web**: [www.interfaz360.cl](https://www.interfaz360.cl)
+```
+api/        Funciones serverless (chat, contacto, dominios, mantenimiento)
+checkup/    Chequeo automático del sitio
+public/     Recursos estáticos
+src/        Aplicación React (páginas y componentes)
+```
 
----
-*Desarrollado con ❤️ por Interfaz 360.*
+## Licencia
+
+© 2026 Interfaz 360. Todos los derechos reservados.
