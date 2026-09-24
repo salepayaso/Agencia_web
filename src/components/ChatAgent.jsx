@@ -113,7 +113,7 @@ const readBlock = () => {
 const renderInline = (text) =>
     text.split(/(\*\*[^*]+\*\*)/g).map((part, i) =>
         part.startsWith('**') && part.endsWith('**') ? (
-            <strong key={i} className="font-semibold text-white">
+            <strong key={i} className="font-semibold text-ink">
                 {part.slice(2, -2)}
             </strong>
         ) : (
@@ -130,7 +130,7 @@ const Markdown = ({ text }) => {
         if (bullet) {
             return (
                 <span key={i} className="flex gap-2">
-                    <span className="text-primary-400 shrink-0">•</span>
+                    <span className="text-signal shrink-0">•</span>
                     <span>{renderInline(bullet[1])}</span>
                 </span>
             );
@@ -143,15 +143,11 @@ const Markdown = ({ text }) => {
     });
 };
 
-const ChatIcon = ({ className }) => (
-    <svg viewBox="0 0 24 24" className={className} xmlns="http://www.w3.org/2000/svg">
-        {/* Burbuja de conversación */}
-        <path d="M12 2.75c-5.11 0-9.25 3.55-9.25 7.93 0 2.5 1.35 4.72 3.46 6.17v3.65c0 .6.67.96 1.17.63l2.96-1.95c.53.08 1.09.13 1.66.13 5.11 0 9.25-3.55 9.25-7.93S17.11 2.75 12 2.75Z" />
-        {/* Destello: marca que es un agente IA, no un chat cualquiera */}
-        <path
-            d="M15.4 5.1l.42 1.12 1.12.42-1.12.42-.42 1.12-.42-1.12-1.12-.42 1.12-.42.42-1.12Z"
-            className="fill-white"
-        />
+// Ícono del asesor: globo de conversación naranja con el 360 del logo.
+const SealIcon = ({ className }) => (
+    <svg viewBox="0 0 32 32" className={className} aria-hidden="true">
+        <path d="M3 4h26v18H13l-7 6v-6H3z" fill="#e8471c" />
+        <text x="16" y="17.2" textAnchor="middle" fontFamily="Archivo, Arial, sans-serif" fontWeight="900" fontSize="10" fill="#fff">360</text>
     </svg>
 );
 
@@ -470,7 +466,7 @@ const ChatAgent = () => {
     };
 
     return (
-        <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end gap-3">
+        <div className="fixed bottom-5 right-4 sm:right-6 z-50 flex flex-col items-end gap-4 font-body">
             {/* ---- Panel de chat ---- */}
             <AnimatePresence>
                 {isOpen && (
@@ -479,26 +475,23 @@ const ChatAgent = () => {
                         animate={{ opacity: 1, y: 0, scale: 1 }}
                         exit={{ opacity: 0, y: 20, scale: 0.95 }}
                         transition={{ type: 'spring', stiffness: 300, damping: 28 }}
-                        className="w-[calc(100vw-3rem)] sm:w-[380px] h-[min(600px,calc(100vh-8rem))] flex flex-col rounded-3xl overflow-hidden bg-dark-card border border-white/10 shadow-2xl shadow-black/50"
+                        className="w-[calc(100vw-2rem)] sm:w-[380px] h-[min(600px,calc(100vh-8rem))] flex flex-col overflow-hidden bg-white text-ink border-[1.5px] border-ink shadow-[10px_10px_0_#0f1a2e]"
                     >
                         {/* Cabecera */}
-                        <div className="flex items-center gap-3 px-4 py-3 bg-gradient-to-r from-primary-600 to-primary-700 shrink-0">
-                            <div className="relative w-10 h-10 rounded-full bg-white/15 flex items-center justify-center shrink-0">
-                                <ChatIcon className="w-6 h-6 fill-white" />
-                                <span className="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full bg-green-400 border-2 border-primary-700" />
-                            </div>
+                        <div className="flex items-center gap-3 px-4 py-3 bg-ink text-paper shrink-0">
+                            <SealIcon className="w-8 h-8 shrink-0" />
                             <div className="flex-1 min-w-0">
-                                <p className="text-white font-semibold text-sm leading-tight">
-                                    Asistente Interfaz360
+                                <p className="font-bold text-[15px] leading-tight">
+                                    Asesor Interfaz 360
                                 </p>
-                                <p className="text-white/70 text-xs leading-tight">
-                                    En línea · responde al instante
+                                <p className="text-[#8fe0a8] text-xs font-semibold leading-tight">
+                                    ● En línea · responde al instante
                                 </p>
                             </div>
                             <button
                                 onClick={() => setIsOpen(false)}
                                 aria-label="Cerrar chat"
-                                className="w-8 h-8 rounded-full flex items-center justify-center text-white/80 hover:text-white hover:bg-white/15 transition-colors"
+                                className="w-8 h-8 flex items-center justify-center text-paper/80 hover:text-white hover:bg-white/15 transition-colors"
                             >
                                 <svg viewBox="0 0 24 24" className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
                                     <path d="M6 6l12 12M18 6L6 18" />
@@ -514,10 +507,10 @@ const ChatAgent = () => {
                                     className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
                                 >
                                     <div
-                                        className={`max-w-[85%] px-4 py-2.5 rounded-2xl text-sm leading-relaxed ${
+                                        className={`max-w-[86%] px-[13px] py-2.5 text-[15px] leading-relaxed ${
                                             msg.role === 'user'
-                                                ? 'bg-primary-600 text-white rounded-br-md'
-                                                : 'bg-white/10 text-slate-100 rounded-bl-md'
+                                                ? 'bg-signal text-white'
+                                                : 'bg-paper-2 text-ink'
                                         }`}
                                     >
                                         {msg.role === 'assistant' ? (
@@ -531,11 +524,11 @@ const ChatAgent = () => {
 
                             {isTyping && (
                                 <div className="flex justify-start">
-                                    <div className="bg-white/10 px-4 py-3 rounded-2xl rounded-bl-md flex gap-1.5">
+                                    <div className="bg-paper-2 px-4 py-3 flex gap-1.5">
                                         {[0, 150, 300].map((delay) => (
                                             <span
                                                 key={delay}
-                                                className="w-2 h-2 rounded-full bg-slate-400 animate-bounce"
+                                                className="w-2 h-2 rounded-full bg-ink-2 animate-bounce"
                                                 style={{ animationDelay: `${delay}ms` }}
                                             />
                                         ))}
@@ -548,22 +541,22 @@ const ChatAgent = () => {
                                     initial={{ opacity: 0, y: 8 }}
                                     animate={{ opacity: 1, y: 0 }}
                                     onSubmit={submitIdentity}
-                                    className="relative bg-white/[0.07] border border-primary-500/30 rounded-2xl p-4 space-y-2.5"
+                                    className="relative bg-paper border-[1.5px] border-ink p-4 space-y-2.5"
                                 >
                                     <button
                                         type="button"
                                         onClick={declineIdentity}
                                         aria-label="Cerrar el formulario y seguir conversando"
-                                        className="absolute top-2.5 right-2.5 w-7 h-7 rounded-full flex items-center justify-center text-slate-400 hover:text-white hover:bg-white/10 transition-colors"
+                                        className="absolute top-2.5 right-2.5 w-7 h-7 flex items-center justify-center text-ink-2 hover:text-ink hover:bg-paper-2 transition-colors"
                                     >
                                         <svg viewBox="0 0 24 24" className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
                                             <path d="M6 6l12 12M18 6L6 18" />
                                         </svg>
                                     </button>
-                                    <p className="text-sm text-white font-medium leading-snug pr-7">
+                                    <p className="text-sm text-ink font-bold leading-snug pr-7">
                                         Déjame tus datos y te muestro precios y detalles 👇
                                     </p>
-                                    <p className="text-xs text-slate-400 leading-snug -mt-1">
+                                    <p className="text-xs text-ink-2 leading-snug -mt-1">
                                         Con tus datos seguimos la conversación acá mismo y te muestro los planes con sus precios.
                                     </p>
                                     <input
@@ -572,7 +565,7 @@ const ChatAgent = () => {
                                         placeholder="Tu nombre"
                                         maxLength={80}
                                         autoComplete="name"
-                                        className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-sm text-white placeholder:text-slate-500 outline-none focus:border-primary-500/60 transition-colors"
+                                        className="w-full bg-white border-[1.5px] border-rule px-3 py-2 text-sm text-ink placeholder:text-ink-2/70 outline-none focus:border-ink transition-colors"
                                     />
                                     <input
                                         value={form.email}
@@ -581,7 +574,7 @@ const ChatAgent = () => {
                                         type="email"
                                         maxLength={120}
                                         autoComplete="email"
-                                        className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-sm text-white placeholder:text-slate-500 outline-none focus:border-primary-500/60 transition-colors"
+                                        className="w-full bg-white border-[1.5px] border-rule px-3 py-2 text-sm text-ink placeholder:text-ink-2/70 outline-none focus:border-ink transition-colors"
                                     />
                                     <input
                                         value={form.telefono}
@@ -590,23 +583,23 @@ const ChatAgent = () => {
                                         type="tel"
                                         maxLength={20}
                                         autoComplete="tel"
-                                        className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-sm text-white placeholder:text-slate-500 outline-none focus:border-primary-500/60 transition-colors"
+                                        className="w-full bg-white border-[1.5px] border-rule px-3 py-2 text-sm text-ink placeholder:text-ink-2/70 outline-none focus:border-ink transition-colors"
                                     />
-                                    {formError && <p className="text-xs text-red-400">{formError}</p>}
+                                    {formError && <p className="text-xs text-signal font-semibold">{formError}</p>}
                                     <button
                                         type="submit"
-                                        className="w-full bg-primary-600 hover:bg-primary-500 text-white text-sm font-medium rounded-xl py-2.5 transition-colors"
+                                        className="w-full bg-signal hover:bg-ink text-white text-sm font-bold py-2.5 transition-colors"
                                     >
                                         Empezar a conversar
                                     </button>
                                     <button
                                         type="button"
                                         onClick={declineIdentity}
-                                        className="w-full text-xs text-slate-400 hover:text-white py-1 transition-colors"
+                                        className="w-full text-xs text-ink-2 hover:text-ink py-1 transition-colors"
                                     >
                                         Ahora no, gracias
                                     </button>
-                                    <p className="text-[11px] text-slate-500 text-center leading-snug">
+                                    <p className="text-[11px] text-ink-2 text-center leading-snug">
                                         Solo los usamos para continuar tu atención y responderte si lo necesitas.
                                     </p>
                                 </motion.form>
@@ -618,7 +611,7 @@ const ChatAgent = () => {
                                         <button
                                             key={suggestion}
                                             onClick={() => send(suggestion)}
-                                            className="px-3 py-1.5 rounded-full text-xs text-primary-100 bg-primary-600/20 border border-primary-500/40 hover:bg-primary-600/40 transition-colors"
+                                            className="px-[11px] py-[7px] text-[13px] font-semibold text-ink bg-white border-[1.5px] border-ink hover:bg-ink hover:text-paper transition-colors"
                                         >
                                             {suggestion}
                                         </button>
@@ -628,7 +621,7 @@ const ChatAgent = () => {
                         </div>
 
                         {/* Entrada */}
-                        <div className="px-3 py-3 border-t border-white/10 bg-dark-bg/60 shrink-0">
+                        <div className="px-3 py-3 border-t-[1.5px] border-ink bg-white shrink-0">
                             <form
                                 onSubmit={(e) => {
                                     e.preventDefault();
@@ -643,13 +636,13 @@ const ChatAgent = () => {
                                     maxLength={800}
                                     disabled={isBlocked}
                                     placeholder={isBlocked ? 'Chat cerrado por ahora' : 'Escribe tu consulta…'}
-                                    className="flex-1 min-w-0 bg-white/5 border border-white/10 rounded-full px-4 py-2.5 text-sm text-white placeholder:text-slate-500 outline-none focus:border-primary-500/60 disabled:opacity-50 transition-colors"
+                                    className="flex-1 min-w-0 bg-paper border-[1.5px] border-rule px-3 py-2.5 text-[15px] text-ink placeholder:text-ink-2/70 outline-none focus:border-ink disabled:opacity-50 transition-colors"
                                 />
                                 <button
                                     type="submit"
                                     disabled={!input.trim() || isTyping || isBlocked}
                                     aria-label="Enviar mensaje"
-                                    className="w-10 h-10 shrink-0 rounded-full bg-primary-600 hover:bg-primary-500 disabled:opacity-40 disabled:hover:bg-primary-600 flex items-center justify-center transition-colors"
+                                    className="w-11 h-11 shrink-0 bg-ink hover:bg-signal disabled:opacity-40 disabled:hover:bg-ink flex items-center justify-center transition-colors"
                                 >
                                     <svg viewBox="0 0 24 24" className="w-5 h-5 fill-white" >
                                         <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z" />
@@ -660,7 +653,7 @@ const ChatAgent = () => {
                                 href={WHATSAPP_URL}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="block text-center text-[11px] text-slate-500 hover:text-slate-300 mt-2 transition-colors"
+                                className="block text-center text-[11px] text-ink-2 hover:text-ink mt-2 transition-colors"
                             >
                                 ¿Prefieres WhatsApp? Escríbenos al +56 9 5414 6176
                             </a>
@@ -680,18 +673,17 @@ const ChatAgent = () => {
                     >
                         <button
                             onClick={() => setIsOpen(true)}
-                            className="block text-left w-full bg-white/10 backdrop-blur-md border border-white/20 text-white px-5 py-3 pr-7 rounded-2xl shadow-2xl font-medium text-sm hover:bg-white/15 transition-colors"
+                            className="block text-left w-full bg-white border-[1.5px] border-ink text-ink px-4 py-3 pr-7 shadow-[6px_6px_0_#0f1a2e] font-semibold text-sm hover:shadow-[6px_6px_0_#e8471c] transition-shadow"
                         >
                             <span className="relative z-10 block">{teaser}</span>
-                            <span className="relative z-10 block text-[11px] text-primary-300 mt-1">
+                            <span className="relative z-10 block text-[12px] font-bold text-signal mt-1">
                                 Toca para conversar →
                             </span>
-                            <div className="absolute inset-0 bg-gradient-to-r from-primary-500/20 to-purple-500/20 rounded-2xl blur-sm -z-10" />
                         </button>
                         <button
                             onClick={dismissTeaser}
                             aria-label="Cerrar aviso"
-                            className="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-dark-card border border-white/20 text-slate-400 hover:text-white flex items-center justify-center text-xs"
+                            className="absolute -top-2 -right-2 w-6 h-6 bg-white border-[1.5px] border-ink text-ink hover:bg-ink hover:text-white flex items-center justify-center text-xs"
                         >
                             ✕
                         </button>
@@ -699,7 +691,7 @@ const ChatAgent = () => {
                 )}
             </AnimatePresence>
 
-            {/* ---- Botón flotante ---- */}
+            {/* ---- Botón flotante: el sello que habla ---- */}
             <motion.button
                 onClick={() => setIsOpen((prev) => !prev)}
                 disabled={isBlocked}
@@ -708,54 +700,26 @@ const ChatAgent = () => {
                         ? 'Chat cerrado por ahora'
                         : isOpen
                           ? 'Cerrar chat'
-                          : 'Abrir chat con el asistente'
+                          : 'Abrir el asesor'
                 }
-                className="group relative w-16 h-16 flex items-center justify-center disabled:cursor-not-allowed"
-                whileHover={isBlocked ? undefined : { scale: 1.05 }}
-                whileTap={isBlocked ? undefined : { scale: 0.95 }}
-                initial={{ opacity: 0, scale: 0 }}
+                className="flex items-center gap-2.5 bg-ink text-white border-[1.5px] border-ink shadow-[5px_5px_0_#e8471c] hover:shadow-[5px_5px_0_#0f1a2e] hover:bg-[#1d2b45] p-3 sm:py-2.5 sm:pl-3 sm:pr-4 font-bold text-[15px] transition-shadow disabled:cursor-not-allowed"
+                initial={{ opacity: 0, y: 12 }}
                 // La opacidad va acá y no en una clase: framer escribe el estilo
                 // en línea y le gana a cualquier `disabled:opacity-*` de Tailwind.
-                animate={{ opacity: isBlocked ? 0.4 : 1, scale: 1 }}
+                animate={{ opacity: isBlocked ? 0.4 : 1, y: 0 }}
                 transition={{ type: 'spring', stiffness: 260, damping: 20 }}
             >
-                {!isOpen && !isBlocked && (
-                    <>
-                        <span className="absolute inset-0 rounded-full bg-primary-500 opacity-25 animate-ping" />
-                        <span className="absolute inset-0 rounded-full bg-primary-500 opacity-10 animate-ping delay-75" />
-                    </>
+                {isOpen ? (
+                    <svg viewBox="0 0 24 24" className="w-7 h-7" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" aria-hidden="true">
+                        <path d="M6 6l12 12M18 6L6 18" />
+                    </svg>
+                ) : (
+                    <SealIcon className="w-7 h-7" />
                 )}
-
-                <div className="relative w-14 h-14 rounded-full bg-gradient-to-tr from-primary-500 to-indigo-600 shadow-lg shadow-primary-500/40 flex items-center justify-center overflow-hidden border border-white/20 group-hover:shadow-primary-500/60 transition-all duration-300">
-                    <div className="absolute top-0 -left-full w-full h-full bg-gradient-to-r from-transparent via-white/30 to-transparent transform -skew-x-12 group-hover:animate-shine transition-all" />
-                    <AnimatePresence mode="wait" initial={false}>
-                        {isOpen ? (
-                            <motion.svg
-                                key="close"
-                                initial={{ rotate: -90, opacity: 0 }}
-                                animate={{ rotate: 0, opacity: 1 }}
-                                exit={{ rotate: 90, opacity: 0 }}
-                                viewBox="0 0 24 24"
-                                className="w-7 h-7"
-                                fill="none"
-                                stroke="white"
-                                strokeWidth="2.5"
-                                strokeLinecap="round"
-                            >
-                                <path d="M6 6l12 12M18 6L6 18" />
-                            </motion.svg>
-                        ) : (
-                            <motion.span
-                                key="icon"
-                                initial={{ rotate: 90, opacity: 0 }}
-                                animate={{ rotate: 0, opacity: 1 }}
-                                exit={{ rotate: -90, opacity: 0 }}
-                            >
-                                <ChatIcon className="w-8 h-8 fill-white" />
-                            </motion.span>
-                        )}
-                    </AnimatePresence>
-                </div>
+                <span className="hidden sm:inline">{isOpen ? 'Cerrar' : 'Asesor'}</span>
+                {!isOpen && !isBlocked && (
+                    <span className="hidden sm:block w-2 h-2 rounded-full bg-[#8fe0a8] shadow-[0_0_0_3px_rgba(143,224,168,.25)]" />
+                )}
             </motion.button>
         </div>
     );

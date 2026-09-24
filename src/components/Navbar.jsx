@@ -1,145 +1,84 @@
 import { Link, useLocation } from 'react-router-dom';
 import { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import Button from './ui/Button';
 import Wordmark from './Wordmark';
-import { Lock, Menu, X } from 'lucide-react';
+import { openChat } from '../lib/chat';
+
+const LINKS = [
+    { to: '/servicios', label: 'Servicios' },
+    { to: '/nosotros', label: 'Nosotros' },
+    { to: '/contacto', label: 'Contacto' },
+];
 
 const Navbar = () => {
-    const [scrolled, setScrolled] = useState(false);
-    const [isOpen, setIsOpen] = useState(false); // Mobile menu state
     const location = useLocation();
+    // El menú del celular queda abierto solo en la página donde se abrió:
+    // al navegar se cierra solo.
+    const [openAt, setOpenAt] = useState(null);
+    const isOpen = openAt === location.key;
+    const setIsOpen = (open) => setOpenAt(open ? location.key : null);
 
+    // Sin scroll de fondo mientras el menú del celular está abierto
     useEffect(() => {
-        const handleScroll = () => {
-            const isScrolled = window.scrollY > 50;
-            setScrolled(prev => (prev !== isScrolled ? isScrolled : prev));
-        };
+        document.body.style.overflow = isOpen ? 'hidden' : '';
+        return () => { document.body.style.overflow = ''; };
+    }, [isOpen]);
 
-        window.addEventListener('scroll', handleScroll, { passive: true });
-        return () => window.removeEventListener('scroll', handleScroll);
-    }, []);
+    const current = (path) => (location.pathname === path ? 'page' : undefined);
 
-    // Close mobile menu when route changes
-    useEffect(() => {
+    const talk = () => {
         setIsOpen(false);
-    }, [location]);
-
-    // Helper to determine if link is active
-    const isActive = (path) => location.pathname === path;
+        openChat();
+    };
 
     return (
-        <>
-            <motion.nav
-                initial={{ y: -100 }}
-                animate={{ y: 0 }}
-                className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled || isOpen ? 'bg-dark-bg/95 backdrop-blur-md shadow-lg py-4' : 'bg-transparent py-6'
-                    }`}
-            >
-                <div className="max-w-7xl mx-auto px-4 md:px-8 flex items-center justify-between">
-                    <Link to="/" className="flex items-center relative z-50" aria-label="Interfaz 360, ir al inicio">
-                        <Wordmark className="text-xl md:text-2xl text-white" />
+        <div className="tc">
+            <header className="nav gutter">
+                <div className="max">
+                    <Link to="/" className="brand" aria-label="Interfaz 360, ir al inicio">
+                        <Wordmark className="text-[22px]" />
                     </Link>
 
-                    {/* Desktop Navigation */}
-                    <div className="hidden md:flex items-center gap-8">
-                        {['Servicios', 'Nosotros'].map((item) => {
-                            const path = `/${item.toLowerCase().replace(' ', '-')}`;
-                            const active = isActive(path);
-                            return (
-                                <Link
-                                    key={item}
-                                    to={path}
-                                    className={`text-xs uppercase tracking-widest font-semibold transition-all duration-300 relative group ${active ? 'text-primary-400' : 'text-gray-400 hover:text-white'}`}
-                                >
-                                    {item}
-                                    <span className={`absolute -bottom-1 left-0 w-full h-[1px] bg-primary-400 transform origin-left transition-transform duration-300 ${active ? 'scale-x-100' : 'scale-x-0 group-hover:scale-x-50'}`}></span>
-                                </Link>
-                            );
-                        })}
+                    <ul>
+                        {LINKS.map(({ to, label }) => (
+                            <li key={to}>
+                                <Link to={to} aria-current={current(to)}>{label}</Link>
+                            </li>
+                        ))}
+                    </ul>
 
-                        <div className="h-6 w-[1px] bg-white/10 mx-2"></div>
-
-                        <Link to="/login" className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-gray-300 hover:text-white transition-all px-4 py-2 rounded-lg bg-white/5 border border-white/5 hover:border-white/20 hover:bg-white/10 backdrop-blur-sm group">
-                            <Lock className="w-3 h-3 text-primary-400 group-hover:text-white transition-colors" />
-                            <span>Clientes</span>
-                        </Link>
-
-                        <Button href="/contacto" variant="primary" className="!py-2.5 !px-6 text-xs uppercase tracking-widest shadow-lg shadow-primary-500/20 hover:shadow-primary-500/40">Hablemos</Button>
+                    <div className="right">
+                        <Link to="/login" className="client">Clientes</Link>
+                        <button type="button" className="btn solid" onClick={talk}>
+                            Hablar con el asesor
+                        </button>
+                        <button
+                            type="button"
+                            className="burger"
+                            onClick={() => setIsOpen(!isOpen)}
+                            aria-label={isOpen ? 'Cerrar menú' : 'Abrir menú'}
+                            aria-expanded={isOpen}
+                        >
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+                                {isOpen ? <path d="M6 6l12 12M18 6L6 18" /> : <path d="M3 7h18M3 12h18M3 17h18" />}
+                            </svg>
+                        </button>
                     </div>
-
-                    {/* Mobile Menu Button */}
-                    <button
-                        className="md:hidden relative z-50 p-2 text-gray-300 hover:text-white transition-colors"
-                        onClick={() => setIsOpen(!isOpen)}
-                        aria-label="Menu"
-                    >
-                        {isOpen ? <X size={28} /> : <Menu size={28} />}
-                    </button>
                 </div>
-            </motion.nav>
+            </header>
 
-            {/* Mobile Menu Overlay - Movido fuera del nav para evitar transform constraints */}
-            <AnimatePresence>
-                {isOpen && (
-                    <motion.div
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
-                        transition={{ duration: 0.2 }}
-                        className="fixed inset-0 bg-dark-bg/98 backdrop-blur-md z-40 md:hidden flex flex-col justify-center items-center overflow-hidden h-screen"
-                    >
-                        <div className="flex flex-col items-center gap-6 p-8 w-full max-w-sm pt-24">
-                            {['Inicio', 'Servicios', 'Nosotros'].map((item, i) => {
-                                const path = item === 'Inicio' ? '/' : `/${item.toLowerCase().replace(' ', '-')}`;
-                                const active = isActive(path);
-                                return (
-                                    <motion.div
-                                        key={item}
-                                        initial={{ opacity: 0, y: 10 }}
-                                        animate={{ opacity: 1, y: 0 }}
-                                        transition={{ delay: i * 0.05 }}
-                                        className="w-full text-center"
-                                    >
-                                        <Link
-                                            to={path}
-                                            className={`text-2xl font-bold uppercase tracking-wider block py-2 ${active ? 'text-primary-400' : 'text-gray-400'}`}
-                                            onClick={() => setIsOpen(false)}
-                                        >
-                                            {item}
-                                        </Link>
-                                    </motion.div>
-                                );
-                            })}
-
-                            <motion.div
-                                initial={{ opacity: 0, y: 10 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ delay: 0.25 }}
-                                className="w-full space-y-4 pt-8 border-t border-white/10 mt-4"
-                            >
-                                <Link
-                                    to="/login"
-                                    className="flex items-center justify-center gap-2 text-sm font-bold uppercase tracking-widest text-gray-300 bg-white/5 border border-white/5 py-4 rounded-xl w-full"
-                                    onClick={() => setIsOpen(false)}
-                                >
-                                    <Lock size={16} />
-                                    Portal Clientes
-                                </Link>
-                                <Button
-                                    href="/contacto"
-                                    variant="primary"
-                                    className="w-full justify-center !py-4 !text-sm"
-                                    onClick={() => setIsOpen(false)}
-                                >
-                                    Hablemos
-                                </Button>
-                            </motion.div>
-                        </div>
-                    </motion.div>
-                )}
-            </AnimatePresence>
-        </>
+            {isOpen && (
+                <nav className="menu" aria-label="Menú principal">
+                    <Link to="/" aria-current={current('/')}>Inicio</Link>
+                    {LINKS.map(({ to, label }) => (
+                        <Link key={to} to={to} aria-current={current(to)}>{label}</Link>
+                    ))}
+                    <Link to="/login" aria-current={current('/login')}>Portal de clientes</Link>
+                    <button type="button" className="btn signal" onClick={talk}>
+                        Hablar con el asesor →
+                    </button>
+                </nav>
+            )}
+        </div>
     );
 };
 

@@ -1,93 +1,55 @@
-import { Facebook, Instagram, Linkedin } from 'lucide-react';
-
 import { Link } from 'react-router-dom';
 import Wordmark from './Wordmark';
 
-const Footer = () => {
-    return (
-        <footer className="relative bg-dark-bg border-t border-white/5 py-16 px-4 md:px-8 overflow-hidden">
-            {/* Background elements */}
-            <div className="absolute top-0 left-1/4 w-96 h-96 bg-primary-500/5 rounded-full blur-[100px]"></div>
-            <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-purple-500/5 rounded-full blur-[100px]"></div>
-
-            <div className="max-w-7xl mx-auto relative z-10">
-                <div className="grid md:grid-cols-4 gap-12 mb-16">
-                    <div className="col-span-1 md:col-span-2">
-                        <div className="mb-6">
-                            <Wordmark className="text-3xl text-white" />
-                        </div>
-                        <p className="text-gray-300 max-w-sm text-lg leading-relaxed">
-                            Interfaz360 es una agencia digital especializada en desarrollo web, gestión de Google y automatización con inteligencia artificial — construida con tecnología propia, pensada para negocios chilenos.
-                        </p>
-                    </div>
-
-                    <div>
-                        <h4 className="font-bold text-white mb-6 flex items-center gap-2">
-                            <span className="w-1.5 h-1.5 rounded-full bg-primary-500"></span>
-                            Navegación
-                        </h4>
-                        <ul className="space-y-4 text-gray-300">
-                            <li>
-                                <Link to="/" className="flex items-center gap-2 hover:text-primary-400 transition-colors group">
-                                    <span className="w-0 group-hover:w-2 h-[1px] bg-primary-400 transition-all"></span>
-                                    Inicio
-                                </Link>
-                            </li>
-                            <li>
-                                <Link to="/servicios" className="flex items-center gap-2 hover:text-primary-400 transition-colors group">
-                                    <span className="w-0 group-hover:w-2 h-[1px] bg-primary-400 transition-all"></span>
-                                    Servicios
-                                </Link>
-                            </li>
-                        </ul>
-                    </div>
-
-                    <div>
-                        <h4 className="font-bold text-white mb-6 flex items-center gap-2">
-                            <span className="w-1.5 h-1.5 rounded-full bg-purple-500"></span>
-                            Conectar
-                        </h4>
-                        <div className="flex gap-4">
-                            <a
-                                href="https://facebook.com"
-                                target="_blank"
-                                rel="noreferrer"
-                                className="w-10 h-10 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center text-gray-300 hover:bg-[#1877F2]/10 hover:border-[#1877F2]/50 hover:text-[#1877F2] transition-all duration-300"
-                            >
-                                <Facebook size={20} />
-                            </a>
-                            <a
-                                href="https://www.instagram.com/interfaz360/"
-                                target="_blank"
-                                rel="noreferrer"
-                                className="w-10 h-10 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center text-gray-300 hover:bg-[#E4405F]/10 hover:border-[#E4405F]/50 hover:text-[#E4405F] transition-all duration-300"
-                            >
-                                <Instagram size={20} />
-                            </a>
-                            <a
-                                href="https://linkedin.com"
-                                target="_blank"
-                                rel="noreferrer"
-                                className="w-10 h-10 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center text-gray-300 hover:bg-[#0A66C2]/10 hover:border-[#0A66C2]/50 hover:text-[#0A66C2] transition-all duration-300"
-                            >
-                                <Linkedin size={20} />
-                            </a>
-                        </div>
-                    </div>
-                </div>
-
-                <div className="pt-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-4 text-center md:text-left">
-                    <p className="text-gray-500 text-sm">
-                        &copy; {new Date().getFullYear()} Interfaz 360. Todos los derechos reservados.
+const Footer = () => (
+    <div className="tc">
+        <footer className="foot-site gutter">
+            <div className="max">
+                <div>
+                    <Link to="/" className="brand" aria-label="Interfaz 360, ir al inicio">
+                        <Wordmark className="text-[28px]" />
+                    </Link>
+                    <p style={{ maxWidth: '34ch' }}>
+                        Agencia digital para pymes y emprendedores de Chile. Web, Google, software y agentes IA.
                     </p>
-                    <div className="flex gap-6 text-sm text-gray-500">
-                        <Link to="/privacidad" className="hover:text-white transition-colors">Privacidad</Link>
-                        <Link to="/terminos" className="hover:text-white transition-colors">Términos</Link>
-                    </div>
+                </div>
+                <div>
+                    <h2>Sitio</h2>
+                    <ul>
+                        <li><Link to="/servicios">Servicios</Link></li>
+                        <li><Link to="/nosotros">Nosotros</Link></li>
+                        <li><Link to="/contacto">Contacto</Link></li>
+                    </ul>
+                </div>
+                <div>
+                    <h2>Clientes</h2>
+                    <ul>
+                        <li><Link to="/login">Portal de clientes</Link></li>
+                        <li><Link to="/#dominio">Buscar dominio</Link></li>
+                        <li><Link to="/contacto">Soporte</Link></li>
+                    </ul>
+                </div>
+                <div>
+                    <h2>Síguenos</h2>
+                    <ul>
+                        <li>
+                            <a href="https://www.instagram.com/interfaz360/" target="_blank" rel="noopener noreferrer">
+                                Instagram @interfaz360
+                            </a>
+                        </li>
+                        <li><a href="mailto:contacto@interfaz360.cl">contacto@interfaz360.cl</a></li>
+                    </ul>
+                </div>
+                <div className="legal">
+                    <span>© {new Date().getFullYear()} Interfaz 360 · Santiago, Chile</span>
+                    <nav aria-label="Legal">
+                        <Link to="/privacidad">Privacidad</Link>
+                        <Link to="/terminos">Términos</Link>
+                    </nav>
                 </div>
             </div>
         </footer>
-    );
-};
+    </div>
+);
 
 export default Footer;
