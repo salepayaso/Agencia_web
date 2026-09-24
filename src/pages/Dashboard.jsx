@@ -294,8 +294,10 @@ const HostingOrder = ({ user, onDone, onCancel }) => {
             await placeOrder({ user, kind: 'hosting', domain: d, years: 1, pay, holder: null });
             setDone(true);
             onDone?.();
-        } catch {
-            setError('No pudimos enviar el pedido. Intenta de nuevo en un momento.');
+        } catch (err) {
+            setError(err?.message === 'limite_diario'
+                ? 'Llegaste al máximo de pedidos por hoy. Si necesitas algo más, escríbenos en Soporte.'
+                : 'No pudimos enviar el pedido. Intenta de nuevo en un momento.');
         } finally {
             setSending(false);
         }
@@ -553,7 +555,9 @@ const Support = ({ user, profile, tickets, composing, setComposing, onCreated })
         }
         if (err) {
             setSending(false);
-            setError('No pudimos guardar tu solicitud. Intenta de nuevo en un momento.');
+            setError(/limite_diario/.test(err.message || '')
+                ? 'Llegaste al máximo de solicitudes por hoy. Si es urgente, escríbenos por WhatsApp al +56 9 5414 6176.'
+                : 'No pudimos guardar tu solicitud. Intenta de nuevo en un momento.');
             return;
         }
 

@@ -108,8 +108,10 @@ const DomainSection = ({ embedded = false, kind = 'dominio', onOrdered, onCancel
             await placeOrder({ user: account.user, kind, domain, years: Number(years), pay, holder: data });
             setStep(3);
             onOrdered?.();
-        } catch {
-            setFormError('No pudimos enviar el pedido. Intenta de nuevo o escríbenos por WhatsApp.');
+        } catch (err) {
+            setFormError(err?.message === 'limite_diario'
+                ? 'Llegaste al máximo de pedidos por hoy. Si necesitas algo más, escríbenos por WhatsApp.'
+                : 'No pudimos enviar el pedido. Intenta de nuevo o escríbenos por WhatsApp.');
         } finally {
             setSending(false);
         }

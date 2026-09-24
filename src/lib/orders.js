@@ -74,7 +74,8 @@ export const holderFromProfile = (profile, user) => ({
  * - Con cuenta: lo guarda en orders y actualiza los datos del titular en la ficha.
  *   Si esas tablas/columnas aún no existen (SQL sin correr), sigue igual con el aviso.
  * - Siempre: nos avisa por correo con /api/contact.
- * Lanza error solo si el aviso por correo falla y tampoco se pudo guardar.
+ * Lanza error si la cuenta llegó al tope diario de pedidos ('limite_diario'),
+ * o si el aviso por correo falla y tampoco se pudo guardar.
  */
 export const placeOrder = async ({ user, kind, domain, years = 1, pay, holder }) => {
     const offer = OFFERS[kind];
@@ -96,6 +97,8 @@ export const placeOrder = async ({ user, kind, domain, years = 1, pay, holder })
             payment_method: pay,
             holder: holderRow || null,
         }]);
+        // Tope diario de pedidos por cuenta (trigger en la base): no seguimos ni avisamos
+        if (error && /limite_diario/.test(error.message || '')) throw new Error('limite_diario');
         saved = !error;
         if (holderRow) {
             await supabase.from('profiles').update(holderRow).eq('id', user.id);
