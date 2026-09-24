@@ -3,6 +3,7 @@ import { supabase } from '../supabase';
 import { useNavigate } from 'react-router-dom';
 import Button from '../components/ui/Button';
 import SEO from '../components/SEO';
+import Wordmark from '../components/Wordmark';
 import { Lock, Mail, Loader2, ArrowLeft } from 'lucide-react';
 import { motion } from 'framer-motion';
 
@@ -59,8 +60,9 @@ const Login = () => {
             >
                 <div className="glass-card p-8 rounded-2xl border border-white/10 shadow-2xl">
                     <div className="text-center mb-8">
-                        <img src="/logo sin fondo optimizado.png" alt="Interfaz 360" className="h-32 w-32 rounded-full object-cover mx-auto mb-4 drop-shadow-[0_0_15px_rgba(56,189,248,0.5)]" />
-                        <h1 className="text-3xl font-bold text-white mb-2">Interfaz 360</h1>
+                        <h1 className="mb-3">
+                            <Wordmark className="text-4xl text-white" />
+                        </h1>
                         <p className="text-gray-400">Accede a tu Portal de Cliente</p>
                     </div>
 

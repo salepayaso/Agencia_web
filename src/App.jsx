@@ -1,6 +1,6 @@
 import { useState, useEffect, lazy, Suspense } from 'react';
 import { supabase } from './supabase';
-import { BrowserRouter as Router, Routes, Route, useNavigate, useLocation } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useNavigate, useLocation, Navigate } from 'react-router-dom';
 import ScrollToTop from './components/ScrollToTop';
 import ProtectedRoute from './components/ProtectedRoute';
 import ScrollProgress from './components/ScrollProgress';
@@ -12,7 +12,6 @@ import { Analytics } from '@vercel/analytics/react';
 // Lazy-loaded pages
 const Home = lazy(() => import('./pages/Home'));
 const Services = lazy(() => import('./pages/Services'));
-const Portfolio = lazy(() => import('./pages/Portfolio'));
 const AboutPage = lazy(() => import('./pages/AboutPage'));
 const ContactPage = lazy(() => import('./pages/ContactPage'));
 const Login = lazy(() => import('./pages/Login'));
@@ -55,7 +54,7 @@ function App() {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/servicios" element={<Services />} />
-          <Route path="/portafolio" element={<Portfolio />} />
+          <Route path="/portafolio" element={<Navigate to="/servicios" replace />} />
           <Route path="/nosotros" element={<AboutPage />} />
           <Route path="/contacto" element={<ContactPage />} />
           <Route path="/login" element={<Login />} />

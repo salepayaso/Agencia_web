@@ -4,6 +4,17 @@ import { escapeHtml } from './_lib/leads.js';
 const MAX_NAME = 100;
 const MAX_EMAIL = 254;
 const MAX_MESSAGE = 3000;
+const MAX_PHONE = 30;
+
+// Mismas opciones que muestra el formulario (src/components/Contact.jsx).
+const SERVICIOS = [
+    'Página web',
+    'Tienda online',
+    'Google y Maps',
+    'Agente IA',
+    'Software a medida',
+    'Dominio y correos',
+];
 
 export default async function handler(req, res) {
     if (req.method !== 'POST') {
@@ -19,7 +30,18 @@ export default async function handler(req, res) {
         return res.status(429).json({ error: limitError });
     }
 
-    const { name, email, message } = req.body || {};
+    const { name, email, message, phone, services, website } = req.body || {};
+
+    // Trampa para bots: el campo está oculto, una persona nunca lo llena.
+    // Se responde OK para que el bot no sepa que lo descartamos.
+    if (website) {
+        return res.status(200).json({ success: true });
+    }
+
+    const safePhone = typeof phone === 'string' ? escapeHtml(phone.trim().slice(0, MAX_PHONE)) : '';
+    const safeServices = Array.isArray(services)
+        ? services.filter((s) => SERVICIOS.includes(s)).map(escapeHtml)
+        : [];
 
     if (typeof name !== 'string' || typeof email !== 'string' || typeof message !== 'string'
         || !name.trim() || !email.trim() || !message.trim()) {
@@ -64,6 +86,14 @@ export default async function handler(req, res) {
                                 <td style="padding: 8px 0; color: #666;"><strong>Email:</strong></td>
                                 <td style="padding: 8px 0;"><a href="mailto:${encodeURIComponent(email.trim())}">${safeEmail}</a></td>
                             </tr>
+                            ${safePhone ? `<tr>
+                                <td style="padding: 8px 0; color: #666;"><strong>WhatsApp:</strong></td>
+                                <td style="padding: 8px 0;">${safePhone}</td>
+                            </tr>` : ''}
+                            ${safeServices.length ? `<tr>
+                                <td style="padding: 8px 0; color: #666; vertical-align: top;"><strong>Busca:</strong></td>
+                                <td style="padding: 8px 0;">${safeServices.join(' · ')}</td>
+                            </tr>` : ''}
                         </table>
                         <hr style="border: none; border-top: 1px solid #eee; margin: 16px 0;" />
                         <h3 style="color: #333;">Mensaje:</h3>

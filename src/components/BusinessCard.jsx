@@ -68,11 +68,9 @@ END:VCARD`
                         <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2">
                             <div className="w-24 h-24 rounded-full p-1 bg-gradient-to-r from-primary-400 to-purple-500 relative group">
                                 <div className="absolute inset-0 rounded-full bg-gradient-to-r from-primary-400 to-purple-500 blur opacity-50 group-hover:opacity-100 transition-opacity duration-500"></div>
-                                <img
-                                    src="/logo sin fondo optimizado.png"
-                                    alt="Profile"
-                                    className="w-full h-full rounded-full object-cover bg-dark-bg relative z-10"
-                                />
+                                <div className="w-full h-full rounded-full bg-dark-bg relative z-10 flex items-center justify-center">
+                                    <span className="font-brand font-extrabold text-2xl text-primary-400" style={{ fontStretch: '112%' }}>360</span>
+                                </div>
                             </div>
                         </div>
                     </div>

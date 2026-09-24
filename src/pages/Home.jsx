@@ -6,6 +6,7 @@ import VentajasCompetitivas from '../components/VentajasCompetitivas';
 import SEO from '../components/SEO';
 import HeroVisual from '../components/HeroVisual';
 import DomainSearch from '../components/DomainSearch';
+import { openChat } from '../lib/chat';
 
 import Button from '../components/ui/Button';
 import SpotlightCard from '../components/SpotlightCard';
@@ -65,9 +66,7 @@ const Home = () => {
                         </p>
                         <div className="flex gap-4">
                             <Button
-                                href={`https://wa.me/56954146176?text=${encodeURIComponent("Hola Interfaz 360, vengo desde la web y me gustaría profesionalizar mi negocio. Necesito asesoría para mi proyecto digital.")}`}
-                                target="_blank"
-                                rel="noopener noreferrer"
+                                onClick={() => openChat()}
                                 variant="primary"
                                 trackingLabel="Hero: Habla con nosotros"
                             >
@@ -256,9 +255,7 @@ const Home = () => {
 
                             <div className="mt-auto">
                                 <Button
-                                    href={`https://wa.me/56954146176?text=${encodeURIComponent("Hola Interfaz 360, me interesa contratar el Plan Pyme Digital. ¿Me podrían dar más información?")}`}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
+                                    onClick={() => openChat('Hola, me interesa el Plan Pyme Digital. ¿Qué incluye?')}
                                     variant="primary"
                                     className="w-full !py-4"
                                     trackingLabel="Contratar: Plan Pyme Digital"
@@ -306,9 +303,7 @@ const Home = () => {
                             <div className="mt-auto">
                                 <p className="text-purple-300 text-sm font-medium mb-4">Precio según tu negocio y necesidades</p>
                                 <Button
-                                    href={`https://wa.me/56954146176?text=${encodeURIComponent("Hola Interfaz 360, me interesa un Agente IA para mi negocio. ¿Me podrían dar más información?")}`}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
+                                    onClick={() => openChat('Hola, me interesa un agente IA para mi negocio. ¿Cómo funciona?')}
                                     variant="primary"
                                     className="w-full !py-4 shadow-lg bg-purple-600 hover:bg-purple-700 shadow-purple-500/20 border-none relative z-20"
                                     trackingLabel="Contratar: Agente IA 24/7"
@@ -499,8 +494,8 @@ const Home = () => {
                             <Button href="/contacto" variant="primary" icon={ArrowRight} className="!py-4 !px-8 text-lg" trackingLabel="CTA Final: Agenda Consultoria">
                                 Agenda tu Consultoría Gratis
                             </Button>
-                            <Button href="/portafolio" variant="glass" className="!py-4 !px-8 text-lg" trackingLabel="CTA Final: Ver Casos Exito">
-                                Ver Casos de Éxito
+                            <Button href="/servicios" variant="glass" className="!py-4 !px-8 text-lg" trackingLabel="CTA Final: Ver Servicios">
+                                Ver Servicios
                             </Button>
                         </div>
                     </motion.div>

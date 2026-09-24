@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { OPEN_CHAT_EVENT } from '../lib/chat';
 
 const WHATSAPP_URL =
     'https://wa.me/56954146176?text=' +
@@ -405,6 +406,28 @@ const ChatAgent = () => {
             setIsTyping(false);
         }
     };
+
+    // ---- Apertura desde los botones del sitio ----------------------------
+    // El listener se registra una vez; el ref le entrega siempre el send y el
+    // estado del render actual.
+    const openRef = useRef(null);
+    useEffect(() => {
+        openRef.current = (message) => {
+            setIsOpen(true);
+            if (!message || isBlocked) return;
+            if (isTyping || needsIdentity) {
+                setInput(message);
+                return;
+            }
+            send(message);
+        };
+    });
+
+    useEffect(() => {
+        const onOpen = (e) => openRef.current?.(e.detail?.message);
+        window.addEventListener(OPEN_CHAT_EVENT, onOpen);
+        return () => window.removeEventListener(OPEN_CHAT_EVENT, onOpen);
+    }, []);
 
     const submitIdentity = (e) => {
         e.preventDefault();

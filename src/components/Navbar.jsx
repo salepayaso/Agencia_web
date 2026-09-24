@@ -2,6 +2,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Button from './ui/Button';
+import Wordmark from './Wordmark';
 import { Lock, Menu, X } from 'lucide-react';
 
 const Navbar = () => {
@@ -36,18 +37,13 @@ const Navbar = () => {
                     }`}
             >
                 <div className="max-w-7xl mx-auto px-4 md:px-8 flex items-center justify-between">
-                    <Link to="/" className="flex items-center gap-3 relative z-50">
-                        <img src="/logo sin fondo optimizado.png" alt="Logo" className="h-10 w-10 md:h-12 md:w-12 rounded-full object-cover" />
-                        <img
-                            src="/brand-text-v2.png"
-                            alt="Interfaz 360"
-                            className="h-8 md:h-12 object-contain"
-                        />
+                    <Link to="/" className="flex items-center relative z-50" aria-label="Interfaz 360, ir al inicio">
+                        <Wordmark className="text-xl md:text-2xl text-white" />
                     </Link>
 
                     {/* Desktop Navigation */}
                     <div className="hidden md:flex items-center gap-8">
-                        {['Servicios', 'Portafolio', 'Nosotros'].map((item) => {
+                        {['Servicios', 'Nosotros'].map((item) => {
                             const path = `/${item.toLowerCase().replace(' ', '-')}`;
                             const active = isActive(path);
                             return (
@@ -94,7 +90,7 @@ const Navbar = () => {
                         className="fixed inset-0 bg-dark-bg/98 backdrop-blur-md z-40 md:hidden flex flex-col justify-center items-center overflow-hidden h-screen"
                     >
                         <div className="flex flex-col items-center gap-6 p-8 w-full max-w-sm pt-24">
-                            {['Inicio', 'Servicios', 'Portafolio', 'Nosotros'].map((item, i) => {
+                            {['Inicio', 'Servicios', 'Nosotros'].map((item, i) => {
                                 const path = item === 'Inicio' ? '/' : `/${item.toLowerCase().replace(' ', '-')}`;
                                 const active = isActive(path);
                                 return (

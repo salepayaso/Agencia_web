@@ -5,6 +5,7 @@ import Section from '../components/ui/Section';
 import Button from '../components/ui/Button';
 import SEO from '../components/SEO';
 import DomainSearch from '../components/DomainSearch';
+import { openChat } from '../lib/chat';
 import { Layout, Rocket, Mail, Zap, Code, ArrowRight, MonitorSmartphone, ShoppingBag, Megaphone, Server, Activity, BarChart3, MessageSquare, User, Lock, TrendingUp, Search, MapPin, ShieldCheck, PieChart, Bot } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useState } from 'react';
@@ -99,8 +100,7 @@ const ServiceCard = ({ service, i }) => {
             {/* CTA Button */}
             <div className="mt-auto">
                 <Button
-                    href={`https://wa.me/56954146176?text=${encodeURIComponent(service.whatsappMsg)}`}
-                    target="_blank"
+                    onClick={() => openChat(service.chatMsg)}
                     variant="primary"
                     className="w-full"
                     trackingLabel={service.trackingLabel}
@@ -128,7 +128,7 @@ const Services = () => {
                 "Configuración personalizada a tu negocio"
             ],
             badge: "NUEVO",
-            whatsappMsg: "Hola Interfaz 360, me interesa saber más sobre los Agentes de IA. ¿Me pueden dar más información?",
+            chatMsg: "Hola, me interesa un agente IA para mi negocio. ¿Cómo funciona?",
             trackingLabel: "Contactar: Agentes de IA"
         },
         {
@@ -145,7 +145,7 @@ const Services = () => {
                 "Tecnología React Alta Interactividad",
                 "Certificado SSL de Seguridad"
             ],
-            whatsappMsg: "Hola Interfaz 360, me interesa contratar el Plan Pyme Digital. ¿Me podrían dar más información?",
+            chatMsg: "Hola, me interesa el Plan Pyme Digital. ¿Qué incluye?",
             trackingLabel: "Contactar: Plan Pyme Digital"
         },
         {
@@ -164,7 +164,7 @@ const Services = () => {
                 "Tecnología React Alta Interactividad",
                 "Certificado SSL de Seguridad"
             ],
-            whatsappMsg: "Hola Interfaz 360, me interesa contratar la Suite Digital 360. ¿Me podrían dar más información?",
+            chatMsg: "Hola, me interesa la Suite Digital 360. ¿Qué incluye?",
             trackingLabel: "Contactar: Suite Digital 360"
         },
         {
@@ -178,7 +178,7 @@ const Services = () => {
                 "Control total de inventario",
                 "Tus clientes compran fácil y rápido"
             ],
-            whatsappMsg: "Hola Interfaz 360, me interesa una Tienda Online. ¿Me podrían dar más información?",
+            chatMsg: "Hola, quiero una tienda online para mi negocio. ¿Cómo funciona?",
             trackingLabel: "Contactar: Tiendas Online"
         },
         {
@@ -196,7 +196,7 @@ const Services = () => {
                 "Métricas reales con Google Analytics",
                 "Posicionamiento SEO Técnico"
             ],
-            whatsappMsg: "Hola Interfaz 360, me interesa el Ecosistema Google & Marketing. ¿Me podrían dar más información?",
+            chatMsg: "Hola, me interesa el Ecosistema Google & Marketing. ¿Qué opciones hay?",
             trackingLabel: "Contactar: Ecosistema Google & Marketing"
         },
         {
@@ -211,7 +211,7 @@ const Services = () => {
                 "Hosting Low-Latency Optimizado"
             ],
             badge: "SOPORTE",
-            whatsappMsg: "Hola Interfaz 360, me interesa el servicio de Dominios, Correos & Hosting. ¿Me podrían dar más información?",
+            chatMsg: "Hola, necesito dominio, correos y hosting. ¿Qué me ofrecen?",
             trackingLabel: "Contactar: Dominios Correos & Hosting"
         }
     ];
@@ -412,8 +412,8 @@ const Services = () => {
                         <Button href="/contacto" variant="primary" icon={ArrowRight} className="!py-4 !px-8 text-lg">
                             Solicita tu Cotización Gratis
                         </Button>
-                        <Button href="/portafolio" variant="glass" className="!py-4 !px-8 text-lg">
-                            Ver Trabajos Realizados
+                        <Button href="/nosotros" variant="glass" className="!py-4 !px-8 text-lg">
+                            Cómo Trabajamos
                         </Button>
                     </div>
                 </div>

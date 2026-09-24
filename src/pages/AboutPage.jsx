@@ -8,8 +8,8 @@ const AboutPage = () => {
     return (
         <div className="min-h-screen bg-dark-bg text-white font-sans selection:bg-primary-500/30">
             <SEO
-                title="Especialistas en Infraestructura Digital"
-                description="Conoce al equipo de Interfaz 360. Expertos en desarrollo web, SEO y ecosistema Google, dedicados a transformar negocios en Chile."
+                title="Nosotros"
+                description="Conoce Interfaz 360: primero entendemos tu negocio y después lo construimos. Trato directo, propuesta con precio cerrado y acompañamiento después de la entrega."
             />
             <Navbar />
             <ChatAgent />

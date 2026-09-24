@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { supabase } from '../supabase';
 import { useNavigate } from 'react-router-dom';
 import Button from '../components/ui/Button';
+import Wordmark from '../components/Wordmark';
 import { LogOut, LayoutDashboard, FileText, Settings, User, Globe, Calendar, Download, HardDrive, Mail, Activity, Server, Plus, X, Send, ShieldCheck, Check } from 'lucide-react';
 
 const Dashboard = () => {
@@ -74,7 +75,7 @@ const Dashboard = () => {
 
                         {/* Logo */}
                         <div className="w-12 h-12 rounded-full bg-white/5 backdrop-blur-sm flex items-center justify-center border border-white/10 relative z-10">
-                            <img src="/logo sin fondo optimizado.png" alt="Logo" className="w-8 h-8 object-contain" />
+                            <span className="font-brand font-extrabold text-sm text-primary-400" style={{ fontStretch: '112%' }}>360</span>
                         </div>
                     </div>
 
@@ -97,15 +98,9 @@ const Dashboard = () => {
 
             {/* Sidebar */}
             <aside className="w-72 bg-dark-card/50 backdrop-blur-xl border-r border-white/5 p-6 flex flex-col relative z-10 hidden md:flex">
-                <div className="mb-12 flex items-center gap-3 px-2">
-                    <div className="relative group cursor-pointer">
-                        <div className="absolute inset-0 bg-primary-500/20 blur-lg rounded-full group-hover:bg-primary-500/30 transition-all"></div>
-                        <img src="/logo sin fondo optimizado.png" alt="Logo" className="h-12 w-12 rounded-full object-cover relative z-10 border border-white/10" />
-                    </div>
-                    <div>
-                        <img src="/brand-text-v2.png" alt="Interfaz 360" className="h-6 object-contain mb-1" />
-                        <span className="text-[10px] tracking-widest uppercase text-primary-400 font-bold block pl-1">Portal Cliente</span>
-                    </div>
+                <div className="mb-12 px-2">
+                    <Wordmark className="text-xl text-white" />
+                    <span className="text-[10px] tracking-widest uppercase text-primary-400 font-bold block mt-2">Portal Cliente</span>
                 </div>
 
                 <nav className="flex-1 space-y-2">

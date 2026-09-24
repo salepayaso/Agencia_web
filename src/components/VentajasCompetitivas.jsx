@@ -2,8 +2,6 @@ import { motion } from 'framer-motion';
 import { Search, Users, BarChart3 } from 'lucide-react';
 import FlipCard from './FlipCard';
 
-const WA_ASESORIA = `https://wa.me/56954146176?text=${encodeURIComponent('Hola Interfaz360, vengo desde la web y me gustaría solicitar asesoría para un proyecto digital.')}`;
-
 const tarjetas = [
     {
         icon: Search,
@@ -21,9 +19,9 @@ const tarjetas = [
         frontTitle: 'Entendemos tu negocio, no solo el código',
         frontDesc: 'No llegamos a vender una web — llegamos a entender cómo opera tu negocio, para construir algo que realmente te sirva en el día a día.',
         backTitle: 'Trato directo, sin intermediarios',
-        backDesc: 'Hablas con quien construye tu proyecto. Escríbenos por WhatsApp y conversemos sobre tu idea, sin formularios ni intermediarios de por medio.',
-        waButton: true,
-        waLink: WA_ASESORIA,
+        backDesc: 'Hablas directo con quien construye tu proyecto. Cuéntale tu idea a nuestro asesor en el chat y te respondemos al tiro, sin intermediarios.',
+        chatButton: true,
+        chatMessage: 'Hola, quiero conversar sobre un proyecto para mi negocio.',
     },
     {
         icon: BarChart3,

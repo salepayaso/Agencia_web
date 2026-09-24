@@ -1,181 +1,237 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { ArrowRight, Check, Clock, Instagram, Loader2, MapPin, MessageCircle, RotateCcw } from 'lucide-react';
 import Section from './ui/Section';
-import Button from './ui/Button';
-import { Send, CheckCircle, Instagram, Facebook, Linkedin } from 'lucide-react';
-import { useLocation } from 'react-router-dom';
+import { openChat } from '../lib/chat';
+
+// Lo que la persona puede marcar. El backend solo acepta estos valores.
+const SERVICIOS = [
+    'Página web',
+    'Tienda online',
+    'Google y Maps',
+    'Agente IA',
+    'Software a medida',
+    'Dominio y correos',
+];
+
+const EMPTY = { name: '', email: '', phone: '', message: '', website: '' };
+
+const inputBase =
+    'peer w-full bg-transparent border-0 border-b border-white/15 px-0 pt-6 pb-2 text-white text-base placeholder-transparent focus:outline-none focus:ring-0 focus:border-primary-400 transition-colors';
+const labelBase =
+    'absolute left-0 top-1.5 text-xs font-medium text-gray-400 transition-all pointer-events-none peer-placeholder-shown:top-6 peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-500 peer-focus:top-1.5 peer-focus:text-xs peer-focus:text-primary-400';
+
+const Field = ({ id, label, optional, textarea, ...props }) => {
+    const Tag = textarea ? 'textarea' : 'input';
+    return (
+        <div className="relative">
+            <Tag id={id} name={id} placeholder={label} className={`${inputBase} ${textarea ? 'resize-none' : ''}`} {...props} />
+            <label htmlFor={id} className={labelBase}>
+                {label}
+                {optional && <span className="text-gray-600 font-normal"> · opcional</span>}
+            </label>
+        </div>
+    );
+};
 
 const Contact = () => {
-    const [formState, setFormState] = useState('idle'); // idle, submitting, success
-    const [message, setMessage] = useState('');
-    const location = useLocation();
+    const [status, setStatus] = useState('idle'); // idle | sending | sent
+    const [error, setError] = useState('');
+    const [servicios, setServicios] = useState([]);
+    const [form, setForm] = useState(EMPTY);
 
-    useEffect(() => {
-        if (location.state?.subject) {
-            setMessage(`Hola, estoy interesado en contratar el servicio de ${location.state.subject}.\n\nMe gustaría saber más detalles y cotizar este servicio.`);
-        }
-    }, [location.state]);
+    const update = (e) => setForm((f) => ({ ...f, [e.target.name]: e.target.value }));
+
+    const toggle = (s) =>
+        setServicios((prev) => (prev.includes(s) ? prev.filter((x) => x !== s) : [...prev, s]));
+
+    const reset = () => {
+        setForm(EMPTY);
+        setServicios([]);
+        setError('');
+        setStatus('idle');
+    };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setFormState('submitting');
+        setError('');
 
-        const formData = new FormData(e.target);
-        const data = {
-            name: formData.get('name'),
-            email: formData.get('email'),
-            message: formData.get('message'),
-        };
+        if (form.name.trim().length < 2) return setError('Escribe tu nombre.');
+        if (!/^[^\s@]+@[^\s@]+\.[a-z]{2,}$/i.test(form.email.trim())) return setError('Revisa el correo, parece incompleto.');
+        if (form.message.trim().length < 5) return setError('Cuéntanos un poco de tu proyecto.');
 
+        setStatus('sending');
         try {
             const response = await fetch('/api/contact', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(data),
+                body: JSON.stringify({ ...form, services: servicios }),
             });
 
             if (response.ok) {
-                setFormState('success');
-                e.target.reset();
-                setMessage('');
-            } else {
-                console.error('Form error:', response);
-                const { error } = await response.json().catch(() => ({}));
-                alert(response.status === 429 && error
-                    ? error
-                    : 'Hubo un error al enviar el mensaje. Por favor intenta nuevamente.');
-                setFormState('idle');
+                setStatus('sent');
+                return;
             }
-        } catch (error) {
-            console.error('Network error:', error);
-            alert('Hubo un error al enviar el mensaje. Por favor revisa tu conexión.');
-            setFormState('idle');
+            const { error: apiError } = await response.json().catch(() => ({}));
+            setError(response.status === 429 && apiError
+                ? apiError
+                : 'No pudimos enviar el mensaje. Intenta de nuevo en un momento.');
+        } catch {
+            setError('No pudimos enviar el mensaje. Revisa tu conexión e intenta de nuevo.');
         }
+        setStatus('idle');
     };
 
     return (
         <Section id="contact" className="pb-24">
-            <div className="max-w-4xl mx-auto relative group">
-                <div className="absolute -inset-1 bg-gradient-to-r from-primary-500 to-purple-500 rounded-3xl blur opacity-25 group-hover:opacity-50 transition duration-1000 group-hover:duration-200"></div>
+            <div className="max-w-6xl mx-auto grid lg:grid-cols-[0.85fr_1.15fr] gap-12 lg:gap-16 items-start">
+                {/* ---- Columna izquierda ---- */}
+                <div className="lg:sticky lg:top-32">
+                    <p className="text-xs font-semibold uppercase tracking-[0.2em] text-primary-400 mb-5">Contacto</p>
+                    <h1 className="text-4xl md:text-5xl font-bold leading-[1.05] mb-6 text-balance">
+                        Cuéntanos qué quieres construir.
+                    </h1>
+                    <p className="text-gray-300 text-lg leading-relaxed mb-10 max-w-md">
+                        Te respondemos con una propuesta concreta, no con un folleto. Sin compromiso.
+                    </p>
 
-                <div className="glass-card rounded-3xl p-8 md:p-12 overflow-hidden relative border border-white/5 bg-dark-card/80 backdrop-blur-xl">
-                    <div className="grid md:grid-cols-2 gap-12">
-                        {/* Contact Info */}
-                        <div className="flex flex-col justify-between">
-                            <div>
-                                <h2 className="text-4xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-white to-gray-400">
-                                    Hablemos de negocios.
-                                </h2>
-                                <p className="text-gray-300 mb-10 text-lg leading-relaxed">
-                                    Completa el formulario y nos pondremos en contacto contigo dentro de 24 horas.
+                    <ul className="space-y-4 text-gray-300 mb-10">
+                        <li className="flex items-center gap-3">
+                            <Clock className="w-5 h-5 text-primary-400 shrink-0" />
+                            Respuesta en menos de 24 horas hábiles
+                        </li>
+                        <li className="flex items-center gap-3">
+                            <MapPin className="w-5 h-5 text-primary-400 shrink-0" />
+                            Santiago presencial · todo Chile remoto
+                        </li>
+                        <li className="flex items-center gap-3">
+                            <Instagram className="w-5 h-5 text-primary-400 shrink-0" />
+                            <a href="https://www.instagram.com/interfaz360/" target="_blank" rel="noopener noreferrer" className="hover:text-white underline-offset-4 hover:underline">
+                                @interfaz360
+                            </a>
+                        </li>
+                    </ul>
+
+                    <button
+                        type="button"
+                        onClick={() => openChat()}
+                        className="group w-full max-w-md flex items-center gap-4 p-5 rounded-2xl border border-white/10 bg-white/[0.03] hover:border-primary-400/50 hover:bg-white/[0.06] transition-colors text-left"
+                    >
+                        <span className="relative flex w-11 h-11 shrink-0 items-center justify-center rounded-xl bg-primary-500/15 text-primary-400">
+                            <MessageCircle className="w-5 h-5" />
+                            <span className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-green-400 ring-2 ring-dark-bg" />
+                        </span>
+                        <span className="flex-1">
+                            <span className="block font-semibold text-white">¿Prefieres una respuesta ya?</span>
+                            <span className="block text-sm text-gray-400">Nuestro asesor IA te atiende ahora mismo</span>
+                        </span>
+                        <ArrowRight className="w-5 h-5 text-gray-500 group-hover:text-primary-400 group-hover:translate-x-1 transition-all" />
+                    </button>
+                </div>
+
+                {/* ---- Formulario ---- */}
+                <div className="rounded-3xl border border-white/10 bg-dark-card/60 p-6 sm:p-10">
+                    <AnimatePresence mode="wait">
+                        {status === 'sent' ? (
+                            <motion.div
+                                key="sent"
+                                initial={{ opacity: 0, y: 10 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                exit={{ opacity: 0 }}
+                                className="py-16 text-center"
+                            >
+                                <div className="w-16 h-16 mx-auto mb-6 rounded-full bg-green-500/15 text-green-400 flex items-center justify-center">
+                                    <Check className="w-8 h-8" strokeWidth={2.5} />
+                                </div>
+                                <h2 className="text-3xl font-bold mb-3">¡Listo, {form.name.trim().split(' ')[0]}!</h2>
+                                <p className="text-gray-300 max-w-sm mx-auto">
+                                    Recibimos tu mensaje. Te escribimos a <span className="text-white">{form.email.trim()}</span> dentro de 24 horas hábiles.
                                 </p>
+                                <button
+                                    type="button"
+                                    onClick={reset}
+                                    className="mt-8 inline-flex items-center gap-2 text-sm text-gray-400 hover:text-white transition-colors"
+                                >
+                                    <RotateCcw className="w-4 h-4" /> Enviar otro mensaje
+                                </button>
+                            </motion.div>
+                        ) : (
+                            <motion.form
+                                key="form"
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                exit={{ opacity: 0 }}
+                                onSubmit={handleSubmit}
+                                noValidate
+                                className="space-y-8"
+                            >
+                                <fieldset>
+                                    <legend className="text-sm font-semibold text-white mb-4">
+                                        ¿Qué necesitas? <span className="text-gray-500 font-normal">Marca todo lo que aplique</span>
+                                    </legend>
+                                    <div className="flex flex-wrap gap-2">
+                                        {SERVICIOS.map((s) => {
+                                            const on = servicios.includes(s);
+                                            return (
+                                                <button
+                                                    key={s}
+                                                    type="button"
+                                                    aria-pressed={on}
+                                                    onClick={() => toggle(s)}
+                                                    className={`inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-medium border transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-400 ${on
+                                                        ? 'bg-primary-500 border-primary-500 text-white'
+                                                        : 'border-white/15 text-gray-300 hover:border-white/40 hover:text-white'}`}
+                                                >
+                                                    {on && <Check className="w-3.5 h-3.5" strokeWidth={3} />}
+                                                    {s}
+                                                </button>
+                                            );
+                                        })}
+                                    </div>
+                                </fieldset>
 
-                                <div className="space-y-8">
-                                    <blockquote className="text-2xl font-light italic text-gray-300 border-l-4 border-primary-500 pl-6 py-2">
-                                        "La innovación distingue a los líderes de los seguidores. Transformemos hoy tu visión en una realidad digital."
-                                    </blockquote>
-
-                                    <div className="flex items-center gap-3 text-primary-400">
-                                        <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
-                                        <p className="text-sm font-medium tracking-wide uppercase">Sistema de Atención Activo 24/7</p>
+                                <div className="grid sm:grid-cols-2 gap-x-8 gap-y-6">
+                                    <Field id="name" label="Tu nombre" autoComplete="name" maxLength={100} value={form.name} onChange={update} />
+                                    <Field id="email" label="Correo" type="email" autoComplete="email" maxLength={254} value={form.email} onChange={update} />
+                                    <div className="sm:col-span-2">
+                                        <Field id="phone" label="WhatsApp" optional type="tel" autoComplete="tel" maxLength={30} value={form.phone} onChange={update} />
+                                    </div>
+                                    <div className="sm:col-span-2">
+                                        <Field id="message" label="Cuéntanos de tu negocio y tu idea" textarea rows={4} maxLength={3000} value={form.message} onChange={update} />
                                     </div>
                                 </div>
-                            </div>
 
-                            <div className="mt-12">
-                                <h4 className="text-sm font-bold text-gray-500 uppercase tracking-wider mb-6">Síguenos en redes</h4>
-                                <div className="flex gap-4">
-                                    <a href="https://instagram.com" target="_blank" rel="noreferrer" className="p-4 bg-white/5 rounded-2xl hover:bg-gradient-to-br hover:from-purple-600 hover:to-pink-600 hover:text-white hover:scale-110 hover:-rotate-3 transition-all duration-300 group/social">
-                                        <Instagram className="text-gray-300 group-hover/social:text-white" size={24} />
-                                    </a>
-                                    <a href="https://facebook.com" target="_blank" rel="noreferrer" className="p-4 bg-white/5 rounded-2xl hover:bg-[#1877F2] hover:text-white hover:scale-110 hover:-rotate-3 transition-all duration-300 group/social">
-                                        <Facebook className="text-gray-300 group-hover/social:text-white" size={24} />
-                                    </a>
-                                    <a href="https://linkedin.com" target="_blank" rel="noreferrer" className="p-4 bg-white/5 rounded-2xl hover:bg-[#0A66C2] hover:text-white hover:scale-110 hover:-rotate-3 transition-all duration-300 group/social">
-                                        <Linkedin className="text-gray-300 group-hover/social:text-white" size={24} />
-                                    </a>
+                                {/* Trampa para bots: invisible para personas. */}
+                                <div className="absolute -left-[9999px]" aria-hidden="true">
+                                    <label htmlFor="website">No completar</label>
+                                    <input id="website" name="website" tabIndex={-1} autoComplete="off" value={form.website} onChange={update} />
                                 </div>
-                            </div>
-                        </div>
 
-                        {/* Contact Form */}
-                        <div className="relative bg-white/5 rounded-2xl p-6 md:p-8 border border-white/5">
-                            {formState === 'success' ? (
-                                <div className="h-full flex flex-col items-center justify-center text-center animate-fade-in py-12">
-                                    <div className="w-20 h-20 bg-green-500/20 text-green-400 rounded-full flex items-center justify-center mb-6 shadow-[0_0_30px_rgba(74,222,128,0.2)]">
-                                        <CheckCircle size={40} />
-                                    </div>
-                                    <h3 className="text-3xl font-bold mb-3 text-white">¡Mensaje Enviado!</h3>
-                                    <p className="text-gray-300 text-lg">Estaremos en contacto pronto.</p>
+                                {error && (
+                                    <p role="alert" className="text-sm text-red-300 bg-red-500/10 border border-red-500/20 rounded-xl px-4 py-3">
+                                        {error}
+                                    </p>
+                                )}
+
+                                <div className="flex flex-col sm:flex-row sm:items-center gap-4 sm:justify-between">
+                                    <p className="text-xs text-gray-500 max-w-xs">
+                                        Usamos tus datos solo para responderte. <a href="/privacidad" className="underline hover:text-gray-300">Privacidad</a>
+                                    </p>
                                     <button
-                                        onClick={() => setFormState('idle')}
-                                        className="mt-8 px-6 py-2 rounded-full border border-white/10 text-gray-300 hover:bg-white/5 transition-colors"
+                                        type="submit"
+                                        disabled={status === 'sending'}
+                                        className="group inline-flex items-center justify-center gap-2 px-7 py-4 rounded-full bg-white text-dark-bg font-semibold hover:bg-primary-400 disabled:opacity-60 transition-colors"
                                     >
-                                        Enviar otro mensaje
+                                        {status === 'sending' ? (
+                                            <><Loader2 className="w-4 h-4 animate-spin" /> Enviando…</>
+                                        ) : (
+                                            <>Enviar mensaje <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" /></>
+                                        )}
                                     </button>
                                 </div>
-                            ) : (
-                                <form onSubmit={handleSubmit} className="space-y-6">
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-300 mb-2 ml-1">Nombre</label>
-                                        <input
-                                            required
-                                            name="name"
-                                            type="text"
-                                            maxLength={100}
-                                            className="w-full bg-dark-bg/50 border border-white/10 rounded-xl px-5 py-4 text-white placeholder-gray-600 focus:outline-none focus:border-primary-500/50 focus:ring-2 focus:ring-primary-500/20 transition-all duration-300"
-                                            placeholder="Juan Pérez"
-                                        />
-                                    </div>
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-300 mb-2 ml-1">Email</label>
-                                        <input
-                                            required
-                                            name="email"
-                                            type="email"
-                                            maxLength={254}
-                                            className="w-full bg-dark-bg/50 border border-white/10 rounded-xl px-5 py-4 text-white placeholder-gray-600 focus:outline-none focus:border-primary-500/50 focus:ring-2 focus:ring-primary-500/20 transition-all duration-300"
-                                            placeholder="juan@ejemplo.com"
-                                        />
-                                    </div>
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-300 mb-2 ml-1">Mensaje</label>
-                                        <textarea
-                                            required
-                                            name="message"
-                                            value={message}
-                                            onChange={(e) => setMessage(e.target.value)}
-                                            rows="4"
-                                            maxLength={3000}
-                                            className="w-full bg-dark-bg/50 border border-white/10 rounded-xl px-5 py-4 text-white placeholder-gray-600 focus:outline-none focus:border-primary-500/50 focus:ring-2 focus:ring-primary-500/20 transition-all duration-300 resize-none"
-                                            placeholder="Cuéntanos sobre tu proyecto..."
-                                        ></textarea>
-                                    </div>
-
-                                    <div className="flex items-center gap-3 p-4 bg-dark-bg/30 rounded-xl border border-white/5">
-                                        <input
-                                            type="checkbox"
-                                            required
-                                            id="bot-check"
-                                            className="w-5 h-5 rounded border-gray-600 text-primary-500 focus:ring-primary-500/50 bg-dark-bg"
-                                        />
-                                        <label htmlFor="bot-check" className="text-sm text-gray-300 cursor-pointer select-none">
-                                            Soy humano (Verificación de seguridad)
-                                        </label>
-                                    </div>
-
-                                    <Button
-                                        type="submit"
-                                        variant="primary"
-                                        className="w-full py-4 text-lg font-medium bg-gradient-to-r from-primary-600 to-primary-500 hover:from-primary-500 hover:to-primary-400 shadow-lg shadow-primary-500/25 hover:shadow-primary-500/40 hover:-translate-y-1"
-                                        disabled={formState === 'submitting'}
-                                        icon={formState === 'submitting' ? null : Send}
-                                    >
-                                        {formState === 'submitting' ? 'Enviando...' : 'Quiero mi asesoría gratuita'}
-                                    </Button>
-                                </form>
-                            )}
-                        </div>
-                    </div>
+                            </motion.form>
+                        )}
+                    </AnimatePresence>
                 </div>
             </div>
         </Section>

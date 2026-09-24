@@ -1,6 +1,7 @@
 import { Facebook, Instagram, Linkedin } from 'lucide-react';
 
 import { Link } from 'react-router-dom';
+import Wordmark from './Wordmark';
 
 const Footer = () => {
     return (
@@ -12,16 +13,8 @@ const Footer = () => {
             <div className="max-w-7xl mx-auto relative z-10">
                 <div className="grid md:grid-cols-4 gap-12 mb-16">
                     <div className="col-span-1 md:col-span-2">
-                        <div className="flex items-center gap-3 mb-6">
-                            <div className="relative">
-                                <div className="absolute inset-0 bg-primary-500/20 blur-xl rounded-full"></div>
-                                <img src="/logo sin fondo optimizado.png" alt="Logo" className="h-14 w-14 rounded-full object-cover relative z-10 border border-white/10" loading="lazy" />
-                            </div>
-                            <img
-                                src="/brand-text-v2.png"
-                                alt="Interfaz 360"
-                                className="h-10 object-contain"
-                            />
+                        <div className="mb-6">
+                            <Wordmark className="text-3xl text-white" />
                         </div>
                         <p className="text-gray-300 max-w-sm text-lg leading-relaxed">
                             Interfaz360 es una agencia digital especializada en desarrollo web, gestión de Google y automatización con inteligencia artificial — construida con tecnología propia, pensada para negocios chilenos.
@@ -44,12 +37,6 @@ const Footer = () => {
                                 <Link to="/servicios" className="flex items-center gap-2 hover:text-primary-400 transition-colors group">
                                     <span className="w-0 group-hover:w-2 h-[1px] bg-primary-400 transition-all"></span>
                                     Servicios
-                                </Link>
-                            </li>
-                            <li>
-                                <Link to="/portafolio" className="flex items-center gap-2 hover:text-primary-400 transition-colors group">
-                                    <span className="w-0 group-hover:w-2 h-[1px] bg-primary-400 transition-all"></span>
-                                    Portafolio
                                 </Link>
                             </li>
                         </ul>
