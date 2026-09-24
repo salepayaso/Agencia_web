@@ -5,7 +5,7 @@ import SEO from '../components/SEO';
 
 const TermsPage = () => {
     return (
-        <div className="min-h-screen bg-dark-bg text-white font-sans selection:bg-primary-500/30">
+        <div className="tc-page">
             <SEO
                 title="Términos y Condiciones"
                 description="Condiciones de uso del sitio y de los servicios ofrecidos por Interfaz 360."
@@ -13,14 +13,20 @@ const TermsPage = () => {
             <Navbar />
             <ChatAgent />
 
-            <div className="pt-32 pb-20 px-6">
-                <div className="max-w-3xl mx-auto">
-                    <h1 className="text-3xl md:text-4xl font-bold mb-2">Términos y Condiciones</h1>
-                    <p className="text-gray-500 text-sm mb-10">Última actualización: junio de 2026</p>
+            <main className="tc">
+            <div className="page-head gutter" style={{ paddingBottom: 40 }}>
+                <div className="max" style={{ display: 'block' }}>
+                    <span className="eyebrow">Legal</span>
+                    <h1 className="display" style={{ fontSize: 'clamp(44px, 6vw, 80px)' }}>Términos y Condiciones</h1>
+                    <p className="muted" style={{ fontSize: 14, marginTop: 16 }}>Última actualización: junio de 2026</p>
 
-                    <div className="space-y-8 text-gray-300 leading-relaxed">
+                    </div>
+            </div>
+            <div className="s gutter" style={{ paddingTop: 48 }}>
+                <div className="max">
+                    <div className="legal-text">
                         <section>
-                            <h2 className="text-xl font-semibold text-white mb-2">Sobre Interfaz 360</h2>
+                            <h2>Sobre Interfaz 360</h2>
                             <p>
                                 Interfaz 360 es un estudio freelance independiente con base en Santiago de Chile,
                                 que ofrece servicios de desarrollo web, gestión de Google y automatización con
@@ -30,7 +36,7 @@ const TermsPage = () => {
                         </section>
 
                         <section>
-                            <h2 className="text-xl font-semibold text-white mb-2">Uso del sitio</h2>
+                            <h2>Uso del sitio</h2>
                             <p>
                                 El contenido de este sitio (textos, imágenes, diseño y código) es propiedad de
                                 Interfaz 360, salvo que se indique lo contrario. Puedes navegar y compartir
@@ -40,7 +46,7 @@ const TermsPage = () => {
                         </section>
 
                         <section>
-                            <h2 className="text-xl font-semibold text-white mb-2">Sobre los planes y precios</h2>
+                            <h2>Sobre los planes y precios</h2>
                             <p>
                                 Los planes, servicios y valores publicados en este sitio son referenciales.
                                 El alcance final, los plazos y el precio de cada proyecto se definen en una
@@ -50,7 +56,7 @@ const TermsPage = () => {
                         </section>
 
                         <section>
-                            <h2 className="text-xl font-semibold text-white mb-2">Responsabilidad</h2>
+                            <h2>Responsabilidad</h2>
                             <p>
                                 Interfaz 360 pone a disposición este sitio y la información que contiene de buena
                                 fe y con la mejor intención de orientarte. Sin embargo, no nos hacemos responsables
@@ -61,7 +67,7 @@ const TermsPage = () => {
                         </section>
 
                         <section>
-                            <h2 className="text-xl font-semibold text-white mb-2">Servicios contratados</h2>
+                            <h2>Servicios contratados</h2>
                             <p>
                                 Cada proyecto contratado con Interfaz 360 se rige además por las condiciones
                                 específicas acordadas directamente con el cliente (alcance, plazos, garantía y
@@ -71,10 +77,10 @@ const TermsPage = () => {
                         </section>
 
                         <section>
-                            <h2 className="text-xl font-semibold text-white mb-2">Contacto</h2>
+                            <h2>Contacto</h2>
                             <p>
                                 Si tienes dudas sobre estos términos, puedes escribirnos a{' '}
-                                <a href="mailto:contacto@interfaz360.cl" className="text-primary-400 hover:underline">
+                                <a href="mailto:contacto@interfaz360.cl">
                                     contacto@interfaz360.cl
                                 </a>.
                             </p>
@@ -82,6 +88,8 @@ const TermsPage = () => {
                     </div>
                 </div>
             </div>
+
+            </main>
 
             <Footer />
         </div>

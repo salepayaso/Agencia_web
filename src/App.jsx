@@ -50,7 +50,7 @@ function App() {
       <ScrollProgress />
       <SpeedInsights />
       <Analytics />
-      <Suspense fallback={<div className="min-h-screen bg-dark-bg" />}>
+      <Suspense fallback={<div className="tc-page" />}>
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/servicios" element={<Services />} />

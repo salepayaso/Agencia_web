@@ -6,10 +6,12 @@ const MAX_EMAIL = 254;
 const MAX_MESSAGE = 3000;
 const MAX_PHONE = 30;
 
-// Mismas opciones que muestra el formulario (src/components/Contact.jsx).
+// Mismas opciones que muestra el formulario (src/pages/ContactPage.jsx).
+// 'Google y Maps' queda por compatibilidad con el nombre anterior.
 const SERVICIOS = [
     'Página web',
     'Tienda online',
+    'Ecosistema Google',
     'Google y Maps',
     'Agente IA',
     'Software a medida',

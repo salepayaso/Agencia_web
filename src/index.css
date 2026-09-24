@@ -8,7 +8,7 @@
   }
   
   body {
-    @apply bg-dark-bg text-white font-sans antialiased;
+    @apply bg-paper text-ink font-body antialiased;
   }
 }
 
@@ -31,12 +31,11 @@
   width: 8px;
 }
 ::-webkit-scrollbar-track {
-  background: #0f172a; 
+  background: #eceae3;
 }
 ::-webkit-scrollbar-thumb {
-  background: #334155; 
-  border-radius: 4px;
+  background: #51607a;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #475569; 
+  background: #0f1a2e;
 }

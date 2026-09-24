@@ -1,36 +1,29 @@
 import { Navigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { supabase } from '../supabase';
-import { Loader2 } from 'lucide-react';
+
+// Pantalla de espera con el sello de la marca
+export const PortalLoading = () => (
+    <div className="tc-page">
+        <div className="tc loading" role="status" aria-label="Cargando tu portal">
+            <span className="seal">360</span>
+        </div>
+    </div>
+);
 
 const ProtectedRoute = ({ children }) => {
     const [loading, setLoading] = useState(true);
     const [user, setUser] = useState(null);
 
     useEffect(() => {
-        const checkUser = async () => {
-            console.log("ProtectedRoute: Verificando sesión...");
-            const { data: { user }, error } = await supabase.auth.getUser();
-            if (error) console.error("ProtectedRoute Error:", error);
-            console.log("ProtectedRoute Usuario encontrado:", user);
-            setUser(user);
+        supabase.auth.getUser().then(({ data: { user: u } }) => {
+            setUser(u);
             setLoading(false);
-        };
-        checkUser();
+        });
     }, []);
 
-    if (loading) {
-        return (
-            <div className="min-h-screen bg-dark-bg flex items-center justify-center text-primary-500">
-                <Loader2 className="w-8 h-8 animate-spin" />
-            </div>
-        );
-    }
-
-    if (!user) {
-        return <Navigate to="/login" replace />;
-    }
-
+    if (loading) return <PortalLoading />;
+    if (!user) return <Navigate to="/login" replace />;
     return children;
 };
 

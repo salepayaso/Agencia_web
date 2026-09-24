@@ -1,130 +1,113 @@
 import { useState, useEffect } from 'react';
-import { supabase } from '../supabase';
 import { useNavigate } from 'react-router-dom';
-import Button from '../components/ui/Button';
-import SEO from '../components/SEO';
-import Wordmark from '../components/Wordmark';
-import { Lock, Mail, Loader2, ArrowLeft } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { supabase } from '../supabase';
+import AuthLayout from '../components/AuthLayout';
+import { authError } from '../lib/authError';
 
 const Login = () => {
+    const [mode, setMode] = useState('login'); // login | forgot
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [loading, setLoading] = useState(false);
-    const [error, setError] = useState(null);
+    const [error, setError] = useState('');
+    const [notice, setNotice] = useState('');
     const navigate = useNavigate();
 
+    // Si ya tiene sesión, directo al portal
     useEffect(() => {
-        const checkSession = async () => {
-            const { data: { session } } = await supabase.auth.getSession();
-            if (session) {
-                navigate('/dashboard');
-            }
-        };
-        checkSession();
+        supabase.auth.getSession().then(({ data: { session } }) => {
+            if (session) navigate('/dashboard', { replace: true });
+        });
     }, [navigate]);
+
+    const switchMode = (next) => {
+        setMode(next);
+        setError('');
+        setNotice('');
+    };
 
     const handleLogin = async (e) => {
         e.preventDefault();
         setLoading(true);
-        setError(null);
+        setError('');
 
-        const { data, error } = await supabase.auth.signInWithPassword({
-            email,
-            password,
-        });
-
-        if (error) {
-            setError(error.message);
+        const { error: err } = await supabase.auth.signInWithPassword({ email: email.trim(), password });
+        if (err) {
+            setError(authError(err));
             setLoading(false);
-        } else {
-            // Login exitoso
-            navigate('/dashboard');
+            return;
         }
+        navigate('/dashboard', { replace: true });
+    };
+
+    const handleForgot = async (e) => {
+        e.preventDefault();
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
+            setError('Escribe el correo con el que entras al portal.');
+            return;
+        }
+        setLoading(true);
+        setError('');
+        const { error: err } = await supabase.auth.resetPasswordForEmail(email.trim(), {
+            redirectTo: `${window.location.origin}/update-password`,
+        });
+        setLoading(false);
+        // Mismo mensaje exista o no la cuenta: no revelamos qué correos son clientes.
+        if (err && !(err.message || '').toLowerCase().includes('not found')) {
+            setError(authError(err));
+            return;
+        }
+        setNotice(`Si ${email.trim()} tiene una cuenta, te llegará un correo con un enlace para crear una nueva contraseña.`);
     };
 
     return (
-        <div className="min-h-screen bg-dark-bg flex items-center justify-center p-4 relative overflow-hidden">
-            <SEO
-                title="Acceso Clientes"
-                description="Portal de gestión exclusivo para clientes de Interfaz 360."
-            />
-            {/* Background Decor */}
-            <div className="absolute top-0 right-0 w-1/2 h-1/2 bg-primary-500/10 rounded-full blur-[120px] -translate-y-1/2 translate-x-1/2"></div>
-            <div className="absolute bottom-0 left-0 w-1/3 h-1/3 bg-purple-500/10 rounded-full blur-[100px] translate-y-1/2 -translate-x-1/2"></div>
-
-            <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="max-w-md w-full relative z-10"
-            >
-                <div className="glass-card p-8 rounded-2xl border border-white/10 shadow-2xl">
-                    <div className="text-center mb-8">
-                        <h1 className="mb-3">
-                            <Wordmark className="text-4xl text-white" />
-                        </h1>
-                        <p className="text-gray-400">Accede a tu Portal de Cliente</p>
+        <AuthLayout title="Acceso clientes" description="Portal de clientes de Interfaz 360: dominio, plan, correos, documentos y soporte.">
+            {mode === 'login' ? (
+                <form onSubmit={handleLogin} style={{ display: 'grid', gap: 18 }}>
+                    <div>
+                        <span className="eyebrow">Acceso clientes</span>
+                        <h2 style={{ marginTop: 10 }}>Entrar a mi portal</h2>
                     </div>
-
-                    <form onSubmit={handleLogin} className="space-y-6">
-                        <div>
-                            <label className="block text-sm font-medium text-gray-300 mb-2">Correo Electrónico</label>
-                            <div className="relative">
-                                <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
-                                    <Mail size={18} />
-                                </div>
-                                <input
-                                    type="email"
-                                    value={email}
-                                    onChange={(e) => setEmail(e.target.value)}
-                                    className="w-full bg-white/5 border border-white/10 rounded-xl py-3 pl-10 pr-4 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary-500/50 transition-all"
-                                    placeholder="cliente@empresa.com"
-                                    required
-                                />
-                            </div>
-                        </div>
-
-                        <div>
-                            <label className="block text-sm font-medium text-gray-300 mb-2">Contraseña</label>
-                            <div className="relative">
-                                <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
-                                    <Lock size={18} />
-                                </div>
-                                <input
-                                    type="password"
-                                    value={password}
-                                    onChange={(e) => setPassword(e.target.value)}
-                                    className="w-full bg-white/5 border border-white/10 rounded-xl py-3 pl-10 pr-4 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary-500/50 transition-all"
-                                    placeholder="••••••••"
-                                    required
-                                />
-                            </div>
-                        </div>
-
-                        {error && (
-                            <div className="p-3 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 text-sm text-center">
-                                {error}
-                            </div>
-                        )}
-
-                        <Button
-                            type="submit"
-                            variant="primary"
-                            className="w-full justify-center !py-3"
-                            disabled={loading}
-                        >
-                            {loading ? <Loader2 className="animate-spin" /> : 'Iniciar Sesión'}
-                        </Button>
-                    </form>
-
-                    <div className="mt-6 text-center">
-                        <a href="/" className="text-gray-500 hover:text-white text-sm flex items-center justify-center gap-2 transition-colors">
-                            <ArrowLeft size={14} /> Volver al inicio
+                    <label className="field">Correo
+                        <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} autoComplete="email" placeholder="tu@empresa.cl" required />
+                    </label>
+                    <label className="field">Contraseña
+                        <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} autoComplete="current-password" required />
+                    </label>
+                    {error && <p className="alert" role="alert">{error}</p>}
+                    <button type="submit" className="btn signal" disabled={loading}>
+                        {loading ? 'Entrando…' : 'Entrar →'}
+                    </button>
+                    <div className="row-between">
+                        <button type="button" className="textlink" onClick={() => switchMode('forgot')}>¿Olvidaste tu contraseña?</button>
+                        <a className="muted" href="https://wa.me/56954146176" target="_blank" rel="noopener noreferrer" style={{ fontSize: 14 }}>
+                            ¿Aún no tienes cuenta?
                         </a>
                     </div>
-                </div>
-            </motion.div>
-        </div>
+                </form>
+            ) : (
+                <form onSubmit={handleForgot} style={{ display: 'grid', gap: 18 }}>
+                    <div>
+                        <span className="eyebrow">Recuperar acceso</span>
+                        <h2 style={{ marginTop: 10 }}>Nueva contraseña</h2>
+                    </div>
+                    <p className="muted" style={{ margin: 0, fontSize: 15 }}>
+                        Escribe tu correo y te enviamos un enlace para crear una contraseña nueva.
+                    </p>
+                    <label className="field">Correo
+                        <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} autoComplete="email" placeholder="tu@empresa.cl" required />
+                    </label>
+                    {error && <p className="alert" role="alert">{error}</p>}
+                    {notice && <p className="alert ok" role="status">{notice}</p>}
+                    <button type="submit" className="btn signal" disabled={loading || !!notice}>
+                        {loading ? 'Enviando…' : 'Enviar enlace →'}
+                    </button>
+                    <div className="row-between">
+                        <button type="button" className="textlink" onClick={() => switchMode('login')}>← Volver a entrar</button>
+                    </div>
+                </form>
+            )}
+        </AuthLayout>
     );
 };
 

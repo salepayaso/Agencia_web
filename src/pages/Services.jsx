@@ -1,427 +1,197 @@
-import Navbar from '../components/Navbar';
-import Footer from '../components/Footer';
-import ChatAgent from '../components/ChatAgent';
-import Section from '../components/ui/Section';
-import Button from '../components/ui/Button';
-import SEO from '../components/SEO';
-import DomainSearch from '../components/DomainSearch';
+import { Link } from 'react-router-dom';
+import PageShell, { PageHead, CtaBand } from '../components/PageShell';
+import DomainSection from '../components/DomainSection';
 import { openChat } from '../lib/chat';
-import { Layout, Rocket, Mail, Zap, Code, ArrowRight, MonitorSmartphone, ShoppingBag, Megaphone, Server, Activity, BarChart3, MessageSquare, User, Lock, TrendingUp, Search, MapPin, ShieldCheck, PieChart, Bot } from 'lucide-react';
-import { motion } from 'framer-motion';
-import { useState } from 'react';
 
-const ServiceCard = ({ service, i }) => {
-    const [mouse, setMouse] = useState({ x: 0, y: 0 });
-    const [hovered, setHovered] = useState(false);
+// Cada servicio dice qué entregamos, no frases genéricas.
+// "Preguntar" abre el asesor con la pregunta ya escrita.
+const SERVICES = [
+    {
+        title: 'Agente IA 24/7',
+        kicker: 'Nuevo',
+        desc: 'Configuramos un asistente con la información de tu negocio: atiende en tu web a cualquier hora, cotiza y te envía los datos de cada interesado.',
+        includes: [
+            'Chat en tu sitio web, disponible las 24 horas',
+            'Entrenado con tus productos, precios y preguntas frecuentes',
+            'Te avisa por correo con los datos de cada interesado',
+            'Opcional: WhatsApp Business y conexión con tu sistema',
+        ],
+        ask: 'Hola, me interesa un agente IA para mi negocio. ¿Cómo funciona?',
+    },
+    {
+        title: 'Página web',
+        kicker: 'Tu carta de presentación',
+        desc: 'Diseñamos y programamos tu página: secciones, textos, fotos, formulario de contacto y botón de WhatsApp, lista para aparecer en Google.',
+        includes: [
+            'Diseño a medida, rápido en el celular',
+            'Formulario de contacto y botón de WhatsApp',
+            'Dominio, hosting y correos el primer año',
+            'Certificado de seguridad (https)',
+        ],
+        ask: '¿Cuánto cuesta una página web?',
+    },
+    {
+        title: 'Tienda online',
+        kicker: 'Vende las 24 horas',
+        desc: 'Armamos tu tienda con catálogo, carrito y el medio de pago que elijas (Webpay, Mercado Pago u otro), más un panel para manejar productos, stock y pedidos desde el celular.',
+        includes: [
+            'Catálogo con fotos, variantes y precios',
+            'Pago en línea con el medio que elijas',
+            'Control de stock y pedidos',
+            'Aviso por correo de cada venta',
+        ],
+        ask: 'Quiero vender online, ¿cómo sería una tienda?',
+    },
+    {
+        title: 'Ecosistema Google',
+        kicker: 'Que te encuentren',
+        desc: 'Configuramos las herramientas de Google para tu negocio: perfil en Google y Maps, Analytics, Tag Manager, Search Console y todo listo para Google Ads.',
+        includes: [
+            'Perfil de empresa en Google y Maps',
+            'Google Analytics y Tag Manager',
+            'Search Console y SEO técnico',
+            'Medición de contactos, lista para Google Ads',
+        ],
+        ask: '¿Qué incluye el Ecosistema Google?',
+    },
+    {
+        title: 'Software a medida',
+        kicker: 'Tu operación, ordenada',
+        desc: 'Desarrollamos el sistema que tu operación necesita, a partir de cómo trabajas hoy: pedidos, inventario, reparto, cobros y reportes.',
+        includes: [
+            'Levantamiento de cómo trabajas hoy',
+            'Paneles y reportes para tu equipo',
+            'Conexión con las herramientas que ya usas',
+            'Acceso desde el computador y el celular',
+        ],
+        ask: 'Necesito un sistema a medida para mi negocio, ¿cómo trabajan?',
+    },
+    {
+        title: 'Dominio y correos',
+        kicker: 'Tu identidad digital',
+        desc: 'Registramos tu dominio .cl a tu nombre, creamos tus correos con el nombre de tu empresa y nos encargamos de renovarlos a tiempo.',
+        includes: [
+            'Dominio .cl registrado a tu nombre',
+            'Correos con el nombre de tu empresa',
+            'Hosting con certificado de seguridad',
+            'Aviso antes de cada vencimiento',
+        ],
+        anchor: '#dominio',
+    },
+];
 
-    const handleMouseMove = (e) => {
-        const rect = e.currentTarget.getBoundingClientRect();
-        setMouse({ x: e.clientX - rect.left, y: e.clientY - rect.top });
-    };
+const PLANS = [
+    {
+        name: 'Plan Pyme Digital',
+        sub: 'Para aparecer en Google con una imagen profesional.',
+        items: [
+            'Página web de una sección (landing)',
+            '5 correos con el nombre de tu empresa',
+            'Dominio y hosting el primer año',
+            'Perfil en Google y Maps + SEO local',
+            'Certificado de seguridad',
+        ],
+        ask: 'Hola, me interesa el Plan Pyme Digital. ¿Qué incluye y cuánto cuesta?',
+    },
+    {
+        name: 'Suite Digital 360',
+        sub: 'Para crecer con web completa, Google y portal de clientes.',
+        badge: 'Más completo',
+        hot: true,
+        items: [
+            'Página web con varias secciones',
+            '5 correos con el nombre de tu empresa',
+            'Dominio y hosting el primer año',
+            'Perfil en Google y Maps + SEO local',
+            'Analytics, Tag Manager y Search Console',
+            'Portal de clientes para tu cuenta',
+            'Certificado de seguridad',
+        ],
+        ask: 'Hola, me interesa la Suite Digital 360. ¿Qué incluye y cuánto cuesta?',
+    },
+];
 
-    return (
-        <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ delay: i * 0.08 }}
-            whileHover={{ y: -4 }}
-            onMouseMove={handleMouseMove}
-            onMouseEnter={() => setHovered(true)}
-            onMouseLeave={() => setHovered(false)}
-            className="relative flex flex-col h-full rounded-2xl p-7 overflow-hidden transition-shadow duration-300"
-            style={{
-                background: hovered
-                    ? `radial-gradient(350px circle at ${mouse.x}px ${mouse.y}px, ${service.accentColor}20, rgba(255,255,255,0.03) 65%)`
-                    : 'rgba(255,255,255,0.03)',
-                boxShadow: hovered
-                    ? `0 0 0 1px ${service.accentColor}40, 0 20px 50px ${service.accentColor}12`
-                    : '0 0 0 1px rgba(255,255,255,0)',
-            }}
-        >
-            {/* Glow blob top-left */}
-            <div
-                className="absolute -top-10 -left-10 w-44 h-44 rounded-full opacity-[0.10] blur-[60px] pointer-events-none transition-opacity duration-300"
-                style={{ backgroundColor: service.accentColor, opacity: hovered ? 0.15 : 0.08 }}
-            />
+const track = (label) =>
+    window.dataLayer?.push({ event: 'interest_click', service_name: label, click_url: 'button' });
 
-            {/* Gradient tint overlay */}
-            <div
-                className="absolute inset-0 rounded-2xl pointer-events-none transition-opacity duration-300"
-                style={{ background: `linear-gradient(135deg, ${service.accentColor}15 0%, transparent 55%)`, opacity: hovered ? 1 : 0.6 }}
-            />
+const Services = () => (
+    <PageShell
+        title="Servicios y Planes Digitales"
+        description="Página web, tienda online, agente IA, ecosistema Google, software a medida, dominio y correos para pymes en Chile."
+    >
+        <PageHead eyebrow="Servicios" title={<>Lo que hacemos<br />por tu <span>negocio</span></>}>
+            Desde tu primera página web hasta el sistema que ordena tu operación, con un solo equipo a cargo. ¿Dudas? El asesor te explica qué incluye y cuánto cuesta.
+        </PageHead>
 
-            {/* Badge */}
-            {service.badge && (
-                <div
-                    className="absolute top-4 right-4 text-[9px] font-bold tracking-widest uppercase px-2 py-1 rounded border"
-                    style={{ backgroundColor: `${service.accentColor}25`, borderColor: `${service.accentColor}60`, color: service.accentColor }}
-                >
-                    {service.badge}
+        <section className="s gutter" style={{ paddingTop: 0 }}>
+            <div className="max">
+                <ul className="svc-detail">
+                    {SERVICES.map((s) => (
+                        <li key={s.title}>
+                            <div>
+                                <h2>{s.title}</h2>
+                                <span className="kicker">{s.kicker}</span>
+                            </div>
+                            <div>
+                                <p>{s.desc}</p>
+                                <ul className="ticks">
+                                    {s.includes.map((i) => <li key={i}>{i}</li>)}
+                                </ul>
+                            </div>
+                            <div className="go">
+                                {s.anchor ? (
+                                    <a className="btn" href={s.anchor}>Buscar dominio →</a>
+                                ) : (
+                                    <button type="button" className="btn" onClick={() => { track(`Servicios: ${s.title}`); openChat(s.ask); }}>
+                                        Preguntar al asesor →
+                                    </button>
+                                )}
+                            </div>
+                        </li>
+                    ))}
+                </ul>
+            </div>
+        </section>
+
+        <section className="s gutter" id="planes" style={{ paddingTop: 0 }}>
+            <div className="max">
+                <div className="s-head">
+                    <h2 className="display">Planes<br />para pymes</h2>
+                    <p>El precio depende de lo que necesites. Cuéntale al asesor de qué es tu negocio y te dice cuál te conviene y cuánto cuesta.</p>
                 </div>
-            )}
-
-            {/* Icon box */}
-            <div
-                className="relative w-[52px] h-[52px] rounded-xl p-3 mb-5 border shrink-0"
-                style={{ background: `linear-gradient(135deg, ${service.accentColor}30, ${service.accentColor}10)`, borderColor: `${service.accentColor}50` }}
-            >
-                <service.icon className="w-full h-full text-white" />
-            </div>
-
-            {/* Tagline */}
-            <p className="text-[10px] font-bold uppercase tracking-widest mb-2" style={{ color: service.accentColor }}>
-                // {service.tagline}
-            </p>
-
-            {/* Title */}
-            <h3 className="text-xl font-extrabold mb-3 leading-snug">
-                {service.title}
-            </h3>
-
-            {/* Divider */}
-            <div className="border-t border-dashed border-white/10 mb-4" />
-
-            {/* Description */}
-            <p className="text-gray-400 text-sm leading-relaxed mb-5">
-                {service.desc}
-            </p>
-
-            {/* Benefits */}
-            <div className="space-y-2.5 flex-grow mb-6">
-                {service.benefits.map((benefit, idx) => (
-                    <div key={idx} className="flex items-start gap-2 text-sm text-gray-300">
-                        <ArrowRight className="w-3.5 h-3.5 mt-0.5 shrink-0" style={{ color: service.accentColor }} />
-                        <span>{benefit}</span>
-                    </div>
-                ))}
-            </div>
-
-            {/* CTA Button */}
-            <div className="mt-auto">
-                <Button
-                    onClick={() => openChat(service.chatMsg)}
-                    variant="primary"
-                    className="w-full"
-                    trackingLabel={service.trackingLabel}
-                >
-                    Habla con nosotros
-                </Button>
-            </div>
-        </motion.div>
-    );
-};
-
-const Services = () => {
-    const services = [
-        {
-            icon: Bot,
-            accentColor: "#10B981",
-            title: "Agentes de IA",
-            tagline: "Tu negocio trabajando solo, 24/7",
-            desc: "Implementamos agentes inteligentes que automatizan procesos, atienden clientes y conectan tus herramientas sin intervención humana.",
-            benefits: [
-                "Atención al cliente IA 24/7 en tu sitio web",
-                "Integración con tu software: app, base de datos y reportes",
-                "Opcional: WhatsApp Business e integración Google",
-                "IA local para datos sensibles (a cotizar)",
-                "Configuración personalizada a tu negocio"
-            ],
-            badge: "NUEVO",
-            chatMsg: "Hola, me interesa un agente IA para mi negocio. ¿Cómo funciona?",
-            trackingLabel: "Contactar: Agentes de IA"
-        },
-        {
-            icon: MonitorSmartphone,
-            accentColor: "#6366F1",
-            title: "Plan Pyme Digital",
-            tagline: "Tu Carta de Presentación Digital",
-            desc: "Ideal para emprendedores que necesitan una imagen impecable y aparecer en Google de inmediato.",
-            benefits: [
-                "Landing Page Profesional",
-                "5 Correos Corporativos",
-                "Dominio & Hosting 1 año GRATIS",
-                "Google Business + SEO Local",
-                "Tecnología React Alta Interactividad",
-                "Certificado SSL de Seguridad"
-            ],
-            chatMsg: "Hola, me interesa el Plan Pyme Digital. ¿Qué incluye?",
-            trackingLabel: "Contactar: Plan Pyme Digital"
-        },
-        {
-            icon: Rocket,
-            accentColor: "#A855F7",
-            title: "Suite Digital 360",
-            tagline: "El Motor Digital de tu Negocio",
-            desc: "Para empresas que buscan mayor potencia, gestión de clientes y una infraestructura Google completa.",
-            benefits: [
-                "Desarrollo Pagina Web Multi-Sección",
-                "5 Correos Corporativos",
-                "Dominio & Hosting 1 año GRATIS",
-                "Google Business + SEO Local",
-                "GTM, Analytics & Search Console",
-                "Perfil de Gestión INTERFAZ 360",
-                "Tecnología React Alta Interactividad",
-                "Certificado SSL de Seguridad"
-            ],
-            chatMsg: "Hola, me interesa la Suite Digital 360. ¿Qué incluye?",
-            trackingLabel: "Contactar: Suite Digital 360"
-        },
-        {
-            icon: ShoppingBag,
-            accentColor: "#8B5CF6",
-            title: "Tiendas Online",
-            tagline: "Vende 24/7 sin límites",
-            desc: "Creamos tu tienda online para que vendas en internet las 24 horas. Recibe pagos seguros y administra todo desde tu celular.",
-            benefits: [
-                "Acepta pagos con tarjeta",
-                "Control total de inventario",
-                "Tus clientes compran fácil y rápido"
-            ],
-            chatMsg: "Hola, quiero una tienda online para mi negocio. ¿Cómo funciona?",
-            trackingLabel: "Contactar: Tiendas Online"
-        },
-        {
-            icon: () => (
-                <svg viewBox="0 0 24 24" fill="currentColor" className="w-full h-full">
-                    <path d="M12.48 10.92v3.28h7.84c-.24 1.84-.853 3.187-1.787 4.133-1.147 1.147-2.933 2.4-6.053 2.4-4.827 0-8.6-3.893-8.6-8.72s3.773-8.72 8.6-8.72c2.6 0 4.507 1.027 5.907 2.347l2.307-2.307C18.747 1.44 16.133 0 12.48 0 5.867 0 .533 5.333 .533 12S5.867 24 12.48 24c3.44 0 6.013-1.147 8.027-3.24 2.053-2.08 2.667-5.013 2.667-7.467 0-.747-.053-1.467-.16-2.133H12.48z" />
-                </svg>
-            ),
-            accentColor: "#3B82F6",
-            title: "Ecosistema Google & Marketing",
-            tagline: "Que te encuentren tus clientes",
-            desc: "Potencia tu presencia con Google Search Console, Analytics y Google Maps (Business). Te ayudamos a aparecer primero en Google y atraer más clientes.",
-            benefits: [
-                "Tu negocio en Google Maps (Business)",
-                "Métricas reales con Google Analytics",
-                "Posicionamiento SEO Técnico"
-            ],
-            chatMsg: "Hola, me interesa el Ecosistema Google & Marketing. ¿Qué opciones hay?",
-            trackingLabel: "Contactar: Ecosistema Google & Marketing"
-        },
-        {
-            icon: Server,
-            accentColor: "#06B6D4",
-            title: "Dominios, Correos & Hosting",
-            tagline: "Tu identidad digital completa",
-            desc: "¿Necesitas un dominio nuevo o ya tienes uno? Gestionamos tu infraestructura cPanel y aseguramos que tu web vuele.",
-            benefits: [
-                "Gestión Integral de Dominios",
-                "Correos Profesionales Ilimitados",
-                "Hosting Low-Latency Optimizado"
-            ],
-            badge: "SOPORTE",
-            chatMsg: "Hola, necesito dominio, correos y hosting. ¿Qué me ofrecen?",
-            trackingLabel: "Contactar: Dominios Correos & Hosting"
-        }
-    ];
-
-    return (
-        <div className="min-h-screen bg-dark-bg text-white font-sans selection:bg-primary-500/30">
-            <SEO
-                title="Servicios y Planes Digitales"
-                description="Descubre nuestros servicios de diseño web, agentes IA, SEO local y ecosistema Google. Tecnología de punta para tu negocio."
-            />
-            <Navbar />
-            <ChatAgent />
-
-            {/* Hero Section */}
-            <Section className="pt-32 pb-20">
-                <div className="text-center max-w-4xl mx-auto">
-                    <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 text-sm text-primary-400 mb-6">
-                        <span className="font-semibold">¿Qué Hacemos?</span>
-                    </div>
-                    <h1 className="text-4xl md:text-6xl font-bold mb-6 leading-tight">
-                        Servicios Digitales <br className="hidden md:block" />
-                        <span className="text-gradient">en Santiago y Todo Chile</span>
-                    </h1>
-                    <p className="text-xl text-gray-300 leading-relaxed">
-                        Desde tu primera página web hasta sistemas complejos. <br className="hidden md:block" />
-                        <span className="text-white font-medium">Todo en un solo lugar, con soporte local garantizado.</span>
-                    </p>
-                </div>
-            </Section>
-
-            {/* Services Grid */}
-            <Section className="py-20">
-                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-7xl mx-auto">
-                    {services.map((service, i) => (
-                        <ServiceCard key={i} service={service} i={i} />
+                <div className="plans">
+                    {PLANS.map((p) => (
+                        <article key={p.name} className={`plan-card${p.hot ? ' hot' : ''}`}>
+                            <header>
+                                <div>
+                                    <h3>{p.name}</h3>
+                                    <small>{p.sub}</small>
+                                </div>
+                                {p.badge && <span className="badge">{p.badge}</span>}
+                            </header>
+                            <div className="body">
+                                <ul className="ticks">
+                                    {p.items.map((i) => <li key={i}>{i}</li>)}
+                                </ul>
+                            </div>
+                            <footer>
+                                <button type="button" className={`btn ${p.hot ? 'signal' : 'solid'}`} onClick={() => { track(`Plan: ${p.name}`); openChat(p.ask); }}>
+                                    Consultar precio →
+                                </button>
+                            </footer>
+                        </article>
                     ))}
                 </div>
-            </Section>
+                <p className="muted" style={{ marginTop: 28, fontSize: 15 }}>
+                    La Suite Digital 360 incluye el <Link to="/login" className="textlink">portal de clientes</Link>. Todos los planes incluyen acompañamiento después de la entrega.
+                </p>
+            </div>
+        </section>
 
-            {/* Domain Search Section */}
-            <DomainSearch />
+        <DomainSection />
 
-            {/* Client Panel Preview Section */}
-            <section className="py-16 px-4 md:px-8 bg-dark-bg/50 relative overflow-hidden">
-                <div className="absolute top-1/2 left-0 w-1/3 h-1/3 bg-blue-500/10 rounded-full blur-[100px] -translate-y-1/2"></div>
-
-                <div className="max-w-7xl mx-auto relative z-10">
-                    <div className="grid lg:grid-cols-2 gap-12 items-center">
-                        <motion.div
-                            initial={{ opacity: 0, x: -50 }}
-                            whileInView={{ opacity: 1, x: 0 }}
-                            viewport={{ once: true }}
-                        >
-                            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-xs text-blue-400 mb-4">
-                                <Lock className="w-3 h-3" />
-                                <span className="font-semibold uppercase tracking-wider">Exclusivo para Nuestros Clientes</span>
-                            </div>
-                            <h2 className="text-3xl md:text-4xl font-bold mb-4 leading-tight">
-                                Tu Perfil de <br />
-                                <span className="text-gradient">Gestión 360</span>
-                            </h2>
-                            <p className="text-gray-300 text-base mb-6 leading-relaxed">
-                                Nuestros clientes con Suite Digital 360 tienen acceso a un panel exclusivo donde pueden ver y gestionar sus servicios activos las 24 horas. Transparencia total.
-                            </p>
-
-                            <div className="space-y-4">
-                                {[
-                                    { icon: Activity, color: "text-emerald-400", bg: "bg-emerald-500/10", text: "Estado de tus servicios en tiempo real" },
-                                    { icon: BarChart3, color: "text-blue-400", bg: "bg-blue-500/10", text: "Métricas de visitas y rendimiento de tu web" },
-                                    { icon: Mail, color: "text-purple-400", bg: "bg-purple-500/10", text: "Gestión de correos corporativos" },
-                                    { icon: MessageSquare, color: "text-amber-400", bg: "bg-amber-500/10", text: "Soporte técnico directo desde el panel" }
-                                ].map((item, i) => (
-                                    <div key={i} className="flex items-center gap-3 group">
-                                        <div className={`p-1.5 rounded-lg ${item.bg} ${item.color} group-hover:scale-110 transition-transform`}>
-                                            <item.icon className="w-4 h-4" />
-                                        </div>
-                                        <span className="text-gray-300 text-sm group-hover:text-white transition-colors">{item.text}</span>
-                                    </div>
-                                ))}
-                            </div>
-
-                            <div className="mt-8">
-                                <Button href="/login" variant="primary" icon={ArrowRight} className="!py-3 !px-6 text-sm">
-                                    Acceso Clientes
-                                </Button>
-                            </div>
-                        </motion.div>
-
-                        <motion.div
-                            initial={{ opacity: 0, scale: 0.9 }}
-                            whileInView={{ opacity: 1, scale: 1 }}
-                            viewport={{ once: true }}
-                            className="relative"
-                        >
-                            <div className="absolute -inset-1 bg-gradient-to-r from-blue-500 to-purple-600 rounded-2xl blur opacity-20"></div>
-                            <div className="relative bg-gray-900 border border-white/10 rounded-2xl p-6 md:p-8 shadow-2xl">
-                                {/* Mock Header */}
-                                <div className="flex items-center gap-4 mb-8 border-b border-white/5 pb-6">
-                                    <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary-500 to-purple-600 p-[2px]">
-                                        <div className="w-full h-full rounded-full bg-gray-900 flex items-center justify-center">
-                                            <User className="w-6 h-6 text-gray-300" />
-                                        </div>
-                                    </div>
-                                    <div>
-                                        <h3 className="font-bold text-lg">Perfil de Gestión</h3>
-                                        <p className="text-xs text-green-400 flex items-center gap-1.5">
-                                            <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse"></span>
-                                            Acceso 24/7
-                                        </p>
-                                    </div>
-                                </div>
-
-                                {/* Mock Dashboard Grid */}
-                                <div className="grid grid-cols-2 gap-4 mb-6">
-                                    <div className="bg-white/5 border border-white/5 rounded-xl p-4">
-                                        <div className="flex items-center gap-2 mb-2 text-primary-400">
-                                            <Search className="w-4 h-4" />
-                                            <span className="text-[10px] font-bold uppercase tracking-wider">Search Console</span>
-                                        </div>
-                                        <p className="text-xl font-bold text-white">4.2k</p>
-                                        <p className="text-[10px] text-gray-500">Impresiones/mes</p>
-                                    </div>
-
-                                    <div className="bg-white/5 border border-white/5 rounded-xl p-4">
-                                        <div className="flex items-center gap-2 mb-2 text-purple-400">
-                                            <MapPin className="w-4 h-4" />
-                                            <span className="text-[10px] font-bold uppercase tracking-wider">Google Business</span>
-                                        </div>
-                                        <p className="text-xl font-bold text-white">85</p>
-                                        <p className="text-[10px] text-gray-500">Interacciones Maps</p>
-                                    </div>
-
-                                    <div className="bg-white/5 border border-white/5 rounded-xl p-4">
-                                        <div className="flex items-center gap-2 mb-2 text-cyan-400">
-                                            <ShieldCheck className="w-4 h-4" />
-                                            <span className="text-[10px] font-bold uppercase tracking-wider">Infraestructura</span>
-                                        </div>
-                                        <p className="text-xs font-semibold text-green-400">SSL Activo</p>
-                                        <p className="text-[10px] text-gray-500">cPanel & Hosting</p>
-                                    </div>
-
-                                    <div className="bg-white/5 border border-white/5 rounded-xl p-4">
-                                        <div className="flex items-center gap-2 mb-2 text-pink-400">
-                                            <Mail className="w-4 h-4" />
-                                            <span className="text-[10px] font-bold uppercase tracking-wider">Correos Admin</span>
-                                        </div>
-                                        <p className="text-xs font-semibold text-white truncate">contacto@tuweb.cl</p>
-                                        <p className="text-[10px] text-gray-500">Gestionar Cuentas</p>
-                                    </div>
-                                </div>
-
-                                {/* Analytics Highlight */}
-                                <div className="bg-gradient-to-br from-primary-500/10 via-purple-500/10 to-transparent border border-white/10 rounded-xl p-6 relative overflow-hidden group">
-                                    <div className="relative z-10">
-                                        <div className="flex justify-between items-start mb-4">
-                                            <div>
-                                                <div className="flex items-center gap-2 mb-1">
-                                                    <PieChart className="w-4 h-4 text-primary-400" />
-                                                    <span className="text-[10px] font-bold uppercase tracking-wider text-gray-300">Google Analytics</span>
-                                                </div>
-                                                <h4 className="text-lg font-bold text-white">Informe de Métricas 360</h4>
-                                            </div>
-                                            <div className="px-2 py-1 bg-primary-500/20 rounded text-[10px] font-bold text-primary-400 uppercase tracking-wide">Actualizado</div>
-                                        </div>
-
-                                        <div className="flex items-end gap-4">
-                                            <div>
-                                                <p className="text-2xl font-bold text-white">1,247</p>
-                                                <p className="text-[10px] text-gray-500">Visitas únicas / mes</p>
-                                            </div>
-                                            <div className="h-10 flex-grow flex items-end gap-1 pb-1">
-                                                {[30, 45, 35, 60, 55, 80, 70].map((h, i) => (
-                                                    <div key={i} className="flex-grow bg-primary-500/30 rounded-t-sm" style={{ height: `${h}%` }}></div>
-                                                ))}
-                                            </div>
-                                            <TrendingUp className="w-5 h-5 text-green-400 mb-2" />
-                                        </div>
-                                    </div>
-                                    <div className="absolute top-0 right-0 w-32 h-32 bg-primary-500/10 blur-3xl -translate-y-1/2 translate-x-1/2"></div>
-                                </div>
-                            </div>
-                        </motion.div>
-                    </div>
-                </div>
-            </section>
-
-            {/* Simple CTA */}
-            <Section className="py-20 bg-gradient-to-br from-primary-950/20 via-purple-950/20 to-primary-950/20">
-                <div className="max-w-3xl mx-auto text-center">
-                    <h2 className="text-3xl md:text-5xl font-bold mb-6">
-                        ¿Tienes dudas?<br />
-                        <span className="text-gradient">Hablemos sin compromiso</span>
-                    </h2>
-                    <p className="text-gray-300 text-lg mb-8">
-                        Te explicamos todo de forma clara y te damos una cotización personalizada.
-                    </p>
-                    <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                        <Button href="/contacto" variant="primary" icon={ArrowRight} className="!py-4 !px-8 text-lg">
-                            Solicita tu Cotización Gratis
-                        </Button>
-                        <Button href="/nosotros" variant="glass" className="!py-4 !px-8 text-lg">
-                            Cómo Trabajamos
-                        </Button>
-                    </div>
-                </div>
-            </Section>
-
-            <Footer />
-        </div>
-    );
-};
+        <CtaBand title="¿Tienes dudas? Conversemos" message="Hola, tengo dudas sobre qué servicio me conviene." />
+    </PageShell>
+);
 
 export default Services;

@@ -1,155 +1,82 @@
-
-import React from 'react';
-import { Download, Globe, Mail, Phone, Share2, Linkedin, Instagram, Facebook } from 'lucide-react';
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import Button from './ui/Button';
+import SEO from './SEO';
+import Wordmark from './Wordmark';
 
-const BusinessCard = () => {
-    const contactInfo = {
-        name: "Interfaz 360",
-        role: "Agencia digital · Web, Google y Agentes IA",
-        email: "contacto@interfaz360.cl",
-        website: "interfaz360.cl",
-        fullWebsite: "https://interfaz360.cl",
-        vCardData: `BEGIN:VCARD
+// Tarjeta digital (/tarjeta): se comparte por QR o enlace.
+const INFO = {
+    name: 'Interfaz 360',
+    role: 'Agencia digital · Web, Google y Agentes IA',
+    email: 'contacto@interfaz360.cl',
+    website: 'interfaz360.cl',
+    url: 'https://interfaz360.cl',
+    instagram: 'https://www.instagram.com/interfaz360/',
+};
+
+const VCARD = `BEGIN:VCARD
 VERSION:3.0
 FN:Interfaz 360
 ORG:Interfaz 360
 TITLE:Agencia digital
 EMAIL:contacto@interfaz360.cl
 URL:https://interfaz360.cl
-END:VCARD`
+END:VCARD`;
+
+const BusinessCard = () => {
+    const [copied, setCopied] = useState(false);
+
+    const saveContact = () => {
+        const url = URL.createObjectURL(new Blob([VCARD], { type: 'text/vcard' }));
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'interfaz-360.vcf';
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        URL.revokeObjectURL(url);
     };
 
-    const handleDownloadVCard = () => {
-        const blob = new Blob([contactInfo.vCardData], { type: 'text/vcard' });
-        const url = window.URL.createObjectURL(blob);
-        const link = document.createElement('a');
-        link.href = url;
-        link.setAttribute('download', 'interfaz-360.vcf');
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-    };
-
-    const handleShare = async () => {
+    const share = async () => {
         if (navigator.share) {
             try {
-                await navigator.share({
-                    title: 'Interfaz 360',
-                    text: 'Tarjeta digital de Interfaz 360',
-                    url: window.location.href,
-                });
-            } catch (err) {
-                console.log('Error sharing:', err);
+                await navigator.share({ title: 'Interfaz 360', text: 'Tarjeta digital de Interfaz 360', url: window.location.href });
+            } catch {
+                // la persona cerró el menú de compartir
             }
-        } else {
-            // Fallback for desktop or unsupported browsers
-            navigator.clipboard.writeText(window.location.href);
-            alert('Enlace copiado al portapapeles!');
+            return;
+        }
+        try {
+            await navigator.clipboard.writeText(window.location.href);
+            setCopied(true);
+            setTimeout(() => setCopied(false), 2000);
+        } catch {
+            // sin portapapeles: el enlace sigue en la barra del navegador
         }
     };
 
     return (
-        <div className="min-h-screen bg-dark-bg flex items-center justify-center p-4 relative overflow-hidden">
-            {/* Background Ambience */}
-            <div className="absolute top-0 left-0 w-full h-full overflow-hidden z-0">
-                <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-primary-500/10 rounded-full blur-[100px] animate-pulse"></div>
-                <div className="absolute bottom-1/4 right-1/4 w-64 h-64 bg-purple-500/10 rounded-full blur-[100px] animate-pulse delay-700"></div>
-                <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20"></div>
-            </div>
-
-            <div className="relative z-10 w-full max-w-md perspective-1000">
-                <div className="glass-card bg-dark-card/60 backdrop-blur-xl border border-white/10 rounded-3xl overflow-hidden shadow-[0_0_50px_rgba(0,0,0,0.5)] transform transition-transform hover:scale-[1.02] duration-500">
-
-                    {/* Header / Banner */}
-                    <div className="h-32 bg-gradient-to-r from-primary-600/20 to-purple-600/20 relative">
-                        <div className="absolute inset-0 bg-[linear-gradient(45deg,transparent_25%,rgba(68,255,255,0.05)_50%,transparent_75%,transparent_100%)] bg-[length:250%_250%] animate-shimmer"></div>
-                        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2">
-                            <div className="w-24 h-24 rounded-full p-1 bg-gradient-to-r from-primary-400 to-purple-500 relative group">
-                                <div className="absolute inset-0 rounded-full bg-gradient-to-r from-primary-400 to-purple-500 blur opacity-50 group-hover:opacity-100 transition-opacity duration-500"></div>
-                                <div className="w-full h-full rounded-full bg-dark-bg relative z-10 flex items-center justify-center">
-                                    <span className="font-brand font-extrabold text-2xl text-primary-400" style={{ fontStretch: '112%' }}>360</span>
-                                </div>
-                            </div>
-                        </div>
+        <div className="tc-page">
+            <SEO title="Tarjeta digital" description="Tarjeta digital de Interfaz 360." />
+            <main className="tc gutter" style={{ minHeight: '100vh', display: 'grid', placeItems: 'center', paddingBlock: 40 }}>
+                <div className="panel" style={{ width: 'min(420px, 100%)' }}>
+                    <div style={{ background: 'var(--ink)', padding: '36px 28px 28px', color: '#fff' }}>
+                        <Wordmark className="text-[34px]" />
+                        <p style={{ margin: '14px 0 0', color: 'var(--mute)', fontSize: 15 }}>{INFO.role}</p>
                     </div>
-
-                    {/* Content */}
-                    <div className="pt-16 pb-8 px-8 text-center">
-                        <h1 className="text-3xl font-bold text-white mb-2 tracking-tight">
-                            {contactInfo.name}
-                        </h1>
-                        <p className="text-transparent bg-clip-text bg-gradient-to-r from-primary-400 to-purple-400 font-medium mb-6">
-                            {contactInfo.role}
-                        </p>
-
-                        {/* Actions */}
-                        <div className="grid grid-cols-2 gap-4 mb-8">
-                            <Button
-                                onClick={handleDownloadVCard}
-                                variant="primary"
-                                className="flex items-center justify-center gap-2 py-3 text-sm bg-primary-500/20 border-primary-500/50 hover:bg-primary-500/30"
-                            >
-                                <Download size={16} />
-                                Guardar
-                            </Button>
-                            <Button
-                                onClick={handleShare}
-                                variant="secondary"
-                                className="flex items-center justify-center gap-2 py-3 text-sm border-white/10 hover:bg-white/5"
-                            >
-                                <Share2 size={16} />
-                                Compartir
-                            </Button>
+                    <div className="box-body" style={{ padding: 24, gap: 18 }}>
+                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+                            <button type="button" className="btn signal" style={{ justifyContent: 'center' }} onClick={saveContact}>Guardar contacto</button>
+                            <button type="button" className="btn" style={{ justifyContent: 'center' }} onClick={share}>{copied ? 'Enlace copiado' : 'Compartir'}</button>
                         </div>
-
-                        {/* Info List */}
-                        <div className="space-y-4 mb-8 text-left">
-                            <a href={`mailto:${contactInfo.email}`} className="flex items-center gap-4 p-3 rounded-xl hover:bg-white/5 transition-colors group">
-                                <div className="p-2 rounded-lg bg-primary-500/10 text-primary-400 group-hover:text-primary-300 group-hover:scale-110 transition-all">
-                                    <Mail size={20} />
-                                </div>
-                                <div>
-                                    <p className="text-xs text-gray-500">Email</p>
-                                    <p className="text-gray-200">{contactInfo.email}</p>
-                                </div>
-                            </a>
-
-                            <a href={contactInfo.fullWebsite} target="_blank" rel="noreferrer" className="flex items-center gap-4 p-3 rounded-xl hover:bg-white/5 transition-colors group">
-                                <div className="p-2 rounded-lg bg-purple-500/10 text-purple-400 group-hover:text-purple-300 group-hover:scale-110 transition-all">
-                                    <Globe size={20} />
-                                </div>
-                                <div>
-                                    <p className="text-xs text-gray-500">Sitio Web</p>
-                                    <p className="text-gray-200">{contactInfo.website}</p>
-                                </div>
-                            </a>
-                        </div>
-
-                        {/* Socials */}
-                        <div className="flex justify-center gap-6 pt-6 border-t border-white/5">
-                            <a href="https://linkedin.com" target="_blank" rel="noreferrer" className="text-gray-400 hover:text-[#0A66C2] hover:scale-125 transition-all">
-                                <Linkedin size={24} />
-                            </a>
-                            <a href="https://instagram.com" target="_blank" rel="noreferrer" className="text-gray-400 hover:text-[#E4405F] hover:scale-125 transition-all">
-                                <Instagram size={24} />
-                            </a>
-                            <a href="https://facebook.com" target="_blank" rel="noreferrer" className="text-gray-400 hover:text-[#1877F2] hover:scale-125 transition-all">
-                                <Facebook size={24} />
-                            </a>
-                        </div>
-
-                    </div>
-
-                    {/* Footer */}
-                    <div className="bg-white/5 py-3 text-center">
-                        <Link to="/" className="text-xs text-gray-500 hover:text-primary-400 transition-colors flex items-center justify-center gap-1">
-                            Powered by Interfaz 360
-                        </Link>
+                        <dl className="acct" style={{ boxShadow: 'none', margin: 0 }}>
+                            <div className="row"><dt>Correo</dt><dd><b><a href={`mailto:${INFO.email}`}>{INFO.email}</a></b></dd><span /></div>
+                            <div className="row"><dt>Sitio</dt><dd><b><a href={INFO.url} target="_blank" rel="noopener noreferrer">{INFO.website}</a></b></dd><span /></div>
+                            <div className="row" style={{ borderBottom: 0 }}><dt>Instagram</dt><dd><b><a href={INFO.instagram} target="_blank" rel="noopener noreferrer">@interfaz360</a></b></dd><span /></div>
+                        </dl>
+                        <Link to="/" className="textlink" style={{ justifySelf: 'start' }}>Ir al sitio →</Link>
                     </div>
                 </div>
-            </div>
+            </main>
         </div>
     );
 };
