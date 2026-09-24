@@ -4,12 +4,16 @@ import { supabase } from '../supabase';
 import SEO from '../components/SEO';
 import Wordmark from '../components/Wordmark';
 import { PortalLoading } from '../components/ProtectedRoute';
+import DomainSection from '../components/DomainSection';
+import { OFFERS, PAYS, ORDER_STATUS, clp, placeOrder } from '../lib/orders';
 
 // Portal del cliente ("Tu cuenta, en orden"): dominio, plan y pagos, correos,
 // estado del sitio, documentos y soporte. Sin estadísticas: esas son internas.
 // Los campos domain_name, domain_expires, billing_cycle, payment_method,
 // site_status y tickets.category vienen de supabase_scripts/portal_cliente_2026_09_24.sql;
 // si todavía no existen, el portal muestra "Por definir" y sigue funcionando.
+// Una cuenta nueva (sin servicios) entra directo a "Contratar": dominio, hosting
+// o pack. Los pedidos van a la tabla orders (portal_registro_pedidos_2026_09_24.sql).
 
 const CATEGORIES = [
     { id: 'general', label: 'Consulta general' },
@@ -51,19 +55,31 @@ const parseEmails = (raw) => {
     }
 };
 
+// ¿Tiene algo contratado? Si no, el portal abre en "Contratar" y oculta el resumen vacío.
+const hasServices = (p, orders = []) =>
+    !!(p?.domain_name || p?.active_web || p?.plan_type || p?.hosting_plan || orders.some((o) => o.status === 'activo'));
+
 const Dashboard = () => {
     const navigate = useNavigate();
     const [user, setUser] = useState(null);
     const [profile, setProfile] = useState(null);
     const [documents, setDocuments] = useState([]);
     const [tickets, setTickets] = useState([]);
+    const [orders, setOrders] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [tab, setTab] = useState('resumen');
+    const [tab, setTab] = useState(null); // se decide al cargar
     const [composing, setComposing] = useState(false);
 
     const loadTickets = useCallback(async (uid) => {
         const { data } = await supabase.from('tickets').select('*').eq('user_id', uid).order('created_at', { ascending: false });
         setTickets(data || []);
+    }, []);
+
+    // Si la tabla orders aún no existe, simplemente no hay pedidos que mostrar
+    const loadOrders = useCallback(async (uid) => {
+        const { data } = await supabase.from('orders').select('*').eq('user_id', uid).order('created_at', { ascending: false });
+        setOrders(data || []);
+        return data || [];
     }, []);
 
     useEffect(() => {
@@ -80,11 +96,12 @@ const Dashboard = () => {
             ]);
             setProfile(p || null);
             setDocuments(docs || []);
-            await loadTickets(u.id);
+            const [, ords] = await Promise.all([loadTickets(u.id), loadOrders(u.id)]);
+            setTab(hasServices(p, ords) ? 'resumen' : 'contratar');
             setLoading(false);
         };
         load();
-    }, [navigate, loadTickets]);
+    }, [navigate, loadTickets, loadOrders]);
 
     const logout = async () => {
         await supabase.auth.signOut();
@@ -94,6 +111,8 @@ const Dashboard = () => {
     if (loading) return <PortalLoading />;
 
     const openTickets = tickets.filter(isOpen);
+    const active = hasServices(profile, orders);
+    const pendingOrders = orders.filter((o) => o.status === 'pendiente' || o.status === 'pagado');
     const name = profile?.client_name || 'Tu negocio';
     const newRequest = () => { setTab('soporte'); setComposing(true); };
 
@@ -124,7 +143,12 @@ const Dashboard = () => {
                                 </h1>
                             </div>
                             <div className="tabs" role="tablist" aria-label="Secciones del portal">
-                                <button type="button" role="tab" aria-selected={tab === 'resumen'} onClick={() => setTab('resumen')}>Resumen</button>
+                                {active && (
+                                    <button type="button" role="tab" aria-selected={tab === 'resumen'} onClick={() => setTab('resumen')}>Resumen</button>
+                                )}
+                                <button type="button" role="tab" aria-selected={tab === 'contratar'} onClick={() => setTab('contratar')}>
+                                    Contratar{pendingOrders.length > 0 && <span className="count">{pendingOrders.length}</span>}
+                                </button>
                                 <button type="button" role="tab" aria-selected={tab === 'soporte'} onClick={() => setTab('soporte')}>
                                     Soporte{openTickets.length > 0 && <span className="count">{openTickets.length}</span>}
                                 </button>
@@ -132,6 +156,9 @@ const Dashboard = () => {
                             </div>
                         </div>
 
+                        {tab === 'contratar' && (
+                            <Hire user={user} isNew={!active} orders={orders} onOrdered={() => loadOrders(user.id)} />
+                        )}
                         {tab === 'resumen' && (
                             <Overview profile={profile} user={user} documents={documents} tickets={tickets} onNewRequest={newRequest} goTo={setTab} />
                         )}
@@ -150,6 +177,166 @@ const Dashboard = () => {
                 </main>
             </div>
         </div>
+    );
+};
+
+/* ---------------- Contratar ---------------- */
+
+const OFFER_CARDS = [
+    {
+        id: 'dominio',
+        price: `Desde ${clp(OFFERS.dominio.years[1].price)}`,
+        desc: 'Tu dominio .cl registrado a tu nombre. Te avisamos antes de que venza.',
+        cta: 'Buscar dominio →',
+    },
+    {
+        id: 'hosting',
+        price: clp(OFFERS.hosting.years[1].price),
+        desc: 'Espacio para tu sitio y correos con el nombre de tu empresa. Al activarlo te enviamos los accesos de cPanel por correo.',
+        cta: 'Contratar hosting →',
+    },
+    {
+        id: 'pack',
+        price: clp(OFFERS.pack.years[1].price),
+        desc: `Hosting con correos + dominio .cl, todo listo para partir. Ahorras ${clp(OFFERS.dominio.years[1].price + OFFERS.hosting.years[1].price - OFFERS.pack.years[1].price)} al año.`,
+        cta: 'Contratar pack →',
+        hot: true,
+    },
+];
+
+const Hire = ({ user, isNew, orders, onOrdered }) => {
+    const [picked, setPicked] = useState(null); // dominio | hosting | pack
+
+    return (
+        <div style={{ display: 'grid', gap: 32, paddingBottom: 80 }}>
+            {isNew && (
+                <section className="panel">
+                    <div className="box-title"><b>Tu cuenta está lista</b></div>
+                    <div className="box-body">
+                        <p className="muted" style={{ margin: 0, fontSize: 16 }}>
+                            Todavía no tienes servicios con nosotros. Elige por dónde partir: cuando se active, aquí verás su estado, vencimiento y pagos.
+                        </p>
+                    </div>
+                </section>
+            )}
+
+            {picked === 'hosting' ? (
+                <HostingOrder user={user} onDone={onOrdered} onCancel={() => setPicked(null)} />
+            ) : picked ? (
+                <DomainSection embedded kind={picked} onOrdered={onOrdered} onCancel={() => setPicked(null)} />
+            ) : (
+                <div className="plans offers">
+                    {OFFER_CARDS.map((o) => (
+                        <article key={o.id} className={`plan-card${o.hot ? ' hot' : ''}`}>
+                            <header>
+                                <div>
+                                    <h3>{OFFERS[o.id].title}</h3>
+                                    <small><b style={{ color: 'var(--ink)', fontSize: 20 }}>{o.price}</b> al año</small>
+                                </div>
+                                {o.hot && <span className="badge">Conviene</span>}
+                            </header>
+                            <div className="body"><p className="muted" style={{ margin: 0, fontSize: 15 }}>{o.desc}</p></div>
+                            <footer>
+                                <button type="button" className={`btn ${o.hot ? 'signal' : 'solid'}`} onClick={() => setPicked(o.id)}>{o.cta}</button>
+                            </footer>
+                        </article>
+                    ))}
+                </div>
+            )}
+
+            <p className="muted" style={{ margin: 0, fontSize: 15 }}>
+                ¿Necesitas también la página web, una tienda o un agente IA? <Link to="/servicios#planes" className="textlink">Mira los planes</Link>
+            </p>
+
+            <section className="panel">
+                <div className="box-title"><b>Tus pedidos</b><span className="muted">{orders.length}</span></div>
+                {orders.length ? orders.map((o) => {
+                    const st = ORDER_STATUS[o.status] || ORDER_STATUS.pendiente;
+                    const plan = OFFERS[o.kind]?.years[o.years] || OFFERS[o.kind]?.years[1];
+                    return (
+                        <article className="ticket" key={o.id}>
+                            <div className="t-top">
+                                <h3>{OFFERS[o.kind]?.title || o.kind}{o.domain ? ` · ${o.domain}` : ''}</h3>
+                                <span className={`pill ${st.cls}`}>{st.label}</span>
+                            </div>
+                            <span className="meta">
+                                {new Date(o.created_at).toLocaleDateString('es-CL')}{plan ? ` · ${plan.label} · ${clp(plan.price)}` : ''} · {PAYS[o.payment_method]?.label}
+                            </span>
+                            {o.admin_note && <div className="reply"><b>Nota de Interfaz 360</b>{o.admin_note}</div>}
+                            {o.status === 'pendiente' && !o.admin_note && (
+                                <p className="desc">Te escribimos al correo con {o.payment_method === 'tr' ? 'los datos para transferir' : 'el enlace de pago'}.</p>
+                            )}
+                        </article>
+                    );
+                }) : (
+                    <p className="empty">Aún no tienes pedidos.</p>
+                )}
+            </section>
+        </div>
+    );
+};
+
+const HostingOrder = ({ user, onDone, onCancel }) => {
+    const [domain, setDomain] = useState('');
+    const [pay, setPay] = useState('webpay');
+    const [sending, setSending] = useState(false);
+    const [error, setError] = useState('');
+    const [done, setDone] = useState(false);
+    const price = OFFERS.hosting.years[1].price;
+
+    const submit = async (e) => {
+        e.preventDefault();
+        const d = domain.toLowerCase().trim().replace(/^https?:\/\//, '').replace(/^www\./, '').replace(/\/.*$/, '');
+        if (!/^[a-z0-9-]+(\.[a-z0-9-]+)+$/.test(d)) return setError('Escribe el dominio completo, por ejemplo minegocio.cl.');
+        setSending(true);
+        setError('');
+        try {
+            await placeOrder({ user, kind: 'hosting', domain: d, years: 1, pay, holder: null });
+            setDone(true);
+            onDone?.();
+        } catch {
+            setError('No pudimos enviar el pedido. Intenta de nuevo en un momento.');
+        } finally {
+            setSending(false);
+        }
+    };
+
+    return (
+        <section className="panel">
+            <div className="box-title">
+                <b>Hosting con correos · {clp(price)} al año</b>
+                <button type="button" className="textlink" onClick={onCancel}>Cerrar</button>
+            </div>
+            {done ? (
+                <div className="box-body">
+                    <p className="alert ok" role="status">
+                        Recibimos tu pedido. Te escribimos a {user.email} con {pay === 'tr' ? 'los datos para transferir' : 'el enlace de pago'}.
+                        Apenas se confirme, activamos tu hosting y te enviamos los accesos de cPanel por correo.
+                    </p>
+                    <div><button type="button" className="textlink" onClick={onCancel}>Volver a Contratar</button></div>
+                </div>
+            ) : (
+                <form className="box-body" onSubmit={submit} noValidate>
+                    <label className="field">¿Para qué dominio?
+                        <input value={domain} onChange={(e) => setDomain(e.target.value)} placeholder="minegocio.cl" maxLength={80} autoCapitalize="none" spellCheck={false} />
+                    </label>
+                    <p className="muted" style={{ margin: 0, fontSize: 14 }}>¿Todavía no tienes dominio? El pack hosting + dominio te sale más barato.</p>
+                    <div style={{ display: 'grid', gap: 8 }}>
+                        <span className="field">¿Cómo quieres pagar?</span>
+                        <div className="toggles" role="radiogroup" aria-label="Forma de pago">
+                            {Object.entries(PAYS).map(([id, p]) => (
+                                <button key={id} type="button" role="radio" aria-checked={pay === id} aria-pressed={pay === id} onClick={() => setPay(id)} title={p.note}>{p.label}</button>
+                            ))}
+                        </div>
+                    </div>
+                    {error && <p className="alert" role="alert">{error}</p>}
+                    <div style={{ display: 'flex', gap: 14, alignItems: 'center', flexWrap: 'wrap' }}>
+                        <button type="submit" className="btn signal" disabled={sending}>{sending ? 'Enviando…' : `Confirmar pedido · ${clp(price)} →`}</button>
+                        <span className="muted" style={{ fontSize: 13 }}>No se cobra ahora: te enviamos el pago por correo.</span>
+                    </div>
+                </form>
+            )}
+        </section>
     );
 };
 

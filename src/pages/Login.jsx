@@ -1,11 +1,22 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { supabase } from '../supabase';
 import AuthLayout from '../components/AuthLayout';
 import { authError } from '../lib/authError';
 
+const MIN = 8;
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+const TITLES = {
+    login: { eyebrow: 'Acceso clientes', title: 'Entrar a mi portal' },
+    signup: { eyebrow: 'Cuenta nueva', title: 'Crear mi cuenta' },
+    forgot: { eyebrow: 'Recuperar acceso', title: 'Nueva contraseña' },
+};
+
 const Login = () => {
-    const [mode, setMode] = useState('login'); // login | forgot
+    const [params] = useSearchParams();
+    const [mode, setMode] = useState(params.get('crear') !== null ? 'signup' : 'login'); // login | signup | forgot
+    const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [loading, setLoading] = useState(false);
@@ -30,7 +41,6 @@ const Login = () => {
         e.preventDefault();
         setLoading(true);
         setError('');
-
         const { error: err } = await supabase.auth.signInWithPassword({ email: email.trim(), password });
         if (err) {
             setError(authError(err));
@@ -40,12 +50,38 @@ const Login = () => {
         navigate('/dashboard', { replace: true });
     };
 
-    const handleForgot = async (e) => {
+    const handleSignup = async (e) => {
         e.preventDefault();
-        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
-            setError('Escribe el correo con el que entras al portal.');
+        if (name.trim().length < 2) return setError('Escribe tu nombre o el de tu negocio.');
+        if (!EMAIL_RE.test(email.trim())) return setError('Revisa el correo, parece incompleto.');
+        if (password.length < MIN) return setError(`La contraseña debe tener al menos ${MIN} caracteres.`);
+        setLoading(true);
+        setError('');
+        const { data, error: err } = await supabase.auth.signUp({
+            email: email.trim(),
+            password,
+            options: {
+                data: { full_name: name.trim() },
+                emailRedirectTo: `${window.location.origin}/dashboard`,
+            },
+        });
+        setLoading(false);
+        if (err) {
+            setError(authError(err));
             return;
         }
+        window.dataLayer?.push({ event: 'sign_up', method: 'email' });
+        // Con confirmación de correo activa no hay sesión hasta que haga clic en el enlace
+        if (data.session) {
+            navigate('/dashboard', { replace: true });
+            return;
+        }
+        setNotice(`Listo. Te enviamos un correo a ${email.trim()}: haz clic en el enlace para activar tu cuenta y entrar a tu portal.`);
+    };
+
+    const handleForgot = async (e) => {
+        e.preventDefault();
+        if (!EMAIL_RE.test(email.trim())) return setError('Escribe el correo con el que entras al portal.');
         setLoading(true);
         setError('');
         const { error: err } = await supabase.auth.resetPasswordForEmail(email.trim(), {
@@ -60,53 +96,69 @@ const Login = () => {
         setNotice(`Si ${email.trim()} tiene una cuenta, te llegará un correo con un enlace para crear una nueva contraseña.`);
     };
 
+    const submit = { login: handleLogin, signup: handleSignup, forgot: handleForgot }[mode];
+    const t = TITLES[mode];
+
     return (
         <AuthLayout title="Acceso clientes" description="Portal de clientes de Interfaz 360: dominio, plan, correos, documentos y soporte.">
-            {mode === 'login' ? (
-                <form onSubmit={handleLogin} style={{ display: 'grid', gap: 18 }}>
-                    <div>
-                        <span className="eyebrow">Acceso clientes</span>
-                        <h2 style={{ marginTop: 10 }}>Entrar a mi portal</h2>
-                    </div>
-                    <label className="field">Correo
-                        <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} autoComplete="email" placeholder="tu@empresa.cl" required />
-                    </label>
-                    <label className="field">Contraseña
-                        <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} autoComplete="current-password" required />
-                    </label>
-                    {error && <p className="alert" role="alert">{error}</p>}
-                    <button type="submit" className="btn signal" disabled={loading}>
-                        {loading ? 'Entrando…' : 'Entrar →'}
-                    </button>
-                    <div className="row-between">
-                        <button type="button" className="textlink" onClick={() => switchMode('forgot')}>¿Olvidaste tu contraseña?</button>
-                        <a className="muted" href="https://wa.me/56954146176" target="_blank" rel="noopener noreferrer" style={{ fontSize: 14 }}>
-                            ¿Aún no tienes cuenta?
-                        </a>
-                    </div>
-                </form>
-            ) : (
-                <form onSubmit={handleForgot} style={{ display: 'grid', gap: 18 }}>
-                    <div>
-                        <span className="eyebrow">Recuperar acceso</span>
-                        <h2 style={{ marginTop: 10 }}>Nueva contraseña</h2>
-                    </div>
+            <form onSubmit={submit} noValidate style={{ display: 'grid', gap: 18 }}>
+                <div>
+                    <span className="eyebrow">{t.eyebrow}</span>
+                    <h2 style={{ marginTop: 10 }}>{t.title}</h2>
+                </div>
+
+                {mode === 'signup' && (
+                    <p className="muted" style={{ margin: 0, fontSize: 15 }}>
+                        Con tu cuenta compras tu dominio o hosting y sigues tus pedidos y solicitudes en un solo lugar.
+                    </p>
+                )}
+                {mode === 'forgot' && (
                     <p className="muted" style={{ margin: 0, fontSize: 15 }}>
                         Escribe tu correo y te enviamos un enlace para crear una contraseña nueva.
                     </p>
-                    <label className="field">Correo
-                        <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} autoComplete="email" placeholder="tu@empresa.cl" required />
+                )}
+
+                {mode === 'signup' && (
+                    <label className="field">Tu nombre o el de tu negocio
+                        <input value={name} onChange={(e) => setName(e.target.value)} autoComplete="name" maxLength={120} />
                     </label>
-                    {error && <p className="alert" role="alert">{error}</p>}
-                    {notice && <p className="alert ok" role="status">{notice}</p>}
-                    <button type="submit" className="btn signal" disabled={loading || !!notice}>
-                        {loading ? 'Enviando…' : 'Enviar enlace →'}
-                    </button>
-                    <div className="row-between">
-                        <button type="button" className="textlink" onClick={() => switchMode('login')}>← Volver a entrar</button>
-                    </div>
-                </form>
-            )}
+                )}
+                <label className="field">Correo
+                    <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} autoComplete="email" placeholder="tu@empresa.cl" />
+                </label>
+                {mode !== 'forgot' && (
+                    <label className="field">
+                        <span>Contraseña{mode === 'signup' && <em> · mínimo {MIN} caracteres</em>}</span>
+                        <input
+                            type="password"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            autoComplete={mode === 'signup' ? 'new-password' : 'current-password'}
+                        />
+                    </label>
+                )}
+
+                {error && <p className="alert" role="alert">{error}</p>}
+                {notice && <p className="alert ok" role="status">{notice}</p>}
+
+                <button type="submit" className="btn signal" disabled={loading || !!notice}>
+                    {loading ? 'Un momento…' : { login: 'Entrar →', signup: 'Crear mi cuenta →', forgot: 'Enviar enlace →' }[mode]}
+                </button>
+
+                <div className="row-between">
+                    {mode === 'login' && (
+                        <>
+                            <button type="button" className="textlink" onClick={() => switchMode('forgot')}>¿Olvidaste tu contraseña?</button>
+                            <button type="button" className="textlink" onClick={() => switchMode('signup')}>Crear una cuenta</button>
+                        </>
+                    )}
+                    {mode !== 'login' && (
+                        <button type="button" className="textlink" onClick={() => switchMode('login')}>
+                            {mode === 'signup' ? '¿Ya tienes cuenta? Entrar' : '← Volver a entrar'}
+                        </button>
+                    )}
+                </div>
+            </form>
         </AuthLayout>
     );
 };

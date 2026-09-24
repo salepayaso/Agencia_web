@@ -1,0 +1,146 @@
+import { supabase } from '../supabase';
+
+// Pedidos de dominio, hosting y pack desde el sitio y el portal.
+// Mientras no esté conectada la pasarela (Webpay), un pedido no cobra: queda
+// guardado (si la persona tiene cuenta), nos llega por correo y coordinamos
+// el pago. Regla vigente: nunca registrar ni activar nada sin el pago recibido.
+
+// Precios al cliente (skill interfaz360, sección 5 y 5b)
+export const OFFERS = {
+    dominio: {
+        title: 'Dominio .cl',
+        years: { 1: { label: '1 año', price: 25000, note: 'Renovación anual $25.000' }, 2: { label: '2 años', price: 45000, note: 'Ahorras $5.000' } },
+    },
+    hosting: {
+        title: 'Hosting con correos',
+        years: { 1: { label: '1 año', price: 60000, note: 'Renovación anual $60.000' } },
+    },
+    pack: {
+        title: 'Pack hosting + dominio',
+        years: { 1: { label: '1 año', price: 75000, note: 'Renovación anual $75.000' } },
+    },
+};
+
+export const PAYS = {
+    webpay: { label: 'Tarjeta', note: 'Débito o crédito vía Webpay' },
+    mp: { label: 'Mercado Pago', note: 'Saldo o tarjetas guardadas' },
+    tr: { label: 'Transferencia', note: 'Activamos al confirmar el depósito' },
+};
+
+export const ORDER_STATUS = {
+    pendiente: { label: 'Esperando pago', cls: 'hot' },
+    pagado: { label: 'Pago recibido', cls: '' },
+    activo: { label: 'Activo', cls: 'ok' },
+    cancelado: { label: 'Cancelado', cls: '' },
+};
+
+export const clp = (n) => `$${n.toLocaleString('es-CL')}`;
+
+// Dígito verificador del RUT (módulo 11)
+export const rutOk = (value) => {
+    const r = String(value || '').replace(/[^0-9kK]/g, '').toUpperCase();
+    if (r.length < 8) return false;
+    const body = r.slice(0, -1);
+    const dv = r.slice(-1);
+    let sum = 0, m = 2;
+    for (let i = body.length - 1; i >= 0; i--) {
+        sum += Number(body[i]) * m;
+        m = m === 7 ? 2 : m + 1;
+    }
+    const calc = 11 - (sum % 11);
+    return (calc === 11 ? '0' : calc === 10 ? 'K' : String(calc)) === dv;
+};
+
+// Sesión y ficha, si la persona entró a su cuenta. Sin sesión devuelve nulls.
+export const loadAccount = async () => {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) return { user: null, profile: null };
+    const { data: profile } = await supabase.from('profiles').select('*').eq('id', session.user.id).maybeSingle();
+    return { user: session.user, profile: profile || null };
+};
+
+// Datos del titular guardados en la ficha → formulario
+export const holderFromProfile = (profile, user) => ({
+    kind: profile?.holder_kind === 'empresa' ? 'e' : 'p',
+    name: profile?.holder_name || profile?.client_name || '',
+    rut: profile?.rut || '',
+    email: profile?.contact_email || profile?.email || user?.email || '',
+    phone: profile?.phone || '',
+    address: profile?.address || '',
+});
+
+/**
+ * Guarda y avisa un pedido.
+ * - Con cuenta: lo guarda en orders y actualiza los datos del titular en la ficha.
+ *   Si esas tablas/columnas aún no existen (SQL sin correr), sigue igual con el aviso.
+ * - Siempre: nos avisa por correo con /api/contact.
+ * Lanza error solo si el aviso por correo falla y tampoco se pudo guardar.
+ */
+export const placeOrder = async ({ user, kind, domain, years = 1, pay, holder }) => {
+    const offer = OFFERS[kind];
+    const plan = offer.years[years];
+    let saved = false;
+
+    if (user) {
+        const holderRow = holder && {
+            holder_kind: holder.kind === 'e' ? 'empresa' : 'persona',
+            holder_name: holder.name.trim(),
+            rut: holder.rut.trim(),
+            phone: holder.phone.trim(),
+            address: holder.address.trim(),
+        };
+        const { error } = await supabase.from('orders').insert([{
+            kind,
+            domain: domain || null,
+            years: Number(years),
+            payment_method: pay,
+            holder: holderRow || null,
+        }]);
+        saved = !error;
+        if (holderRow) {
+            await supabase.from('profiles').update(holderRow).eq('id', user.id);
+        }
+    }
+
+    const lines = [
+        `PEDIDO: ${offer.title}${domain ? ` · ${domain}` : ''}`,
+        `Plan: ${plan.label} · ${clp(plan.price)}`,
+        `Forma de pago elegida: ${PAYS[pay].label}`,
+        `Cuenta de cliente: ${user ? `sí (${user.email})${saved ? ', pedido guardado en el portal' : ''}` : 'no'}`,
+    ];
+    if (holder) {
+        lines.push(
+            '',
+            `Titular (${holder.kind === 'e' ? 'empresa' : 'persona'}): ${holder.name.trim()}`,
+            `RUT: ${holder.rut.trim()}`,
+            `Correo: ${holder.email.trim()}`,
+            `Teléfono: ${holder.phone.trim() || '—'}`,
+            `Dirección: ${holder.address.trim()}`,
+        );
+        if (!user) lines.push(`Crear cuenta de cliente: ${holder.account ? 'sí' : 'no'}`);
+    }
+
+    const contactName = holder?.name.trim() || user?.email || 'Cliente';
+    const contactEmail = holder?.email.trim() || user?.email;
+    let mailed = false;
+    try {
+        const res = await fetch('/api/contact', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                name: contactName,
+                email: contactEmail,
+                phone: holder?.phone.trim() || '',
+                services: ['Dominio y correos'],
+                message: lines.join('\n'),
+            }),
+        });
+        mailed = res.ok;
+    } catch {
+        mailed = false;
+    }
+
+    if (!mailed && !saved) throw new Error('order_failed');
+    window.dataLayer?.push({ event: 'order_placed', order_kind: kind, domain_name: domain, plan_years: years, payment: pay });
+    return { saved, mailed };
+};
