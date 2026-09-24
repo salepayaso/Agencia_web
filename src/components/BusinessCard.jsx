@@ -6,16 +6,16 @@ import Button from './ui/Button';
 
 const BusinessCard = () => {
     const contactInfo = {
-        name: "Carlos Maturana",
-        role: "CEO & Fundador",
+        name: "Interfaz 360",
+        role: "Agencia digital · Web, Google y Agentes IA",
         email: "contacto@interfaz360.cl",
         website: "interfaz360.cl",
         fullWebsite: "https://interfaz360.cl",
         vCardData: `BEGIN:VCARD
 VERSION:3.0
-FN:Carlos Maturana
+FN:Interfaz 360
 ORG:Interfaz 360
-TITLE:CEO & Fundador
+TITLE:Agencia digital
 EMAIL:contacto@interfaz360.cl
 URL:https://interfaz360.cl
 END:VCARD`
@@ -26,7 +26,7 @@ END:VCARD`
         const url = window.URL.createObjectURL(blob);
         const link = document.createElement('a');
         link.href = url;
-        link.setAttribute('download', 'carlos-maturana.vcf');
+        link.setAttribute('download', 'interfaz-360.vcf');
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
@@ -36,8 +36,8 @@ END:VCARD`
         if (navigator.share) {
             try {
                 await navigator.share({
-                    title: 'Carlos Maturana - Interfaz 360',
-                    text: 'Tarjeta Digital de Carlos Maturana',
+                    title: 'Interfaz 360',
+                    text: 'Tarjeta digital de Interfaz 360',
                     url: window.location.href,
                 });
             } catch (err) {

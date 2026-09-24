@@ -57,8 +57,10 @@ export default async function handler(req, res) {
     const safeEmail = escapeHtml(email.trim());
     const safeMessage = escapeHtml(message.trim());
 
+    // El correo que recibe los avisos va en una variable de entorno: el repo es público.
     const apiKey = process.env.RESEND_API_KEY;
-    if (!apiKey) {
+    const destino = process.env.AVISOS_EMAIL;
+    if (!apiKey || !destino) {
         return res.status(500).json({ error: 'Configuración de servidor incompleta' });
     }
 
@@ -71,7 +73,7 @@ export default async function handler(req, res) {
             },
             body: JSON.stringify({
                 from: 'Interfaz360 <onboarding@resend.dev>',
-                to: ['oss.maturana@gmail.com'],
+                to: [destino],
                 reply_to: email.trim(),
                 subject: `Nuevo contacto desde interfaz360.cl — ${name.trim().replace(/\s+/g, ' ')}`,
                 html: `

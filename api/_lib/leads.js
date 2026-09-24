@@ -40,8 +40,9 @@ function buildActions(lead) {
  */
 export async function sendLeadEmail(lead, transcript = []) {
     const apiKey = process.env.RESEND_API_KEY;
-    if (!apiKey) {
-        console.error('Lead sin enviar: falta RESEND_API_KEY');
+    const destino = process.env.AVISOS_EMAIL;
+    if (!apiKey || !destino) {
+        console.error('Lead sin enviar: falta RESEND_API_KEY o AVISOS_EMAIL');
         return false;
     }
 
@@ -62,7 +63,7 @@ export async function sendLeadEmail(lead, transcript = []) {
             },
             body: JSON.stringify({
                 from: 'Interfaz360 <onboarding@resend.dev>',
-                to: ['oss.maturana@gmail.com'],
+                to: [destino],
                 subject: `🤖 Lead del agente IA — ${lead.nombre}`,
                 html: `
                     <div style="font-family: Arial, sans-serif; max-width: 620px; margin: 0 auto;">
