@@ -1,5 +1,5 @@
 import { checkContactLimit, getClientIp, isAllowedOrigin } from './_lib/guardrails.js';
-import { escapeHtml } from './_lib/leads.js';
+import { escapeHtml, avisosFrom } from './_lib/leads.js';
 
 const MAX_NAME = 100;
 const MAX_EMAIL = 254;
@@ -74,7 +74,7 @@ export default async function handler(req, res) {
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify({
-                from: 'Interfaz360 <onboarding@resend.dev>',
+                from: avisosFrom(),
                 to: [destino],
                 reply_to: email.trim(),
                 subject: `Nuevo contacto desde interfaz360.cl — ${name.trim().replace(/\s+/g, ' ')}`,

@@ -1,6 +1,11 @@
 // Envío del lead capturado por el agente al correo interno, vía Resend.
 // Reusa la misma cuenta y API key que api/contact.js.
 
+// Remitente de los avisos. Con interfaz360.cl verificado en Resend, en Vercel:
+// AVISOS_FROM=Interfaz 360 <avisos@interfaz360.cl>. Sin la variable se usa la
+// dirección de prueba de Resend, que solo entrega al dueño de la cuenta.
+export const avisosFrom = () => process.env.AVISOS_FROM || 'Interfaz360 <onboarding@resend.dev>';
+
 export const escapeHtml = (value = '') =>
     String(value)
         .replace(/&/g, '&amp;')
@@ -62,7 +67,7 @@ export async function sendLeadEmail(lead, transcript = []) {
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify({
-                from: 'Interfaz360 <onboarding@resend.dev>',
+                from: avisosFrom(),
                 to: [destino],
                 subject: `🤖 Lead del agente IA — ${lead.nombre}`,
                 html: `
