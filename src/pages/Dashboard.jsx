@@ -55,9 +55,23 @@ const parseEmails = (raw) => {
     }
 };
 
-// ¿Tiene algo contratado? Si no, el portal abre en "Contratar" y oculta el resumen vacío.
+// ¿Tiene algo contratado? Si no, solo "Contratar" está habilitado; el resto se
+// desbloquea al tener un servicio. plan_type y hosting_plan NO cuentan: la base
+// les pone 'basic' y 'Plan Básico' por defecto a toda ficha nueva.
 const hasServices = (p, orders = []) =>
-    !!(p?.domain_name || p?.active_web || p?.plan_type || p?.hosting_plan || orders.some((o) => o.status === 'activo'));
+    !!(p?.domain_name || p?.active_web || orders.some((o) => o.status === 'activo'));
+
+// "VICTOR ANDRÉS" → "Victor"; para el saludo y la barra superior
+const firstName = (full) => {
+    const w = String(full || '').trim().split(/\s+/)[0] || '';
+    return w ? w.charAt(0).toLocaleUpperCase('es-CL') + w.slice(1).toLocaleLowerCase('es-CL') : '';
+};
+
+const Lock = () => (
+    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" aria-hidden="true" style={{ marginRight: 6, verticalAlign: '-1px' }}>
+        <rect x="4" y="11" width="16" height="10" /><path d="M8 11V7a4 4 0 0 1 8 0v4" />
+    </svg>
+);
 
 const Dashboard = () => {
     const navigate = useNavigate();
@@ -113,8 +127,18 @@ const Dashboard = () => {
     const openTickets = tickets.filter(isOpen);
     const active = hasServices(profile, orders);
     const pendingOrders = orders.filter((o) => o.status === 'pendiente' || o.status === 'pagado');
-    const name = profile?.client_name || 'Tu negocio';
+    const fullName = (profile?.client_name || (profile?.holder_kind === 'persona' ? profile?.holder_name : '') || '').trim();
+    const first = firstName(fullName);
+    const initial = (first || user?.email || '?').charAt(0).toUpperCase();
     const newRequest = () => { setTab('soporte'); setComposing(true); };
+    const locked = 'Se habilita cuando tengas un servicio activo con nosotros';
+    const tabBtn = (id, label, extra = null) => (
+        <button type="button" role="tab" aria-selected={tab === id} aria-disabled={!active && id !== 'contratar'}
+            disabled={!active && id !== 'contratar'} title={!active && id !== 'contratar' ? locked : undefined}
+            onClick={() => setTab(id)}>
+            {!active && id !== 'contratar' && <Lock />}{label}{extra}
+        </button>
+    );
 
     return (
         <div className="tc-page">
@@ -127,7 +151,13 @@ const Dashboard = () => {
                             <small>Portal de clientes</small>
                         </Link>
                         <div className="who">
-                            <span title={user?.email}>{profile?.contact_email || user?.email}</span>
+                            <span className="id" title={user?.email}>
+                                <span className="avatar" aria-hidden="true">{initial}</span>
+                                <span className="txt">
+                                    <b>{fullName || 'Mi cuenta'}</b>
+                                    <small>{active ? 'Cliente Interfaz 360' : 'Cuenta de cliente'}</small>
+                                </span>
+                            </span>
                             <button type="button" className="btn" onClick={logout}>Cerrar sesión</button>
                         </div>
                     </div>
@@ -137,27 +167,24 @@ const Dashboard = () => {
                     <div className="max">
                         <div className="portal-head">
                             <div>
-                                <span className="eyebrow">Mi cuenta · {name}</span>
+                                <span className="eyebrow">Mi cuenta</span>
                                 <h1 className="display" style={{ marginTop: 14 }}>
-                                    Tu cuenta, <span>en orden</span>
+                                    {first ? <>Hola, <span>{first}</span></> : <>Te damos la <span>bienvenida</span></>}
                                 </h1>
+                                <p className="portal-lede">
+                                    {active ? 'Tu cuenta, en orden: tus servicios, pagos y solicitudes en un solo lugar.' : 'Elige por dónde partir. Cuando tengas un servicio activo, se habilitan el resumen, el soporte y tus documentos.'}
+                                </p>
                             </div>
                             <div className="tabs" role="tablist" aria-label="Secciones del portal">
-                                {active && (
-                                    <button type="button" role="tab" aria-selected={tab === 'resumen'} onClick={() => setTab('resumen')}>Resumen</button>
-                                )}
-                                <button type="button" role="tab" aria-selected={tab === 'contratar'} onClick={() => setTab('contratar')}>
-                                    Contratar{pendingOrders.length > 0 && <span className="count">{pendingOrders.length}</span>}
-                                </button>
-                                <button type="button" role="tab" aria-selected={tab === 'soporte'} onClick={() => setTab('soporte')}>
-                                    Soporte{openTickets.length > 0 && <span className="count">{openTickets.length}</span>}
-                                </button>
-                                <button type="button" role="tab" aria-selected={tab === 'documentos'} onClick={() => setTab('documentos')}>Documentos</button>
+                                {tabBtn('resumen', 'Resumen')}
+                                {tabBtn('contratar', 'Contratar', pendingOrders.length > 0 && <span className="count">{pendingOrders.length}</span>)}
+                                {tabBtn('soporte', 'Soporte', openTickets.length > 0 && <span className="count">{openTickets.length}</span>)}
+                                {tabBtn('documentos', 'Documentos')}
                             </div>
                         </div>
 
                         {tab === 'contratar' && (
-                            <Hire user={user} isNew={!active} orders={orders} onOrdered={() => loadOrders(user.id)} />
+                            <Hire user={user} orders={orders} onOrdered={() => loadOrders(user.id)} />
                         )}
                         {tab === 'resumen' && (
                             <Overview profile={profile} user={user} documents={documents} tickets={tickets} onNewRequest={newRequest} goTo={setTab} />
@@ -204,22 +231,11 @@ const OFFER_CARDS = [
     },
 ];
 
-const Hire = ({ user, isNew, orders, onOrdered }) => {
+const Hire = ({ user, orders, onOrdered }) => {
     const [picked, setPicked] = useState(null); // dominio | hosting | pack
 
     return (
         <div style={{ display: 'grid', gap: 32, paddingBottom: 80 }}>
-            {isNew && (
-                <section className="panel">
-                    <div className="box-title"><b>Tu cuenta está lista</b></div>
-                    <div className="box-body">
-                        <p className="muted" style={{ margin: 0, fontSize: 16 }}>
-                            Todavía no tienes servicios con nosotros. Elige por dónde partir: cuando se active, aquí verás su estado, vencimiento y pagos.
-                        </p>
-                    </div>
-                </section>
-            )}
-
             {picked === 'hosting' ? (
                 <HostingOrder user={user} onDone={onOrdered} onCancel={() => setPicked(null)} />
             ) : picked ? (
