@@ -5,7 +5,7 @@ import SEO from '../components/SEO';
 import Wordmark from '../components/Wordmark';
 import { PortalLoading } from '../components/ProtectedRoute';
 import DomainSection from '../components/DomainSection';
-import { OFFERS, PAYS, ACTIVE_PAYS, DEFAULT_PAY, ORDER_STATUS, clp, placeOrder } from '../lib/orders';
+import { OFFERS, PAYS, ACTIVE_PAYS, DEFAULT_PAY, ORDER_STATUS, clp, placeOrder, rutOk } from '../lib/orders';
 
 // Portal del cliente ("Tu cuenta, en orden"): dominio, plan y pagos, correos,
 // estado del sitio, documentos y soporte. Sin estadísticas: esas son internas.
@@ -132,11 +132,13 @@ const Dashboard = () => {
     const initial = (first || user?.email || '?').charAt(0).toUpperCase();
     const newRequest = () => { setTab('soporte'); setComposing(true); };
     const locked = 'Se habilita cuando tengas un servicio activo con nosotros';
+    // Contratar y Mis datos siempre; el resto solo con un servicio activo
+    const isLocked = (id) => !active && !['contratar', 'datos'].includes(id);
     const tabBtn = (id, label, extra = null) => (
-        <button type="button" role="tab" aria-selected={tab === id} aria-disabled={!active && id !== 'contratar'}
-            disabled={!active && id !== 'contratar'} title={!active && id !== 'contratar' ? locked : undefined}
+        <button type="button" role="tab" aria-selected={tab === id} aria-disabled={isLocked(id)}
+            disabled={isLocked(id)} title={isLocked(id) ? locked : undefined}
             onClick={() => setTab(id)}>
-            {!active && id !== 'contratar' && <Lock />}{label}{extra}
+            {isLocked(id) && <Lock />}{label}{extra}
         </button>
     );
 
@@ -151,13 +153,13 @@ const Dashboard = () => {
                             <small>Portal de clientes</small>
                         </Link>
                         <div className="who">
-                            <span className="id" title={user?.email}>
+                            <button type="button" className="id" title={`${user?.email} · Ver mis datos`} onClick={() => setTab('datos')}>
                                 <span className="avatar" aria-hidden="true">{initial}</span>
                                 <span className="txt">
                                     <b>{fullName || 'Mi cuenta'}</b>
                                     <small>{active ? 'Cliente Interfaz 360' : 'Cuenta de cliente'}</small>
                                 </span>
-                            </span>
+                            </button>
                             <button type="button" className="btn" onClick={logout}>Cerrar sesión</button>
                         </div>
                     </div>
@@ -180,6 +182,7 @@ const Dashboard = () => {
                                 {tabBtn('contratar', 'Contratar', pendingOrders.length > 0 && <span className="count">{pendingOrders.length}</span>)}
                                 {tabBtn('soporte', 'Soporte', openTickets.length > 0 && <span className="count">{openTickets.length}</span>)}
                                 {tabBtn('documentos', 'Documentos')}
+                                {tabBtn('datos', 'Mis datos')}
                             </div>
                         </div>
 
@@ -200,6 +203,9 @@ const Dashboard = () => {
                             />
                         )}
                         {tab === 'documentos' && <Documents documents={documents} profile={profile} />}
+                        {tab === 'datos' && (
+                            <MyData user={user} profile={profile} onSaved={(changes) => setProfile((p) => ({ ...p, ...changes }))} />
+                        )}
                     </div>
                 </main>
             </div>
@@ -539,6 +545,98 @@ const CopyEmail = ({ email }) => {
 /* ---------------- Soporte ---------------- */
 
 const EMPTY_TICKET = { category: 'general', title: '', description: '' };
+
+// Mis datos: nombre, correo de contacto y datos del titular de dominios.
+// Habilitado para todos, sea o no cliente. Los permisos por columna viven en
+// la base (portal_registro_pedidos_2026_09_24.sql + portal_mis_datos_2026_09_30.sql);
+// si el segundo aún no se corrió, se guardan igual los datos de titular.
+const EMAIL_RE = /^[^\s@<>"]+@[^\s@<>"]+\.[^\s@<>"]+$/;
+const OWN_COLS = ['client_name', 'contact_email'];
+
+const MyData = ({ user, profile, onSaved }) => {
+    const [form, setForm] = useState(() => ({
+        client_name: profile?.client_name || '',
+        contact_email: profile?.contact_email || user.email,
+        phone: profile?.phone || '',
+        holder_kind: profile?.holder_kind || 'persona',
+        holder_name: profile?.holder_name || '',
+        rut: profile?.rut || '',
+        address: profile?.address || '',
+    }));
+    const [saving, setSaving] = useState(false);
+    const [msg, setMsg] = useState(null); // { ok, text }
+
+    const set = (k) => (e) => { setForm((f) => ({ ...f, [k]: e.target.value })); setMsg(null); };
+
+    const submit = async (e) => {
+        e.preventDefault();
+        const row = Object.fromEntries(Object.entries(form).map(([k, v]) => [k, typeof v === 'string' ? v.trim() : v]));
+        if (row.client_name.length < 2) return setMsg({ ok: false, text: 'Escribe tu nombre.' });
+        if (!EMAIL_RE.test(row.contact_email)) return setMsg({ ok: false, text: 'Revisa el correo de contacto.' });
+        if (row.rut && !rutOk(row.rut)) return setMsg({ ok: false, text: 'El RUT no es válido. Revisa el dígito verificador.' });
+        for (const k of ['phone', 'holder_name', 'rut', 'address']) if (!row[k]) row[k] = null;
+
+        setSaving(true);
+        let { error } = await supabase.from('profiles').update(row).eq('id', user.id);
+        let partial = false;
+        // Sin permiso sobre nombre/correo (SQL pendiente): guardamos el resto
+        if (error && /permission/i.test(error.message || '')) {
+            const rest = Object.fromEntries(Object.entries(row).filter(([k]) => !OWN_COLS.includes(k)));
+            ({ error } = await supabase.from('profiles').update(rest).eq('id', user.id));
+            partial = !error;
+        }
+        setSaving(false);
+        if (error) return setMsg({ ok: false, text: 'No pudimos guardar tus datos. Intenta de nuevo en un momento.' });
+        onSaved(partial ? Object.fromEntries(Object.entries(row).filter(([k]) => !OWN_COLS.includes(k))) : row);
+        setMsg(partial
+            ? { ok: true, text: 'Guardamos tus datos de titular. El nombre y el correo de contacto todavía no se pueden cambiar desde aquí: escríbenos y lo hacemos.' }
+            : { ok: true, text: 'Listo, tus datos quedaron guardados.' });
+    };
+
+    return (
+        <form className="portal-grid" onSubmit={submit} noValidate>
+            <section className="panel">
+                <div className="box-title"><b>Tus datos</b></div>
+                <div className="box-body">
+                    <label className="field">Nombre
+                        <input value={form.client_name} onChange={set('client_name')} maxLength={120} autoComplete="name" />
+                    </label>
+                    <label className="field">Correo de contacto <em>(donde te enviamos avisos y links de pago)</em>
+                        <input type="email" value={form.contact_email} onChange={set('contact_email')} maxLength={254} autoComplete="email" autoCapitalize="none" spellCheck={false} />
+                    </label>
+                    <p className="muted" style={{ margin: 0, fontSize: 14 }}>Para entrar al portal sigues usando {user.email}.</p>
+                    <label className="field">Teléfono o WhatsApp
+                        <input type="tel" value={form.phone} onChange={set('phone')} maxLength={30} autoComplete="tel" placeholder="+56 9 1234 5678" />
+                    </label>
+                </div>
+            </section>
+
+            <section className="panel">
+                <div className="box-title"><b>Titular de tus dominios</b></div>
+                <div className="box-body">
+                    <p className="muted" style={{ margin: 0, fontSize: 14 }}>Con estos datos registramos tus dominios .cl y te los dejamos listos en cada pedido.</p>
+                    <label className="field">Tipo
+                        <select value={form.holder_kind} onChange={set('holder_kind')}>
+                            <option value="persona">Persona</option>
+                            <option value="empresa">Empresa</option>
+                        </select>
+                    </label>
+                    <label className="field">{form.holder_kind === 'empresa' ? 'Razón social' : 'Nombre completo'}
+                        <input value={form.holder_name} onChange={set('holder_name')} maxLength={120} />
+                    </label>
+                    <label className="field">RUT
+                        <input value={form.rut} onChange={set('rut')} maxLength={14} placeholder="12.345.678-9" />
+                    </label>
+                    <label className="field">Dirección
+                        <input value={form.address} onChange={set('address')} maxLength={200} autoComplete="street-address" />
+                    </label>
+                    {msg && <p className={`alert${msg.ok ? ' ok' : ''}`} role={msg.ok ? 'status' : 'alert'}>{msg.text}</p>}
+                    <div><button type="submit" className="btn signal" disabled={saving}>{saving ? 'Guardando…' : 'Guardar mis datos →'}</button></div>
+                </div>
+            </section>
+        </form>
+    );
+};
 
 const Support = ({ user, profile, tickets, composing, setComposing, onCreated }) => {
     const [form, setForm] = useState(EMPTY_TICKET);
