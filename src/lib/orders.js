@@ -9,10 +9,22 @@ import { OFFERS } from '../data/catalogo';
 // Precios al cliente: viven en src/data/catalogo.js junto con lo que incluye cada servicio.
 export { OFFERS };
 
+// active: si el cliente la puede elegir hoy. Tarjeta y Mercado Pago quedan
+// apagadas hasta tener cómo cobrarlas (Webpay en espera). Para encender una,
+// cambiar a true: el pedido, el portal y los textos se ajustan solos.
 export const PAYS = {
-    webpay: { label: 'Tarjeta', note: 'Débito o crédito vía Webpay' },
-    mp: { label: 'Mercado Pago', note: 'Saldo o tarjetas guardadas' },
-    tr: { label: 'Transferencia', note: 'Activamos al confirmar el depósito' },
+    webpay: { label: 'Tarjeta', note: 'Débito o crédito vía Webpay', active: false },
+    mp: { label: 'Mercado Pago', note: 'Saldo o tarjetas guardadas', active: false },
+    tr: { label: 'Transferencia', note: 'Activamos al confirmar el depósito', active: true },
+};
+
+export const ACTIVE_PAYS = Object.entries(PAYS).filter(([, p]) => p.active);
+export const DEFAULT_PAY = ACTIVE_PAYS[0][0];
+
+// "tarjeta, Mercado Pago o transferencia" / "transferencia"
+export const payMethodsText = () => {
+    const names = ACTIVE_PAYS.map(([, p]) => p.label.toLowerCase().replace('mercado pago', 'Mercado Pago'));
+    return names.length > 1 ? `${names.slice(0, -1).join(', ')} o ${names.at(-1)}` : names[0];
 };
 
 export const ORDER_STATUS = {

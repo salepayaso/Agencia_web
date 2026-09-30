@@ -5,7 +5,7 @@ import SEO from '../components/SEO';
 import Wordmark from '../components/Wordmark';
 import { PortalLoading } from '../components/ProtectedRoute';
 import DomainSection from '../components/DomainSection';
-import { OFFERS, PAYS, ORDER_STATUS, clp, placeOrder } from '../lib/orders';
+import { OFFERS, PAYS, ACTIVE_PAYS, DEFAULT_PAY, ORDER_STATUS, clp, placeOrder } from '../lib/orders';
 
 // Portal del cliente ("Tu cuenta, en orden"): dominio, plan y pagos, correos,
 // estado del sitio, documentos y soporte. Sin estadísticas: esas son internas.
@@ -278,7 +278,7 @@ const Hire = ({ user, isNew, orders, onOrdered }) => {
 
 const HostingOrder = ({ user, onDone, onCancel }) => {
     const [domain, setDomain] = useState('');
-    const [pay, setPay] = useState('webpay');
+    const [pay, setPay] = useState(DEFAULT_PAY);
     const [sending, setSending] = useState(false);
     const [error, setError] = useState('');
     const [done, setDone] = useState(false);
@@ -326,7 +326,7 @@ const HostingOrder = ({ user, onDone, onCancel }) => {
                     <div style={{ display: 'grid', gap: 8 }}>
                         <span className="field">¿Cómo quieres pagar?</span>
                         <div className="toggles" role="radiogroup" aria-label="Forma de pago">
-                            {Object.entries(PAYS).map(([id, p]) => (
+                            {ACTIVE_PAYS.map(([id, p]) => (
                                 <button key={id} type="button" role="radio" aria-checked={pay === id} aria-pressed={pay === id} onClick={() => setPay(id)} title={p.note}>{p.label}</button>
                             ))}
                         </div>

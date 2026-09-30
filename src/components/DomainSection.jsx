@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { OFFERS, PAYS, clp, rutOk, loadAccount, holderFromProfile, placeOrder } from '../lib/orders';
+import { OFFERS, PAYS, ACTIVE_PAYS, DEFAULT_PAY, payMethodsText, clp, rutOk, loadAccount, holderFromProfile, placeOrder } from '../lib/orders';
 
 // Buscador de dominios .cl con compra en 3 pasos: datos del titular → plan y
 // forma de pago → listo.
@@ -32,7 +32,7 @@ const DomainSection = ({ embedded = false, kind = 'dominio', onOrdered, onCancel
     const [bad, setBad] = useState({});
     const [formError, setFormError] = useState('');
     const [years, setYears] = useState('1');
-    const [pay, setPay] = useState('webpay');
+    const [pay, setPay] = useState(DEFAULT_PAY);
     const [sending, setSending] = useState(false);
     const nameRef = useRef(null);
 
@@ -267,7 +267,7 @@ const DomainSection = ({ embedded = false, kind = 'dominio', onOrdered, onCancel
                             </div>
                             <fieldset className="pay">
                                 <legend>¿Cómo quieres pagar?</legend>
-                                {Object.entries(PAYS).map(([id, p]) => (
+                                {ACTIVE_PAYS.map(([id, p]) => (
                                     <label key={id}>
                                         <input type="radio" name="pay" value={id} checked={pay === id} onChange={(e) => setPay(e.target.value)} />
                                         <span><b>{p.label}</b><small>{p.note}</small></span>
@@ -344,7 +344,7 @@ const DomainSection = ({ embedded = false, kind = 'dominio', onOrdered, onCancel
                     <p>Busca tu dominio .cl. Si está libre, lo pides aquí mismo: dejas tus datos, pagas y lo registramos a tu nombre.</p>
                     <ol className="dsteps-info">
                         <li><span><b>Tus datos</b> como titular del dominio.</span></li>
-                        <li><span><b>Pagas</b> con tarjeta, Mercado Pago o transferencia.</span></li>
+                        <li><span><b>Pagas</b> {ACTIVE_PAYS.length === 1 ? 'por' : 'con'} {payMethodsText()}.</span></li>
                         <li><span><b>Lo ves en tu portal</b> con su fecha de vencimiento.</span></li>
                     </ol>
                 </div>
