@@ -121,6 +121,47 @@ const chatDevApi = () => ({
   },
 });
 
+// Sirve /api/contact en desarrollo local (npm run dev): formularios y pedidos.
+// En producción Vercel usa api/contact.js directamente.
+// Sin RESEND_API_KEY y AVISOS_EMAIL en .env (viven en Vercel) no envía nada:
+// muestra en la terminal el correo que habría llegado y responde OK.
+const contactDevApi = () => ({
+  name: 'contact-dev-api',
+  configureServer(server) {
+    server.middlewares.use('/api/contact', async (req, res) => {
+      const send = (status, payload) => {
+        res.statusCode = status;
+        res.setHeader('Content-Type', 'application/json');
+        res.end(JSON.stringify(payload));
+      };
+      if (req.method !== 'POST') return send(405, { error: 'Method not allowed' });
+
+      const chunks = [];
+      for await (const chunk of req) chunks.push(chunk);
+      let body = {};
+      try {
+        body = JSON.parse(Buffer.concat(chunks).toString('utf-8') || '{}');
+      } catch {
+        return send(400, { error: 'JSON inválido' });
+      }
+
+      if (!process.env.RESEND_API_KEY || !process.env.AVISOS_EMAIL) {
+        console.log(`\n[contacto · local] Correo NO enviado (faltan RESEND_API_KEY / AVISOS_EMAIL en .env). Habría llegado:\n`
+          + `De: ${body.name} <${body.email}>${body.phone ? ` · ${body.phone}` : ''}\n${body.message}\n`);
+        return send(200, { success: true, dev: true });
+      }
+
+      const { default: handler } = await import('./api/contact.js');
+      req.body = body;
+      const vercelRes = {
+        status(code) { res.statusCode = code; return vercelRes; },
+        json(payload) { send(res.statusCode, payload); return vercelRes; },
+      };
+      await handler(req, vercelRes);
+    });
+  },
+});
+
 // https://vite.dev/config/
 export default defineConfig(({ mode }) => {
   // Expone las claves del .env al middleware de desarrollo (contexto Node).
@@ -131,6 +172,7 @@ export default defineConfig(({ mode }) => {
     react(),
     domainCheckDevApi(),
     chatDevApi(),
+    contactDevApi(),
     ViteImageOptimizer({
       png: {
         quality: 80,
