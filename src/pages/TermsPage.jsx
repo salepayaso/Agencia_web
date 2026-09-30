@@ -28,7 +28,7 @@ const TermsPage = () => {
                         <section>
                             <h2>Sobre Interfaz 360</h2>
                             <p>
-                                Interfaz 360 es un estudio freelance independiente con base en Santiago de Chile,
+                                Interfaz 360 es un equipo chileno con base en Santiago de Chile,
                                 que ofrece servicios de desarrollo web, gestión de Google y automatización con
                                 inteligencia artificial. Al navegar este sitio o contratar nuestros servicios,
                                 aceptas las condiciones descritas a continuación.

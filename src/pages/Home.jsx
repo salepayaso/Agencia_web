@@ -7,42 +7,18 @@ import HeroVisuals from '../components/HeroVisuals';
 import TechBand from '../components/TechBand';
 import DomainSection from '../components/DomainSection';
 import { openChat } from '../lib/chat';
+import { SERVICIOS } from '../data/catalogo';
 
 // Cada servicio abre el asesor con una pregunta ya escrita,
 // así responde al tiro sobre lo que le interesó a la persona.
-const SERVICES = [
-    {
-        title: 'Agente IA 24/7',
-        tag: 'Nuevo',
-        desc: 'Configuramos un asistente con la información de tu negocio: atiende en tu web a cualquier hora, cotiza y te envía los datos de cada interesado. Puedes sumarle WhatsApp.',
-        ask: '¿Qué hace un agente IA y cómo funcionaría en mi negocio?',
-    },
-    {
-        title: 'Página web',
-        desc: 'Diseñamos y programamos tu página: secciones, textos, fotos, formulario de contacto y botón de WhatsApp, lista para aparecer en Google. Incluye dominio, hosting y correos el primer año.',
-        ask: '¿Cuánto cuesta una página web?',
-    },
-    {
-        title: 'Tienda online',
-        desc: 'Armamos tu tienda con catálogo, carrito y el medio de pago que elijas (Webpay, Mercado Pago u otro), más un panel para manejar productos, stock y pedidos desde el celular.',
-        ask: 'Quiero vender online, ¿cómo sería una tienda?',
-    },
-    {
-        title: 'Ecosistema Google',
-        desc: 'Configuramos las herramientas de Google para tu negocio: perfil en Google y Maps, Analytics, Tag Manager, Search Console y todo listo para Google Ads.',
-        ask: '¿Qué incluye el Ecosistema Google?',
-    },
-    {
-        title: 'Software a medida',
-        desc: 'Desarrollamos el sistema que tu operación necesita, a partir de cómo trabajas hoy: pedidos, inventario, reparto, cobros y reportes.',
-        ask: 'Necesito un sistema a medida para mi negocio, ¿cómo trabajan?',
-    },
-    {
-        title: 'Dominio y correos',
-        desc: 'Registramos tu dominio .cl a tu nombre, creamos tus correos con el nombre de tu empresa y nos encargamos de renovarlos a tiempo.',
-        anchor: '#dominio',
-    },
-];
+// Textos en src/data/catalogo.js; la portada usa su versión corta si la hay.
+const SERVICES = SERVICIOS.filter((s) => !s.soloAgente).map((s) => ({
+    title: s.title,
+    tag: s.id === 'agente' ? s.kicker : undefined,
+    desc: s.home?.desc || s.desc,
+    ask: s.home?.ask || s.ask,
+    anchor: s.anchor,
+}));
 
 const STEPS = [
     { title: 'Conversamos', desc: 'Nos cuentas cómo funciona tu negocio y qué quieres resolver.' },

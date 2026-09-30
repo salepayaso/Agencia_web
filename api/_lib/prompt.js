@@ -12,7 +12,18 @@
 // cache_control y cualquier cambio de un solo byte invalida el caché.
 // No insertar fechas, horas ni datos variables en los bloques.
 
+import { catalogoParaAgente, preciosPublicosParaAgente } from '../../src/data/catalogo.js';
+
 const BLOQUES = ['base', 'pricing', 'gateAnonimo', 'gateIdConTelefono', 'gateIdSinTelefono'];
+
+// Lo que incluye cada servicio y los precios que el sitio ya muestra salen del
+// mismo catálogo que usa la página (src/data/catalogo.js), así el agente nunca
+// promete algo distinto. AGENT_PROMPT solo lleva la marca donde va cada texto.
+// Sin la marca se usa el texto tal cual (prompt antiguo) y se avisa en el log.
+const MARCAS = [
+    { bloque: 'base', marca: '{{CATALOGO}}', texto: catalogoParaAgente },
+    { bloque: 'pricing', marca: '{{PRECIOS_PUBLICOS}}', texto: preciosPublicosParaAgente },
+];
 
 // Marca que ocupa el lugar del nombre del visitante dentro de los bloques de
 // gate identificado. Se sustituye en cada request.
@@ -38,6 +49,14 @@ function cargarBloques() {
     for (const bloque of BLOQUES) {
         if (typeof parsed[bloque] !== 'string' || !parsed[bloque]) {
             throw new Error(`AGENT_PROMPT: falta el bloque "${bloque}" o está vacío.`);
+        }
+    }
+
+    for (const { bloque, marca, texto } of MARCAS) {
+        if (parsed[bloque].includes(marca)) {
+            parsed[bloque] = parsed[bloque].split(marca).join(texto());
+        } else {
+            console.warn(`[prompt] AGENT_PROMPT.${bloque} no tiene ${marca}: se usa el texto fijo, no el catálogo.`);
         }
     }
 
@@ -69,14 +88,3 @@ export function buildSystemPrompt(visitor) {
         { type: 'text', text: gate },
     ];
 }
-
-// Primer mensaje que ve el visitante. No pasa por la API, es texto fijo.
-export const WELCOME_MESSAGE =
-    '¡Hola! 👋 Soy el asistente de Interfaz360. Te puedo contar sobre nuestros servicios, precios y planes, o dejarte agendada una reunión con Carlos. ¿Qué andas buscando?';
-
-export const SUGGESTED_PROMPTS = [
-    '¿Cuánto cuesta una página web?',
-    'Quiero un agente IA para mi negocio',
-    '¿Qué incluye la Suite Digital 360?',
-    'Necesito hablar con alguien',
-];

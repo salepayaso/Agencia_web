@@ -1,25 +1,13 @@
 import { supabase } from '../supabase';
+import { OFFERS } from '../data/catalogo';
 
 // Pedidos de dominio, hosting y pack desde el sitio y el portal.
 // Mientras no esté conectada la pasarela (Webpay), un pedido no cobra: queda
 // guardado (si la persona tiene cuenta), nos llega por correo y coordinamos
 // el pago. Regla vigente: nunca registrar ni activar nada sin el pago recibido.
 
-// Precios al cliente (skill interfaz360, sección 5 y 5b)
-export const OFFERS = {
-    dominio: {
-        title: 'Dominio .cl',
-        years: { 1: { label: '1 año', price: 25000, note: 'Renovación anual $25.000' }, 2: { label: '2 años', price: 45000, note: 'Ahorras $5.000' } },
-    },
-    hosting: {
-        title: 'Hosting con correos',
-        years: { 1: { label: '1 año', price: 60000, note: 'Renovación anual $60.000' } },
-    },
-    pack: {
-        title: 'Pack hosting + dominio',
-        years: { 1: { label: '1 año', price: 75000, note: 'Renovación anual $75.000' } },
-    },
-};
+// Precios al cliente: viven en src/data/catalogo.js junto con lo que incluye cada servicio.
+export { OFFERS };
 
 export const PAYS = {
     webpay: { label: 'Tarjeta', note: 'Débito o crédito vía Webpay' },

@@ -28,7 +28,7 @@ const PrivacyPage = () => {
                         <section>
                             <h2>¿Quién recibe tus datos?</h2>
                             <p>
-                                Interfaz 360 es un estudio freelance independiente que presta servicios de
+                                Interfaz 360 es un equipo chileno que presta servicios de
                                 desarrollo web, gestión de Google y automatización con IA en Chile.
                                 No existen terceros ni equipos externos: los datos que nos compartes los
                                 recibimos y administramos directamente nosotros.
