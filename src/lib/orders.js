@@ -9,17 +9,20 @@ import { OFFERS } from '../data/catalogo';
 // Precios al cliente: viven en src/data/catalogo.js junto con lo que incluye cada servicio.
 export { OFFERS };
 
-// active: si el cliente la puede elegir hoy. Tarjeta y Mercado Pago quedan
-// apagadas hasta tener cómo cobrarlas (Webpay en espera). Para encender una,
-// cambiar a true: el pedido, el portal y los textos se ajustan solos.
+// active: si el cliente la puede elegir hoy. Para encender o apagar una, cambiar
+// a true/false: el pedido, el portal y los textos se ajustan solos.
+// Tarjeta (Webpay) queda apagada mientras Webpay está en espera. Mercado Pago se
+// cobra a mano: al llegar el pedido creamos un "Link de pago" en la app y lo
+// enviamos por correo (comisión ~2,24% + IVA, la absorbemos).
 export const PAYS = {
     webpay: { label: 'Tarjeta', note: 'Débito o crédito vía Webpay', active: false },
-    mp: { label: 'Mercado Pago', note: 'Saldo o tarjetas guardadas', active: false },
+    mp: { label: 'Mercado Pago', note: 'Tarjeta o saldo, con un link de pago', active: true },
     tr: { label: 'Transferencia', note: 'Activamos al confirmar el depósito', active: true },
 };
 
 export const ACTIVE_PAYS = Object.entries(PAYS).filter(([, p]) => p.active);
-export const DEFAULT_PAY = ACTIVE_PAYS[0][0];
+// Transferencia marcada por defecto: no tiene comisión
+export const DEFAULT_PAY = PAYS.tr.active ? 'tr' : ACTIVE_PAYS[0][0];
 
 // "tarjeta, Mercado Pago o transferencia" / "transferencia"
 export const payMethodsText = () => {
