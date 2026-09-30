@@ -16,6 +16,7 @@ const AboutPage = lazy(() => import('./pages/AboutPage'));
 const ContactPage = lazy(() => import('./pages/ContactPage'));
 const Login = lazy(() => import('./pages/Login'));
 const Dashboard = lazy(() => import('./pages/Dashboard'));
+const Admin = lazy(() => import('./pages/Admin'));
 const UpdatePassword = lazy(() => import('./pages/UpdatePassword'));
 const BusinessCard = lazy(() => import('./components/BusinessCard'));
 const PrivacyPage = lazy(() => import('./pages/PrivacyPage'));
@@ -67,6 +68,14 @@ function App() {
             element={
               <ProtectedRoute>
                 <Dashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin"
+            element={
+              <ProtectedRoute>
+                <Admin />
               </ProtectedRoute>
             }
           />

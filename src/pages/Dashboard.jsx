@@ -6,6 +6,7 @@ import Wordmark from '../components/Wordmark';
 import { PortalLoading } from '../components/ProtectedRoute';
 import DomainSection from '../components/DomainSection';
 import { OFFERS, PAYS, ACTIVE_PAYS, DEFAULT_PAY, ORDER_STATUS, clp, placeOrder, rutOk } from '../lib/orders';
+import { CATEGORIES, catLabel, TICKET_STATUS as STATUS, isOpen, parseDate, fmt, daysFrom, dayWord, hasServices, firstName } from '../lib/portal';
 
 // Portal del cliente ("Tu cuenta, en orden"): dominio, plan y pagos, correos,
 // estado del sitio, documentos y soporte. Sin estadísticas: esas son internas.
@@ -15,37 +16,6 @@ import { OFFERS, PAYS, ACTIVE_PAYS, DEFAULT_PAY, ORDER_STATUS, clp, placeOrder, 
 // Una cuenta nueva (sin servicios) entra directo a "Contratar": dominio, hosting
 // o pack. Los pedidos van a la tabla orders (portal_registro_pedidos_2026_09_24.sql).
 
-const CATEGORIES = [
-    { id: 'general', label: 'Consulta general' },
-    { id: 'contenido', label: 'Cambios en mi sitio' },
-    { id: 'correo', label: 'Correos' },
-    { id: 'dns', label: 'Cambio de DNS' },
-    { id: 'pagos', label: 'Pagos y facturación' },
-];
-const catLabel = (id) => CATEGORIES.find((c) => c.id === id)?.label || 'Consulta general';
-
-const STATUS = {
-    pending: { label: 'En revisión', cls: 'hot' },
-    in_progress: { label: 'En curso', cls: 'hot' },
-    solved: { label: 'Resuelto', cls: 'ok' },
-};
-const isOpen = (t) => t.status !== 'solved';
-
-// Fechas 'AAAA-MM-DD' como fecha local (sin correrse un día por la zona horaria)
-const parseDate = (v) => {
-    if (!v) return null;
-    const [y, m, d] = String(v).slice(0, 10).split('-').map(Number);
-    return y && m && d ? new Date(y, m - 1, d) : null;
-};
-const fmt = (d) => d?.toLocaleDateString('es-CL', { day: '2-digit', month: 'short', year: 'numeric' }).replace('.', '');
-const daysFrom = (d) => {
-    if (!d) return null;
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    return Math.round((d - today) / 86400000);
-};
-const dayWord = (n) => (Math.abs(n) === 1 ? 'día' : 'días');
-
 const parseEmails = (raw) => {
     try {
         const list = typeof raw === 'string' ? JSON.parse(raw) : raw;
@@ -53,18 +23,6 @@ const parseEmails = (raw) => {
     } catch {
         return [];
     }
-};
-
-// ¿Tiene algo contratado? Si no, solo "Contratar" está habilitado; el resto se
-// desbloquea al tener un servicio. plan_type y hosting_plan NO cuentan: la base
-// les pone 'basic' y 'Plan Básico' por defecto a toda ficha nueva.
-const hasServices = (p, orders = []) =>
-    !!(p?.domain_name || p?.active_web || orders.some((o) => o.status === 'activo'));
-
-// "VICTOR ANDRÉS" → "Victor"; para el saludo y la barra superior
-const firstName = (full) => {
-    const w = String(full || '').trim().split(/\s+/)[0] || '';
-    return w ? w.charAt(0).toLocaleUpperCase('es-CL') + w.slice(1).toLocaleLowerCase('es-CL') : '';
 };
 
 const Lock = () => (
@@ -83,6 +41,7 @@ const Dashboard = () => {
     const [loading, setLoading] = useState(true);
     const [tab, setTab] = useState(null); // se decide al cargar
     const [composing, setComposing] = useState(false);
+    const [isAdmin, setIsAdmin] = useState(false);
 
     const loadTickets = useCallback(async (uid) => {
         const { data } = await supabase.from('tickets').select('*').eq('user_id', uid).order('created_at', { ascending: false });
@@ -109,6 +68,8 @@ const Dashboard = () => {
                 supabase.from('documents').select('*').eq('user_id', u.id).order('created_at', { ascending: false }),
             ]);
             setProfile(p || null);
+            // Sin el SQL del panel la función no existe: simplemente no es admin
+            supabase.rpc('is_admin').then(({ data }) => setIsAdmin(data === true));
             setDocuments(docs || []);
             const [, ords] = await Promise.all([loadTickets(u.id), loadOrders(u.id)]);
             setTab(hasServices(p, ords) ? 'resumen' : 'contratar');
@@ -160,6 +121,7 @@ const Dashboard = () => {
                                     <small>{active ? 'Cliente Interfaz 360' : 'Cuenta de cliente'}</small>
                                 </span>
                             </button>
+                            {isAdmin && <Link to="/admin" className="btn signal">Administración</Link>}
                             <button type="button" className="btn" onClick={logout}>Cerrar sesión</button>
                         </div>
                     </div>

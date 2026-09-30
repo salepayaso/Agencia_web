@@ -58,6 +58,8 @@
   & .nav .right { display: flex; align-items: center; gap: 14px; }
   & .nav .client { font-size: 13px; font-weight: 600; color: var(--ink-2); text-decoration: none; }
   & .nav .client:hover { color: var(--ink); }
+  & .nav .client.in { display: inline-flex; align-items: center; gap: 8px; color: var(--ink); border: 1.5px solid var(--ink); padding: 8px 12px; }
+  & .nav .client.in .dot { width: 8px; height: 8px; background: var(--ok); }
   & .nav .btn { padding: 10px 14px; font-size: 13px; }
   & .nav .burger { display: none; background: none; border: 1.5px solid var(--ink); width: 42px; height: 42px; place-items: center; padding: 0; }
   & .nav .burger svg { width: 20px; height: 20px; }
@@ -478,6 +480,20 @@
   & .portal-head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: end; gap: 20px; padding-block: 48px 28px; }
   & .portal-head h1 { font-size: clamp(44px, 6vw, 80px); }
   & .portal-head h1 span { color: var(--signal); }
+  /* Panel de administración */
+  & .admin-tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; }
+  & .admin-tile { display: grid; gap: 6px; text-align: left; padding: 22px; cursor: pointer; font: inherit; color: var(--ink); }
+  & .admin-tile b { font-family: var(--display); font-size: 56px; line-height: 1; font-weight: 800; }
+  & .admin-tile.hot b { color: var(--signal); }
+  & .admin-tile span { font-weight: 800; font-size: 17px; }
+  & .admin-tile small { color: var(--ink-2); font-size: 14px; }
+  & .admin-tile:hover { background: var(--paper-2); }
+  & .admin-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
+  & .admin-actions .btn { padding: 9px 14px; font-size: 14px; }
+  & .admin-input { flex: 1 1 220px; min-width: 0; background: var(--white); border: 1.5px solid var(--rule); color: var(--ink); font: 500 15px var(--body); padding: 9px 11px; border-radius: 0; }
+  & .admin-input:focus { border-color: var(--ink); outline: none; box-shadow: 3px 3px 0 var(--signal); }
+  & .admin-form { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px; }
+  & .admin-form .wide { grid-column: 1 / -1; }
   & .portal-head .portal-lede { margin: 12px 0 0; font-size: 17px; color: var(--ink-2); max-width: 52ch; }
   & .portal-grid { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr); gap: 32px; align-items: start; padding-bottom: 80px; }
   @media (max-width: 960px) { & .portal-grid { grid-template-columns: minmax(0, 1fr); } }
