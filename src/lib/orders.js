@@ -77,10 +77,13 @@ export const holderFromProfile = (profile, user) => ({
  * - Con cuenta: lo guarda en orders y actualiza los datos del titular en la ficha.
  *   Si esas tablas/columnas aún no existen (SQL sin correr), sigue igual con el aviso.
  * - Siempre: nos avisa por correo con /api/contact.
+ * - renewal: renovación del dominio que ya está en la ficha. Es un pedido de
+ *   'dominio' normal; al activarlo, la base extiende el vencimiento (trigger
+ *   order_activated en admin_panel_2026_09_30.sql).
  * Lanza error si la cuenta llegó al tope diario de pedidos ('limite_diario'),
  * o si el aviso por correo falla y tampoco se pudo guardar.
  */
-export const placeOrder = async ({ user, kind, domain, years = 1, pay, holder }) => {
+export const placeOrder = async ({ user, kind, domain, years = 1, pay, holder, renewal = false }) => {
     const offer = OFFERS[kind];
     const plan = offer.years[years];
     let saved = false;
@@ -109,7 +112,7 @@ export const placeOrder = async ({ user, kind, domain, years = 1, pay, holder })
     }
 
     const lines = [
-        `PEDIDO: ${offer.title}${domain ? ` · ${domain}` : ''}`,
+        `${renewal ? 'RENOVACIÓN' : 'PEDIDO'}: ${offer.title}${domain ? ` · ${domain}` : ''}`,
         `Plan: ${plan.label} · ${clp(plan.price)}`,
         `Forma de pago elegida: ${PAYS[pay].label}`,
         `Cuenta de cliente: ${user ? `sí (${user.email})${saved ? ', pedido guardado en el portal' : ''}` : 'no'}`,
@@ -147,6 +150,6 @@ export const placeOrder = async ({ user, kind, domain, years = 1, pay, holder })
     }
 
     if (!mailed && !saved) throw new Error('order_failed');
-    window.dataLayer?.push({ event: 'order_placed', order_kind: kind, domain_name: domain, plan_years: years, payment: pay });
+    window.dataLayer?.push({ event: renewal ? 'renewal_placed' : 'order_placed', order_kind: kind, domain_name: domain, plan_years: years, payment: pay });
     return { saved, mailed };
 };

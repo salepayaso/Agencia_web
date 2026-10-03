@@ -189,12 +189,14 @@ const OrderRow = ({ order: o, client, onChanged }) => {
     };
 
     const next = NEXT[o.status];
+    // Pedido de dominio para el mismo dominio que ya está en la ficha = renovación
+    const renewal = o.kind === 'dominio' && o.status !== 'activo' && !!o.domain && client?.domain_name === o.domain;
     const mailSubject = encodeURIComponent(`Tu pedido ${OFFERS[o.kind]?.title || ''}${o.domain ? ` · ${o.domain}` : ''}`);
 
     return (
         <article className="ticket">
             <div className="t-top">
-                <h3>{OFFERS[o.kind]?.title || o.kind}{o.domain ? ` · ${o.domain}` : ''}</h3>
+                <h3>{renewal ? 'Renovación · ' : ''}{OFFERS[o.kind]?.title || o.kind}{o.domain ? ` · ${o.domain}` : ''}</h3>
                 <span className={`pill ${ORDER_STATUS[o.status]?.cls || ''}`}>{ORDER_STATUS[o.status]?.label || o.status}</span>
             </div>
             <span className="meta">
@@ -214,7 +216,10 @@ const OrderRow = ({ order: o, client, onChanged }) => {
                 {email && <a className="textlink" href={`mailto:${email}?subject=${mailSubject}`}>Correo</a>}
                 {wa && <a className="textlink" href={wa} target="_blank" rel="noreferrer">WhatsApp</a>}
             </div>
-            {o.status === 'pagado' && (o.kind === 'dominio' || o.kind === 'pack') && (
+            {o.status === 'pagado' && renewal && (
+                <p className="muted" style={{ margin: 0, fontSize: 13 }}>Renueva primero en NIC. Al activar, el vencimiento de la ficha se extiende {o.years} {o.years === 1 ? 'año' : 'años'} (desde la fecha actual si ya venció; corrígela en Clientes si NIC indica otra).</p>
+            )}
+            {o.status === 'pagado' && !renewal && (o.kind === 'dominio' || o.kind === 'pack') && (
                 <p className="muted" style={{ margin: 0, fontSize: 13 }}>Al activar, la ficha del cliente queda con el dominio y vence en {o.years} {o.years === 1 ? 'año' : 'años'}.</p>
             )}
             {error && <p className="alert" role="alert">{error}</p>}

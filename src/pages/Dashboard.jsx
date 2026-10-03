@@ -41,6 +41,7 @@ const Dashboard = () => {
     const [loading, setLoading] = useState(true);
     const [tab, setTab] = useState(null); // se decide al cargar
     const [composing, setComposing] = useState(false);
+    const [renewing, setRenewing] = useState(false);
     const [isAdmin, setIsAdmin] = useState(false);
 
     const loadTickets = useCallback(async (uid) => {
@@ -92,6 +93,7 @@ const Dashboard = () => {
     const first = firstName(fullName);
     const initial = (first || user?.email || '?').charAt(0).toUpperCase();
     const newRequest = () => { setTab('soporte'); setComposing(true); };
+    const startRenewal = () => { setTab('contratar'); setRenewing(true); };
     const locked = 'Se habilita cuando tengas un servicio activo con nosotros';
     // Contratar y Mis datos siempre; el resto solo con un servicio activo
     const isLocked = (id) => !active && !['contratar', 'datos'].includes(id);
@@ -149,10 +151,17 @@ const Dashboard = () => {
                         </div>
 
                         {tab === 'contratar' && (
-                            <Hire user={user} orders={orders} onOrdered={() => loadOrders(user.id)} />
+                            <Hire
+                                user={user}
+                                profile={profile}
+                                orders={orders}
+                                renewing={renewing}
+                                setRenewing={setRenewing}
+                                onOrdered={() => loadOrders(user.id)}
+                            />
                         )}
                         {tab === 'resumen' && (
-                            <Overview profile={profile} user={user} documents={documents} tickets={tickets} onNewRequest={newRequest} goTo={setTab} />
+                            <Overview profile={profile} user={user} documents={documents} tickets={tickets} orders={orders} onNewRequest={newRequest} onRenew={startRenewal} goTo={setTab} />
                         )}
                         {tab === 'soporte' && (
                             <Support
@@ -199,11 +208,22 @@ const OFFER_CARDS = [
     },
 ];
 
-const Hire = ({ user, orders, onOrdered }) => {
+// Renovación del dominio de la ficha: ¿ya hay un pedido en curso para él?
+const renewalInProgress = (profile, orders) =>
+    orders.some((o) => o.kind === 'dominio' && o.domain === profile?.domain_name && (o.status === 'pendiente' || o.status === 'pagado'));
+
+const Hire = ({ user, profile, orders, renewing, setRenewing, onOrdered }) => {
     const [picked, setPicked] = useState(null); // dominio | hosting | pack
+    const myDomain = profile?.domain_name || null;
 
     return (
         <div style={{ display: 'grid', gap: 32, paddingBottom: 80 }}>
+            {myDomain && (renewing ? (
+                <RenewDomain user={user} profile={profile} onDone={onOrdered} onCancel={() => setRenewing(false)} />
+            ) : (
+                <MyDomainCard profile={profile} inProgress={renewalInProgress(profile, orders)} onRenew={() => setRenewing(true)} />
+            ))}
+
             {picked === 'hosting' ? (
                 <HostingOrder user={user} onDone={onOrdered} onCancel={() => setPicked(null)} />
             ) : picked ? (
@@ -257,6 +277,120 @@ const Hire = ({ user, orders, onOrdered }) => {
                 )}
             </section>
         </div>
+    );
+};
+
+// Estado del dominio según los días que le quedan (null = sin fecha cargada)
+const domainStatus = (dLeft) => (dLeft === null ? null
+    : dLeft < 0 ? { t: 'Vencido', c: 'bad' }
+        : dLeft <= 30 ? { t: 'Por vencer', c: 'warn' }
+            : { t: 'Vigente', c: '' });
+
+const MyDomainCard = ({ profile, inProgress, onRenew }) => {
+    const expires = parseDate(profile?.domain_expires);
+    const dLeft = daysFrom(expires);
+    const st = domainStatus(dLeft);
+    const expired = dLeft !== null && dLeft < 0;
+
+    return (
+        <section className="panel">
+            <div className="box-title">
+                <b>Tu dominio · {profile.domain_name}</b>
+                {st && <span className={`pill ${st.c === 'bad' ? 'hot' : st.c === '' ? 'ok' : ''}`}>{st.t}</span>}
+            </div>
+            <div className="box-body">
+                <p className="muted" style={{ margin: 0, fontSize: 15 }}>
+                    {expires
+                        ? expired
+                            ? `Venció el ${fmt(expires)} y está suspendido. Reactívalo pagando la renovación: apenas se confirme el pago, vuelve a funcionar.`
+                            : `Vence el ${fmt(expires)} (quedan ${dLeft} ${dayWord(dLeft)}). Puedes renovarlo cuando quieras; el año nuevo se suma a la fecha actual.`
+                        : 'Todavía no cargamos la fecha de vencimiento. Puedes renovarlo igual.'}
+                </p>
+                {inProgress ? (
+                    <p className="alert ok" role="status" style={{ margin: 0 }}>
+                        Tu renovación ya está en curso. Mira el estado en "Tus pedidos", más abajo.
+                    </p>
+                ) : (
+                    <div>
+                        <button type="button" className={`btn ${expired || (dLeft !== null && dLeft <= 30) ? 'signal' : 'solid'}`} onClick={onRenew}>
+                            {expired ? 'Reactivar mi dominio →' : 'Renovar mi dominio →'}
+                        </button>
+                    </div>
+                )}
+            </div>
+        </section>
+    );
+};
+
+const RenewDomain = ({ user, profile, onDone, onCancel }) => {
+    const domain = profile.domain_name;
+    const [years, setYears] = useState(1);
+    const [pay, setPay] = useState(DEFAULT_PAY);
+    const [sending, setSending] = useState(false);
+    const [error, setError] = useState('');
+    const [done, setDone] = useState(false);
+    const price = OFFERS.dominio.years[years].price;
+
+    const submit = async (e) => {
+        e.preventDefault();
+        setSending(true);
+        setError('');
+        try {
+            await placeOrder({ user, kind: 'dominio', domain, years, pay, holder: null, renewal: true });
+            setDone(true);
+            onDone?.();
+        } catch (err) {
+            setError(err?.message === 'limite_diario'
+                ? 'Llegaste al máximo de pedidos por hoy. Si necesitas algo más, escríbenos en Soporte.'
+                : 'No pudimos enviar la renovación. Intenta de nuevo en un momento.');
+        } finally {
+            setSending(false);
+        }
+    };
+
+    return (
+        <section className="panel">
+            <div className="box-title">
+                <b>Renovar {domain}</b>
+                <button type="button" className="textlink" onClick={onCancel}>Cerrar</button>
+            </div>
+            {done ? (
+                <div className="box-body">
+                    <p className="alert ok" role="status">
+                        Recibimos tu renovación. Te escribimos a {user.email} con {pay === 'tr' ? 'los datos para transferir' : 'el enlace de pago'}.
+                        Apenas se confirme, renovamos {domain} y verás la nueva fecha de vencimiento en tu Resumen.
+                    </p>
+                    <div><button type="button" className="textlink" onClick={onCancel}>Volver a Contratar</button></div>
+                </div>
+            ) : (
+                <form className="box-body" onSubmit={submit} noValidate>
+                    <div style={{ display: 'grid', gap: 8 }}>
+                        <span className="field">¿Por cuánto tiempo?</span>
+                        <div className="toggles" role="radiogroup" aria-label="Años de renovación">
+                            {Object.entries(OFFERS.dominio.years).map(([y, p]) => (
+                                <button key={y} type="button" role="radio" aria-checked={years === Number(y)} aria-pressed={years === Number(y)} onClick={() => setYears(Number(y))}>
+                                    {p.label} · {clp(p.price)}
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+                    <div style={{ display: 'grid', gap: 8 }}>
+                        <span className="field">¿Cómo quieres pagar?</span>
+                        <div className="toggles" role="radiogroup" aria-label="Forma de pago">
+                            {ACTIVE_PAYS.map(([id, p]) => (
+                                <button key={id} type="button" role="radio" aria-checked={pay === id} aria-pressed={pay === id} onClick={() => setPay(id)} title={p.note}>{p.label}</button>
+                            ))}
+                        </div>
+                    </div>
+                    <p className="muted" style={{ margin: 0, fontSize: 14 }}>El titular y la configuración del dominio no cambian.</p>
+                    {error && <p className="alert" role="alert">{error}</p>}
+                    <div style={{ display: 'flex', gap: 14, alignItems: 'center', flexWrap: 'wrap' }}>
+                        <button type="submit" className="btn signal" disabled={sending}>{sending ? 'Enviando…' : `Confirmar renovación · ${clp(price)} →`}</button>
+                        <span className="muted" style={{ fontSize: 13 }}>No se cobra ahora: te enviamos el pago por correo.</span>
+                    </div>
+                </form>
+            )}
+        </section>
     );
 };
 
@@ -328,7 +462,7 @@ const HostingOrder = ({ user, onDone, onCancel }) => {
 
 /* ---------------- Resumen ---------------- */
 
-const Overview = ({ profile, user, documents, tickets, onNewRequest, goTo }) => {
+const Overview = ({ profile, user, documents, tickets, orders, onNewRequest, onRenew, goTo }) => {
     const emails = parseEmails(profile?.additional_emails);
     const emailLimit = parseInt(profile?.email_count, 10) || null;
 
@@ -336,10 +470,9 @@ const Overview = ({ profile, user, documents, tickets, onNewRequest, goTo }) => 
     const domain = profile?.domain_name || profile?.active_web || null;
     const expires = parseDate(profile?.domain_expires);
     const dLeft = daysFrom(expires);
-    const domainSt = dLeft === null ? null
-        : dLeft < 0 ? { t: 'Vencido', c: 'bad' }
-            : dLeft <= 30 ? { t: 'Por vencer', c: 'warn' }
-                : { t: 'Vigente', c: '' };
+    const domainSt = domainStatus(dLeft);
+    // Botón para renovar o reactivar: solo si el dominio está en la ficha y vence pronto o ya venció
+    const canRenew = !!profile?.domain_name && dLeft !== null && dLeft <= 30 && !renewalInProgress(profile, orders);
 
     // Plan y pago
     const plan = [profile?.plan_type, profile?.billing_cycle].filter(Boolean).join(' · ');
@@ -380,7 +513,9 @@ const Overview = ({ profile, user, documents, tickets, onNewRequest, goTo }) => 
                                     : 'Fecha de vencimiento por cargar'}
                             </small>
                         </dd>
-                        {domainSt ? <span className={`st ${domainSt.c}`}>{domainSt.t}</span> : <span className="st ghost">—</span>}
+                        {canRenew
+                            ? <button type="button" className={`st ${domainSt.c}`} style={{ cursor: 'pointer' }} onClick={onRenew}>{dLeft < 0 ? 'Reactivar →' : 'Renovar →'}</button>
+                            : domainSt ? <span className={`st ${domainSt.c}`}>{domainSt.t}</span> : <span className="st ghost">—</span>}
                     </div>
                     <div className="row">
                         <dt>Plan</dt>
@@ -434,6 +569,9 @@ const Overview = ({ profile, user, documents, tickets, onNewRequest, goTo }) => 
                 </dl>
                 {!profile && (
                     <div className="foot">Estamos terminando de cargar tu cuenta. Si ves algo incompleto, escríbenos en Soporte.</div>
+                )}
+                {canRenew && dLeft < 0 && (
+                    <div className="foot">Tu dominio venció y está suspendido. Reactívalo con el botón “Reactivar” pagando la renovación.</div>
                 )}
             </div>
 
