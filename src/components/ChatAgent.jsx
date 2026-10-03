@@ -600,7 +600,8 @@ const ChatAgent = () => {
                                         Ahora no, gracias
                                     </button>
                                     <p className="text-[11px] text-ink-2 text-center leading-snug">
-                                        Solo los usamos para continuar tu atención y responderte si lo necesitas.
+                                        Te responde un asistente de IA y guardamos la conversación para darte seguimiento.{' '}
+                                        <a href="/privacidad" target="_blank" rel="noopener noreferrer" className="underline hover:text-ink">Privacidad</a>
                                     </p>
                                 </motion.form>
                             )}
@@ -657,6 +658,10 @@ const ChatAgent = () => {
                             >
                                 ¿Prefieres WhatsApp? Escríbenos al +56 9 5414 6176
                             </a>
+                            <p className="text-center text-[10px] text-ink-2/80 mt-1">
+                                Asistente de IA · la conversación se guarda ·{' '}
+                                <a href="/privacidad" target="_blank" rel="noopener noreferrer" className="underline hover:text-ink">Privacidad</a>
+                            </p>
                         </div>
                     </motion.div>
                 )}

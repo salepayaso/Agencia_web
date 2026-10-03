@@ -427,6 +427,9 @@
   & .legal-text h2 { margin: 0 0 8px; font-size: 21px; font-weight: 700; color: var(--ink); }
   & .legal-text p, & .legal-text li { color: var(--ink-2); }
   & .legal-text a { color: var(--ink); font-weight: 700; text-decoration-color: var(--signal); }
+  & .legal-text p + p, & .legal-text ul + p, & .legal-text p + ul { margin-top: 12px; }
+  & .legal-text ul { list-style: disc; padding-left: 1.25em; display: grid; gap: 6px; }
+  & .legal-text strong { color: var(--ink); }
 
   /* ---------- acceso de clientes ---------- */
   &.auth { min-height: 100vh; display: grid; grid-template-columns: 1fr 1fr; }
