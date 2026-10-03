@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import Wordmark from './Wordmark';
+import { openCookieSettings } from '../lib/consent';
 
 const Footer = () => (
     <div className="tc">
@@ -45,6 +46,7 @@ const Footer = () => (
                     <nav aria-label="Legal">
                         <Link to="/privacidad">Privacidad</Link>
                         <Link to="/terminos">Términos</Link>
+                        <button type="button" onClick={openCookieSettings}>Cookies</button>
                     </nav>
                 </div>
             </div>

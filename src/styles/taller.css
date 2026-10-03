@@ -342,6 +342,8 @@
   & .foot-site a:hover { color: #fff; }
   & .foot-site .legal { grid-column: 1 / -1; border-top: 1px solid #26324a; padding-top: 20px; display: flex; flex-wrap: wrap; justify-content: space-between; gap: 10px; font-size: 13px; }
   & .foot-site .legal nav { display: flex; gap: 18px; }
+  & .foot-site .legal nav button { background: none; border: 0; padding: 0; font: inherit; color: inherit; cursor: pointer; }
+  & .foot-site .legal nav button:hover { color: #fff; }
   @media (max-width: 820px) { & .foot-site .max { grid-template-columns: 1fr 1fr; } }
   @media (max-width: 480px) { & .foot-site .max { grid-template-columns: 1fr; } }
 

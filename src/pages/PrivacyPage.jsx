@@ -234,14 +234,19 @@ const PrivacyPage = () => {
                         <section>
                             <h2>Cookies y medición</h2>
                             <p>
-                                Usamos Google Tag Manager y Google Analytics, que instalan cookies para contar visitas y
-                                entender cómo se llega al sitio (por ejemplo, desde un anuncio). Vercel Analytics mide visitas
-                                sin usar cookies. El chat guarda datos temporales en tu navegador solo mientras dura la
-                                pestaña, para no perder la conversación al cambiar de página.
+                                Usamos Google Tag Manager y Google Analytics para contar visitas y entender cómo se llega al
+                                sitio (por ejemplo, desde un anuncio de Google). Instalan cookies, por eso <strong>solo se
+                                activan si las aceptas</strong> en el aviso que aparece al entrar. Si eliges "Solo
+                                necesarias", no se cargan.
                             </p>
                             <p>
-                                Puedes bloquear o borrar las cookies desde la configuración de tu navegador, o instalar el
-                                complemento de inhabilitación de Google Analytics. El sitio sigue funcionando igual.
+                                Sin pedir permiso usamos solo lo necesario para que el sitio funcione: Vercel Analytics, que
+                                cuenta visitas de forma agregada y sin cookies; los datos temporales del chat, que se guardan
+                                en tu navegador mientras dura la pestaña; la sesión del portal si inicias sesión; y tu
+                                elección sobre las cookies.
+                            </p>
+                            <p>
+                                Puedes cambiar tu elección cuando quieras desde el enlace "Cookies" al pie de cada página.
                             </p>
                         </section>
 

@@ -5,6 +5,7 @@ import ScrollToTop from './components/ScrollToTop';
 import ProtectedRoute from './components/ProtectedRoute';
 import ScrollProgress from './components/ScrollProgress';
 import GTMTracker from './components/GTMTracker';
+import CookieBanner from './components/CookieBanner';
 import SessionManager from './components/SessionManager';
 import { SpeedInsights } from '@vercel/speed-insights/react';
 import { Analytics } from '@vercel/analytics/react';
@@ -45,6 +46,7 @@ function App() {
   return (
     <Router>
       <GTMTracker />
+      <CookieBanner />
       <AuthHandler />
       <SessionManager />
       <ScrollToTop />
