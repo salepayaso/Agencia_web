@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { OFFERS, PAYS, ACTIVE_PAYS, DEFAULT_PAY, payMethodsText, clp, rutOk, loadAccount, holderFromProfile, placeOrder } from '../lib/orders';
+import { OFFERS, PAYS, ACTIVE_PAYS, DEFAULT_PAY, payMethodsText, clp, rutOk, loadAccount, holderFromProfile, submitOrder as sendOrder } from '../lib/orders';
 
 // Buscador de dominios .cl con compra en 3 pasos: datos del titular → plan y
 // forma de pago → listo.
@@ -105,13 +105,17 @@ const DomainSection = ({ embedded = false, kind = 'dominio', onOrdered, onCancel
         setSending(true);
         setFormError('');
         try {
-            await placeOrder({ user: account.user, kind, domain, years: Number(years), pay, holder: data });
+            await sendOrder({ user: account.user, kind, domain, years: Number(years), pay, holder: data });
             setStep(3);
             onOrdered?.();
         } catch (err) {
             setFormError(err?.message === 'limite_diario'
                 ? 'Llegaste al máximo de pedidos por hoy. Si necesitas algo más, escríbenos por WhatsApp.'
-                : 'No pudimos enviar el pedido. Intenta de nuevo o escríbenos por WhatsApp.');
+                : err?.message === 'sin_sesion'
+                    ? 'Tu sesión se cerró. Entra de nuevo a tu cuenta para pagar con tarjeta.'
+                    : pay === 'webpay'
+                        ? 'No pudimos abrir el pago con tarjeta. Intenta de nuevo o elige transferencia.'
+                        : 'No pudimos enviar el pedido. Intenta de nuevo o escríbenos por WhatsApp.');
         } finally {
             setSending(false);
         }
@@ -267,17 +271,26 @@ const DomainSection = ({ embedded = false, kind = 'dominio', onOrdered, onCancel
                             </div>
                             <fieldset className="pay">
                                 <legend>¿Cómo quieres pagar?</legend>
-                                {ACTIVE_PAYS.map(([id, p]) => (
-                                    <label key={id}>
-                                        <input type="radio" name="pay" value={id} checked={pay === id} onChange={(e) => setPay(e.target.value)} />
-                                        <span><b>{p.label}</b><small>{p.note}</small></span>
-                                    </label>
-                                ))}
+                                {ACTIVE_PAYS.map(([id, p]) => {
+                                    // Tarjeta pide cuenta: el pedido pagado queda en el portal
+                                    const locked = p.needsAccount && !loggedIn;
+                                    return (
+                                        <label key={id} aria-disabled={locked || undefined} style={locked ? { opacity: 0.6 } : undefined}>
+                                            <input type="radio" name="pay" value={id} checked={pay === id} disabled={locked} onChange={(e) => setPay(e.target.value)} />
+                                            <span>
+                                                <b>{p.label}</b>
+                                                <small>{locked ? <><Link to="/login">Entra o crea tu cuenta</Link> para pagar con tarjeta</> : p.note}</small>
+                                            </span>
+                                        </label>
+                                    );
+                                })}
                             </fieldset>
                             {formError && <p className="err" role="alert">{formError}</p>}
                             <div className="bnav">
                                 <button className="btn signal" type="submit" disabled={sending}>
-                                    {sending ? 'Enviando…' : `Confirmar pedido · ${clp(plan.price)} →`}
+                                    {pay === 'webpay'
+                                        ? (sending ? 'Abriendo Webpay…' : `Pagar con Webpay · ${clp(plan.price)} →`)
+                                        : (sending ? 'Enviando…' : `Confirmar pedido · ${clp(plan.price)} →`)}
                                 </button>
                                 <button className="link" type="button" onClick={() => setStep(1)}>← Volver</button>
                             </div>

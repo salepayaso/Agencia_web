@@ -162,6 +162,46 @@ const contactDevApi = () => ({
   },
 });
 
+// Sirve /api/webpay/crear y /api/webpay/retorno en desarrollo local (npm run dev),
+// contra el ambiente de integración de Transbank (tarjetas de prueba).
+// Necesita SUPABASE_SERVICE_ROLE_KEY en .env. En producción Vercel usa api/webpay/*.js.
+const webpayDevApi = () => ({
+  name: 'webpay-dev-api',
+  configureServer(server) {
+    server.middlewares.use('/api/webpay', async (req, res) => {
+      const route = new URL(req.url, 'http://localhost');
+      const name = route.pathname.replace(/^\//, '');
+      if (!['crear', 'retorno'].includes(name)) {
+        res.statusCode = 404;
+        return res.end();
+      }
+
+      const chunks = [];
+      for await (const chunk of req) chunks.push(chunk);
+      const raw = Buffer.concat(chunks).toString('utf-8');
+      const type = String(req.headers['content-type'] || '');
+      try {
+        req.body = type.includes('json') ? JSON.parse(raw || '{}')
+          : type.includes('urlencoded') ? Object.fromEntries(new URLSearchParams(raw)) : {};
+      } catch {
+        req.body = {};
+      }
+      req.query = Object.fromEntries(route.searchParams);
+
+      const vercelRes = Object.assign(res, {
+        status(code) { res.statusCode = code; return vercelRes; },
+        json(payload) {
+          res.setHeader('Content-Type', 'application/json');
+          res.end(JSON.stringify(payload));
+          return vercelRes;
+        },
+      });
+      const { default: handler } = await server.ssrLoadModule(`./api/webpay/${name}.js`);
+      await handler(req, vercelRes);
+    });
+  },
+});
+
 // https://vite.dev/config/
 export default defineConfig(({ mode }) => {
   // Expone las claves del .env al middleware de desarrollo (contexto Node).
@@ -173,6 +213,7 @@ export default defineConfig(({ mode }) => {
     domainCheckDevApi(),
     chatDevApi(),
     contactDevApi(),
+    webpayDevApi(),
     ViteImageOptimizer({
       png: {
         quality: 80,

@@ -5,7 +5,7 @@ import SEO from '../components/SEO';
 import Wordmark from '../components/Wordmark';
 import { PortalLoading } from '../components/ProtectedRoute';
 import DomainSection from '../components/DomainSection';
-import { OFFERS, PAYS, ACTIVE_PAYS, DEFAULT_PAY, ORDER_STATUS, clp, placeOrder, rutOk } from '../lib/orders';
+import { OFFERS, PAYS, ACTIVE_PAYS, DEFAULT_PAY, clp, submitOrder, rutOk, isOpenOrder, isUnpaidCard, orderStatus } from '../lib/orders';
 import { CATEGORIES, catLabel, TICKET_STATUS as STATUS, isOpen, parseDate, fmt, daysFrom, dayWord, hasServices, firstName } from '../lib/portal';
 
 // Portal del cliente ("Tu cuenta, en orden"): dominio, plan y pagos, correos,
@@ -23,6 +23,20 @@ const parseEmails = (raw) => {
     } catch {
         return [];
     }
+};
+
+// Vuelta desde Webpay: api/webpay/retorno.js manda a /dashboard?pago=<estado>&pedido=<id>
+const PAGO_MSG = {
+    ok: { cls: 'ok', t: (n) => `Pago recibido${n ? ` (pedido N.º ${n})` : ''}. Lo activamos dentro de un día hábil y te avisamos aquí.` },
+    rechazado: { cls: '', t: () => 'El pago fue rechazado y no se hizo ningún cobro. Puedes intentarlo de nuevo o elegir transferencia.' },
+    anulado: { cls: '', t: () => 'Anulaste el pago en Webpay. No se hizo ningún cobro.' },
+    error: { cls: '', t: (n) => `No pudimos confirmar el pago${n ? ` del pedido N.º ${n}` : ''}. Si ves un cargo en tu tarjeta, escríbenos en Soporte y lo revisamos.` },
+};
+
+const readPago = () => {
+    const q = new URLSearchParams(window.location.search);
+    const msg = PAGO_MSG[q.get('pago')];
+    return msg ? { ...msg, text: msg.t(q.get('pedido')) } : null;
 };
 
 const Lock = () => (
@@ -43,6 +57,7 @@ const Dashboard = () => {
     const [composing, setComposing] = useState(false);
     const [renewing, setRenewing] = useState(false);
     const [isAdmin, setIsAdmin] = useState(false);
+    const [pago] = useState(readPago);
 
     const loadTickets = useCallback(async (uid) => {
         const { data } = await supabase.from('tickets').select('*').eq('user_id', uid).order('created_at', { ascending: false });
@@ -73,11 +88,13 @@ const Dashboard = () => {
             supabase.rpc('is_admin').then(({ data }) => setIsAdmin(data === true));
             setDocuments(docs || []);
             const [, ords] = await Promise.all([loadTickets(u.id), loadOrders(u.id)]);
-            setTab(hasServices(p, ords) ? 'resumen' : 'contratar');
+            setTab(pago || !hasServices(p, ords) ? 'contratar' : 'resumen');
+            // El aviso de Webpay se muestra una vez: si recarga, no vuelve a salir
+            if (pago) window.history.replaceState(null, '', '/dashboard');
             setLoading(false);
         };
         load();
-    }, [navigate, loadTickets, loadOrders]);
+    }, [navigate, loadTickets, loadOrders, pago]);
 
     const logout = async () => {
         await supabase.auth.signOut();
@@ -88,7 +105,7 @@ const Dashboard = () => {
 
     const openTickets = tickets.filter(isOpen);
     const active = hasServices(profile, orders);
-    const pendingOrders = orders.filter((o) => o.status === 'pendiente' || o.status === 'pagado');
+    const pendingOrders = orders.filter(isOpenOrder);
     const fullName = (profile?.client_name || (profile?.holder_kind === 'persona' ? profile?.holder_name : '') || '').trim();
     const first = firstName(fullName);
     const initial = (first || user?.email || '?').charAt(0).toUpperCase();
@@ -150,6 +167,10 @@ const Dashboard = () => {
                             </div>
                         </div>
 
+                        {pago && (
+                            <p className={`alert ${pago.cls}`} role="status" style={{ marginBottom: 24 }}>{pago.text}</p>
+                        )}
+
                         {tab === 'contratar' && (
                             <Hire
                                 user={user}
@@ -210,7 +231,7 @@ const OFFER_CARDS = [
 
 // Renovación del dominio de la ficha: ¿ya hay un pedido en curso para él?
 const renewalInProgress = (profile, orders) =>
-    orders.some((o) => o.kind === 'dominio' && o.domain === profile?.domain_name && (o.status === 'pendiente' || o.status === 'pagado'));
+    orders.some((o) => o.kind === 'dominio' && o.domain === profile?.domain_name && isOpenOrder(o));
 
 const Hire = ({ user, profile, orders, renewing, setRenewing, onOrdered }) => {
     const [picked, setPicked] = useState(null); // dominio | hosting | pack
@@ -255,7 +276,7 @@ const Hire = ({ user, profile, orders, renewing, setRenewing, onOrdered }) => {
             <section className="panel">
                 <div className="box-title"><b>Tus pedidos</b><span className="muted">{orders.length}</span></div>
                 {orders.length ? orders.map((o) => {
-                    const st = ORDER_STATUS[o.status] || ORDER_STATUS.pendiente;
+                    const st = orderStatus(o);
                     const plan = OFFERS[o.kind]?.years[o.years] || OFFERS[o.kind]?.years[1];
                     return (
                         <article className="ticket" key={o.id}>
@@ -267,8 +288,14 @@ const Hire = ({ user, profile, orders, renewing, setRenewing, onOrdered }) => {
                                 {new Date(o.created_at).toLocaleDateString('es-CL')}{plan ? ` · ${plan.label} · ${clp(plan.price)}` : ''} · {PAYS[o.payment_method]?.label}
                             </span>
                             {o.admin_note && <div className="reply"><b>Nota de Interfaz 360</b>{o.admin_note}</div>}
-                            {o.status === 'pendiente' && !o.admin_note && (
+                            {isUnpaidCard(o) && (
+                                <p className="desc">El pago con tarjeta no se completó y no se hizo ningún cobro. Si aún lo quieres, haz el pedido de nuevo.</p>
+                            )}
+                            {o.status === 'pendiente' && !isUnpaidCard(o) && !o.admin_note && (
                                 <p className="desc">Te escribimos al correo con {o.payment_method === 'tr' ? 'los datos para transferir' : 'el enlace de pago'}.</p>
+                            )}
+                            {o.status === 'pagado' && o.payment_method === 'webpay' && !o.admin_note && (
+                                <p className="desc">Pagaste con tarjeta{o.payment_info?.card_last4 ? ` terminada en ${o.payment_info.card_last4}` : ''}. Lo activamos dentro de un día hábil y te avisamos aquí.</p>
                             )}
                         </article>
                     );
@@ -336,13 +363,14 @@ const RenewDomain = ({ user, profile, onDone, onCancel }) => {
         setSending(true);
         setError('');
         try {
-            await placeOrder({ user, kind: 'dominio', domain, years, pay, holder: null, renewal: true });
+            await submitOrder({ user, kind: 'dominio', domain, years, pay, holder: null, renewal: true });
             setDone(true);
             onDone?.();
         } catch (err) {
             setError(err?.message === 'limite_diario'
                 ? 'Llegaste al máximo de pedidos por hoy. Si necesitas algo más, escríbenos en Soporte.'
-                : 'No pudimos enviar la renovación. Intenta de nuevo en un momento.');
+                : pay === 'webpay' ? 'No pudimos abrir el pago con tarjeta. Intenta de nuevo o elige transferencia.'
+                    : 'No pudimos enviar la renovación. Intenta de nuevo en un momento.');
         } finally {
             setSending(false);
         }
@@ -385,8 +413,12 @@ const RenewDomain = ({ user, profile, onDone, onCancel }) => {
                     <p className="muted" style={{ margin: 0, fontSize: 14 }}>El titular y la configuración del dominio no cambian.</p>
                     {error && <p className="alert" role="alert">{error}</p>}
                     <div style={{ display: 'flex', gap: 14, alignItems: 'center', flexWrap: 'wrap' }}>
-                        <button type="submit" className="btn signal" disabled={sending}>{sending ? 'Enviando…' : `Confirmar renovación · ${clp(price)} →`}</button>
-                        <span className="muted" style={{ fontSize: 13 }}>No se cobra ahora: te enviamos el pago por correo.</span>
+                        <button type="submit" className="btn signal" disabled={sending}>
+                            {pay === 'webpay'
+                                ? (sending ? 'Abriendo Webpay…' : `Pagar con Webpay · ${clp(price)} →`)
+                                : (sending ? 'Enviando…' : `Confirmar renovación · ${clp(price)} →`)}
+                        </button>
+                        <span className="muted" style={{ fontSize: 13 }}>{pay === 'webpay' ? 'Pagas en Webpay, el sitio seguro de Transbank.' : 'No se cobra ahora: te enviamos el pago por correo.'}</span>
                     </div>
                 </form>
             )}
@@ -409,13 +441,14 @@ const HostingOrder = ({ user, onDone, onCancel }) => {
         setSending(true);
         setError('');
         try {
-            await placeOrder({ user, kind: 'hosting', domain: d, years: 1, pay, holder: null });
+            await submitOrder({ user, kind: 'hosting', domain: d, years: 1, pay, holder: null });
             setDone(true);
             onDone?.();
         } catch (err) {
             setError(err?.message === 'limite_diario'
                 ? 'Llegaste al máximo de pedidos por hoy. Si necesitas algo más, escríbenos en Soporte.'
-                : 'No pudimos enviar el pedido. Intenta de nuevo en un momento.');
+                : pay === 'webpay' ? 'No pudimos abrir el pago con tarjeta. Intenta de nuevo o elige transferencia.'
+                    : 'No pudimos enviar el pedido. Intenta de nuevo en un momento.');
         } finally {
             setSending(false);
         }
@@ -451,8 +484,12 @@ const HostingOrder = ({ user, onDone, onCancel }) => {
                     </div>
                     {error && <p className="alert" role="alert">{error}</p>}
                     <div style={{ display: 'flex', gap: 14, alignItems: 'center', flexWrap: 'wrap' }}>
-                        <button type="submit" className="btn signal" disabled={sending}>{sending ? 'Enviando…' : `Confirmar pedido · ${clp(price)} →`}</button>
-                        <span className="muted" style={{ fontSize: 13 }}>No se cobra ahora: te enviamos el pago por correo.</span>
+                        <button type="submit" className="btn signal" disabled={sending}>
+                            {pay === 'webpay'
+                                ? (sending ? 'Abriendo Webpay…' : `Pagar con Webpay · ${clp(price)} →`)
+                                : (sending ? 'Enviando…' : `Confirmar pedido · ${clp(price)} →`)}
+                        </button>
+                        <span className="muted" style={{ fontSize: 13 }}>{pay === 'webpay' ? 'Pagas en Webpay, el sitio seguro de Transbank.' : 'No se cobra ahora: te enviamos el pago por correo.'}</span>
                     </div>
                 </form>
             )}

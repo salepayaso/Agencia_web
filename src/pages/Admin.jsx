@@ -4,7 +4,7 @@ import { supabase } from '../supabase';
 import SEO from '../components/SEO';
 import Wordmark from '../components/Wordmark';
 import { PortalLoading } from '../components/ProtectedRoute';
-import { OFFERS, PAYS, ORDER_STATUS, clp } from '../lib/orders';
+import { OFFERS, PAYS, clp, isOpenOrder, isUnpaidCard, orderStatus } from '../lib/orders';
 import { catLabel, TICKET_STATUS, isOpen, parseDate, fmt, daysFrom, dayWord, hasServices } from '../lib/portal';
 
 // Panel de administración (/admin): pedidos, clientes y soporte sin entrar a Supabase.
@@ -61,7 +61,7 @@ const Admin = () => {
 
     if (loading) return <PortalLoading />;
 
-    const waiting = orders.filter((o) => o.status === 'pendiente');
+    const waiting = orders.filter((o) => o.status === 'pendiente' && isOpenOrder(o));
     const paid = orders.filter((o) => o.status === 'pagado');
     const openTickets = tickets.filter(isOpen);
     const expiring = profiles.filter((p) => {
@@ -130,7 +130,7 @@ const Admin = () => {
 // Hoy: lo que requiere acción ----------------------------------------------------------
 const Today = ({ waiting, paid, openTickets, expiring, goTo }) => {
     const tiles = [
-        { n: waiting.length, t: 'Esperando pago', d: 'Envía el link de Mercado Pago o los datos de transferencia.', go: 'pedidos' },
+        { n: waiting.length, t: 'Esperando pago', d: 'Envía los datos de transferencia. Los pagos con tarjeta llegan solos a "Pagados".', go: 'pedidos' },
         { n: paid.length, t: 'Pagados por activar', d: 'Registra el dominio o activa el hosting y márcalos activos.', go: 'pedidos' },
         { n: openTickets.length, t: 'Solicitudes abiertas', d: 'Respondemos dentro de un día hábil.', go: 'soporte' },
         { n: expiring.length, t: 'Dominios por vencer', d: 'Vencen en 30 días o menos (o ya vencieron).', go: 'clientes' },
@@ -156,7 +156,7 @@ const NEXT = {
 
 const Orders = ({ orders, byId, onChanged }) => {
     const [all, setAll] = useState(false);
-    const list = all ? orders : orders.filter((o) => o.status === 'pendiente' || o.status === 'pagado');
+    const list = all ? orders : orders.filter(isOpenOrder);
     return (
         <section className="panel">
             <div className="box-title">
@@ -188,7 +188,8 @@ const OrderRow = ({ order: o, client, onChanged }) => {
         onChanged();
     };
 
-    const next = NEXT[o.status];
+    // Tarjeta sin completar: no hubo cobro, no se confirma a mano
+    const next = isUnpaidCard(o) ? null : NEXT[o.status];
     // Pedido de dominio para el mismo dominio que ya está en la ficha = renovación
     const renewal = o.kind === 'dominio' && o.status !== 'activo' && !!o.domain && client?.domain_name === o.domain;
     const mailSubject = encodeURIComponent(`Tu pedido ${OFFERS[o.kind]?.title || ''}${o.domain ? ` · ${o.domain}` : ''}`);
@@ -197,10 +198,11 @@ const OrderRow = ({ order: o, client, onChanged }) => {
         <article className="ticket">
             <div className="t-top">
                 <h3>{renewal ? 'Renovación · ' : ''}{OFFERS[o.kind]?.title || o.kind}{o.domain ? ` · ${o.domain}` : ''}</h3>
-                <span className={`pill ${ORDER_STATUS[o.status]?.cls || ''}`}>{ORDER_STATUS[o.status]?.label || o.status}</span>
+                <span className={`pill ${orderStatus(o).cls}`}>{orderStatus(o).label}</span>
             </div>
             <span className="meta">
                 N.º {o.id} · {new Date(o.created_at).toLocaleDateString('es-CL')} · {plan ? `${plan.label} · ${clp(plan.price)}` : ''} · {PAYS[o.payment_method]?.label || o.payment_method}
+                {o.payment_method === 'webpay' && o.payment_info?.authorization_code && ` · Aut. ${o.payment_info.authorization_code}${o.payment_info.card_last4 ? ` · **** ${o.payment_info.card_last4}` : ''}`}
             </span>
             <p className="desc">
                 <b>{clientLabel(client)}</b>{email ? ` · ${email}` : ''}

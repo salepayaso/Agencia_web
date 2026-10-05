@@ -143,8 +143,8 @@ const PrivacyPage = () => {
                                     los datos del titular que exige. NIC Chile publica el nombre del titular en su sistema de consulta.
                                 </li>
                                 <li>
-                                    <strong>Proveedores de pago</strong> (por ejemplo, Mercado Pago), cuando pagas por ese medio.
-                                    Ellos procesan el pago directamente; nosotros no vemos los datos de tu tarjeta.
+                                    <strong>Transbank</strong> (Chile): procesa los pagos con tarjeta vía Webpay.
+                                    Nosotros no vemos ni guardamos los datos de tu tarjeta: solo el resultado del pago y los últimos 4 dígitos.
                                 </li>
                             </ul>
                             <p>
