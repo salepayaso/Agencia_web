@@ -6,17 +6,20 @@ import Wordmark from '../components/Wordmark';
 import { PortalLoading } from '../components/ProtectedRoute';
 import { OFFERS, conIva, PAYS, clp, isOpenOrder, isUnpaidCard, orderStatus } from '../lib/orders';
 import { catLabel, TICKET_STATUS, isOpen, parseDate, fmt, daysFrom, dayWord, hasServices } from '../lib/portal';
+import { QUOTE_STATUS, briefNumber, briefRows, cleanBrief } from '../data/brief';
 
-// Panel de administración (/admin): pedidos, clientes y soporte sin entrar a Supabase.
+// Panel de administración (/admin): cotizaciones, pedidos, clientes y soporte sin entrar a Supabase.
 // Solo para cuentas en la tabla admins (supabase_scripts/admin_panel_2026_09_30.sql).
 // Lee con las políticas "Admin can view all ..." y cambia datos SOLO con las
-// funciones admin_update_order / admin_update_ticket / admin_update_client,
+// funciones admin_update_order / admin_update_ticket / admin_update_client
+// (y admin_create_brief / admin_update_quote, de cotizaciones_2026_10_12.sql),
 // que vuelven a revisar is_admin() en la base. Ocultar esta página no es la
 // seguridad: la seguridad está en la base.
 
 const ERRORS = {
     no_autorizado: 'Tu cuenta no tiene permiso de administrador.',
     estado_invalido: 'Ese estado no es válido.',
+    falta_nombre: 'Escribe el nombre del cliente.',
 };
 const errText = (e) => ERRORS[Object.keys(ERRORS).find((k) => (e?.message || '').includes(k))] || 'No se pudo guardar. Intenta de nuevo.';
 
@@ -34,16 +37,19 @@ const Admin = () => {
     const [profiles, setProfiles] = useState([]);
     const [orders, setOrders] = useState([]);
     const [tickets, setTickets] = useState([]);
+    const [quotes, setQuotes] = useState([]);
 
     const load = useCallback(async () => {
-        const [p, o, t] = await Promise.all([
+        const [p, o, t, q] = await Promise.all([
             supabase.from('profiles').select('*').order('created_at', { ascending: false }),
             supabase.from('orders').select('*').order('created_at', { ascending: false }),
             supabase.from('tickets').select('*').order('created_at', { ascending: false }),
+            supabase.from('quotes').select('*').order('created_at', { ascending: false }),
         ]);
         setProfiles(p.data || []);
         setOrders(o.data || []);
         setTickets(t.data || []);
+        setQuotes(q.data || []);
     }, []);
 
     useEffect(() => {
@@ -64,6 +70,7 @@ const Admin = () => {
     const waiting = orders.filter((o) => o.status === 'pendiente' && isOpenOrder(o));
     const paid = orders.filter((o) => o.status === 'pagado');
     const openTickets = tickets.filter(isOpen);
+    const newBriefs = quotes.filter((x) => x.status === 'brief_recibido');
     const expiring = profiles.filter((p) => {
         const d = daysFrom(parseDate(p.domain_expires));
         return d !== null && d <= 30;
@@ -106,6 +113,7 @@ const Admin = () => {
                             </div>
                             <div className="tabs" role="tablist" aria-label="Secciones del panel">
                                 {tabBtn('hoy', 'Hoy')}
+                                {tabBtn('cotizaciones', 'Cotizaciones', newBriefs.length)}
                                 {tabBtn('pedidos', 'Pedidos', waiting.length + paid.length)}
                                 {tabBtn('clientes', 'Clientes')}
                                 {tabBtn('soporte', 'Soporte', openTickets.length)}
@@ -114,8 +122,9 @@ const Admin = () => {
 
                         <div style={{ paddingBottom: 80 }}>
                             {tab === 'hoy' && (
-                                <Today waiting={waiting} paid={paid} openTickets={openTickets} expiring={expiring} goTo={setTab} />
+                                <Today newBriefs={newBriefs} waiting={waiting} paid={paid} openTickets={openTickets} expiring={expiring} goTo={setTab} />
                             )}
+                            {tab === 'cotizaciones' && <Quotes quotes={quotes} onChanged={load} />}
                             {tab === 'pedidos' && <Orders orders={orders} byId={byId} onChanged={load} />}
                             {tab === 'clientes' && <Clients profiles={profiles} orders={orders} onChanged={load} />}
                             {tab === 'soporte' && <Tickets tickets={tickets} byId={byId} onChanged={load} />}
@@ -128,8 +137,9 @@ const Admin = () => {
 };
 
 // Hoy: lo que requiere acción ----------------------------------------------------------
-const Today = ({ waiting, paid, openTickets, expiring, goTo }) => {
+const Today = ({ newBriefs, waiting, paid, openTickets, expiring, goTo }) => {
     const tiles = [
+        { n: newBriefs.length, t: 'Briefs por cotizar', d: 'Clientes que ya enviaron su brief: prepara la cotización.', go: 'cotizaciones' },
         { n: waiting.length, t: 'Esperando pago', d: 'Envía los datos de transferencia. Los pagos con Webpay o Mercado Pago llegan solos a "Pagados".', go: 'pedidos' },
         { n: paid.length, t: 'Pagados por activar', d: 'Registra el dominio o activa el hosting y márcalos activos.', go: 'pedidos' },
         { n: openTickets.length, t: 'Solicitudes abiertas', d: 'Respondemos dentro de un día hábil.', go: 'soporte' },
@@ -145,6 +155,175 @@ const Today = ({ waiting, paid, openTickets, expiring, goTo }) => {
                 </button>
             ))}
         </div>
+    );
+};
+
+// Cotizaciones: briefs por enlace ----------------------------------------------------------
+const briefLink = (q) => `${window.location.origin}/brief/${q.token}`;
+
+const briefMessage = (q) => {
+    const first = (q.client_name || '').trim().split(' ')[0];
+    return `Hola ${first}, te dejo el enlace para que nos cuentes de tu proyecto: ${briefLink(q)}\nPuedes guardar y volver cuando quieras. Con tus respuestas preparamos tu cotización.\nEquipo Interfaz 360`;
+};
+
+const copyText = async (value) => {
+    try {
+        await navigator.clipboard.writeText(value);
+        return true;
+    } catch {
+        return false;
+    }
+};
+
+const CLOSED = ['publicado', 'cancelada'];
+
+const Quotes = ({ quotes, onChanged }) => {
+    const [all, setAll] = useState(false);
+    const [created, setCreated] = useState(null);
+    const list = all ? quotes : quotes.filter((q) => !CLOSED.includes(q.status));
+
+    return (
+        <div style={{ display: 'grid', gap: 28 }}>
+            <NewBrief onCreated={(q) => { setCreated(q); onChanged(); }} />
+            {created && <LinkBox quote={created} onClose={() => setCreated(null)} />}
+            <section className="panel">
+                <div className="box-title">
+                    <b>{all ? 'Todos los proyectos' : 'Proyectos en curso'}</b>
+                    <button type="button" className="textlink" onClick={() => setAll((v) => !v)}>{all ? 'Ver solo en curso' : `Ver todos (${quotes.length})`}</button>
+                </div>
+                {list.length ? list.map((q) => <QuoteRow key={q.id} quote={q} onChanged={onChanged} />) : (
+                    <p className="empty">No hay proyectos {all ? '' : 'en curso'}. Crea un brief cuando termines de conversar con un cliente.</p>
+                )}
+            </section>
+        </div>
+    );
+};
+
+const NewBrief = ({ onCreated }) => {
+    const empty = { name: '', email: '', phone: '', note: '' };
+    const [f, setF] = useState(empty);
+    const [busy, setBusy] = useState(false);
+    const [error, setError] = useState('');
+    const set = (k) => (e) => setF((x) => ({ ...x, [k]: e.target.value }));
+
+    const submit = async (e) => {
+        e.preventDefault();
+        setBusy(true);
+        setError('');
+        const { data, error: err } = await supabase.rpc('admin_create_brief', { p_name: f.name, p_email: f.email, p_phone: f.phone, p_note: f.note });
+        setBusy(false);
+        if (err) return setError(errText(err));
+        const row = data?.[0];
+        setF(empty);
+        onCreated({ id: row.id, token: row.token, client_name: f.name, client_email: f.email, client_phone: f.phone, created_at: new Date().toISOString() });
+    };
+
+    return (
+        <section className="panel">
+            <div className="box-title"><b>Nuevo brief</b><span>Después de conversar con el cliente</span></div>
+            <form className="box-body" onSubmit={submit} noValidate>
+                <div className="admin-form">
+                    <label className="field">Nombre del cliente<input value={f.name} onChange={set('name')} maxLength={120} required /></label>
+                    <label className="field">Correo<input type="email" value={f.email} onChange={set('email')} maxLength={254} autoCapitalize="none" /></label>
+                    <label className="field">WhatsApp<input type="tel" value={f.phone} onChange={set('phone')} maxLength={30} placeholder="+56 9 1234 5678" /></label>
+                    <label className="field wide">Nota interna <em>(no la ve el cliente)</em><input value={f.note} onChange={set('note')} maxLength={1000} placeholder="Qué conversamos: quiere tienda, viene recomendado por…" /></label>
+                </div>
+                {error && <p className="alert" role="alert">{error}</p>}
+                <div className="admin-actions">
+                    <button type="submit" className="btn signal" disabled={busy}>{busy ? 'Creando…' : 'Crear enlace →'}</button>
+                    <span className="muted" style={{ fontSize: 13 }}>El cliente lo llena sin crear cuenta. Tú le mandas el enlace.</span>
+                </div>
+            </form>
+        </section>
+    );
+};
+
+// Enlace del brief: copiarlo o mandarlo por WhatsApp o correo.
+const LinkBox = ({ quote: q, onClose }) => {
+    const [copied, setCopied] = useState('');
+    const copy = async (what, value) => setCopied(await copyText(value) ? what : 'error');
+    const wa = waLink(q.client_phone);
+    const message = briefMessage(q);
+    return (
+        <section className="panel">
+            <div className="box-title">
+                <b>Enlace del brief · {briefNumber(q)}</b>
+                <button type="button" className="textlink" onClick={onClose}>Cerrar</button>
+            </div>
+            <div className="box-body">
+                <input className="admin-input" readOnly value={briefLink(q)} onFocus={(e) => e.target.select()} aria-label="Enlace del brief" />
+                <div className="admin-actions">
+                    <button type="button" className="btn signal" onClick={() => copy('enlace', briefLink(q))}>Copiar enlace</button>
+                    <button type="button" className="btn" onClick={() => copy('mensaje', message)}>Copiar mensaje</button>
+                    {wa && <a className="textlink" href={`${wa}?text=${encodeURIComponent(message)}`} target="_blank" rel="noreferrer">Enviar por WhatsApp</a>}
+                    {q.client_email && <a className="textlink" href={`mailto:${q.client_email}?subject=${encodeURIComponent('Cuéntanos de tu proyecto')}&body=${encodeURIComponent(message)}`}>Enviar por correo</a>}
+                </div>
+                {copied && (
+                    <p className={copied === 'error' ? 'alert' : 'alert ok'} role="status">
+                        {copied === 'error' ? 'No se pudo copiar: selecciona el enlace y cópialo a mano.' : `Copiaste el ${copied}.`}
+                    </p>
+                )}
+            </div>
+        </section>
+    );
+};
+
+const QuoteRow = ({ quote: q, onChanged }) => {
+    const [status, setStatus] = useState(q.status);
+    const [note, setNote] = useState(q.admin_note || '');
+    const [open, setOpen] = useState(false);
+    const [showLink, setShowLink] = useState(false);
+    const [busy, setBusy] = useState(false);
+    const [error, setError] = useState('');
+    const sent = !!q.brief_sent_at;
+    const brief = sent ? cleanBrief(q.brief) : null;
+    const st = QUOTE_STATUS[q.status] || { label: q.status, cls: '' };
+    const wa = waLink(brief?.telefono || q.client_phone);
+    const email = brief?.correo || q.client_email;
+    const progress = sent ? `brief enviado el ${new Date(q.brief_sent_at).toLocaleDateString('es-CL')}`
+        : q.brief_saved_at ? 'lo empezó a llenar' : 'aún no guarda nada';
+
+    const save = async () => {
+        setBusy(true);
+        setError('');
+        const { error: err } = await supabase.rpc('admin_update_quote', { p_id: q.id, p_status: status, p_note: note });
+        setBusy(false);
+        if (err) return setError(errText(err));
+        onChanged();
+    };
+
+    return (
+        <article className="ticket">
+            <div className="t-top">
+                <h3>{q.client_name}{brief?.negocio ? ` · ${brief.negocio}` : ''}</h3>
+                <span className={`pill ${st.cls}`}>{st.label}</span>
+            </div>
+            <span className="meta">
+                {briefNumber(q)} · creado el {new Date(q.created_at).toLocaleDateString('es-CL')} · {progress}{email ? ` · ${email}` : ''}
+            </span>
+            {sent && (
+                <button type="button" className="textlink" style={{ justifySelf: 'start' }} onClick={() => setOpen((v) => !v)}>{open ? 'Ocultar brief' : 'Ver brief'}</button>
+            )}
+            {open && brief && (
+                <dl className="brief-summary" style={{ padding: 0 }}>
+                    {briefRows(brief, { team: true }).map(([k, v]) => <div key={k}><dt>{k}</dt><dd>{v}</dd></div>)}
+                </dl>
+            )}
+            <div className="admin-actions">
+                <select className="admin-input" style={{ maxWidth: 240 }} value={status} onChange={(e) => setStatus(e.target.value)} aria-label="Estado">
+                    {Object.entries(QUOTE_STATUS).map(([id, s]) => <option key={id} value={id}>{s.label}</option>)}
+                </select>
+                <input className="admin-input" value={note} onChange={(e) => setNote(e.target.value)} maxLength={1000} placeholder="Nota interna (no la ve el cliente)" aria-label="Nota interna" />
+                <button type="button" className="btn signal" disabled={busy} onClick={save}>{busy ? 'Guardando…' : 'Guardar →'}</button>
+            </div>
+            <div className="admin-actions">
+                <button type="button" className="textlink" onClick={() => setShowLink((v) => !v)}>{showLink ? 'Ocultar enlace' : 'Enlace del brief'}</button>
+                {wa && <a className="textlink" href={wa} target="_blank" rel="noreferrer">WhatsApp</a>}
+                {email && <a className="textlink" href={`mailto:${email}`}>Correo</a>}
+            </div>
+            {showLink && <LinkBox quote={q} onClose={() => setShowLink(false)} />}
+            {error && <p className="alert" role="alert">{error}</p>}
+        </article>
     );
 };
 

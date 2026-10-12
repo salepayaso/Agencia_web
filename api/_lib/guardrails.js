@@ -255,6 +255,21 @@ export function isIdentifyLimited(ip) {
     return false;
 }
 
+// Brief por enlace (api/brief.js): leer y guardar es barato, enviar manda dos correos.
+const briefReads = new Map();
+const briefSaves = new Map();
+const briefSends = new Map();
+
+/** Devuelve un mensaje si la IP abusa del brief, o null. action: 'leer' | 'guardar' | 'enviar'. */
+export function checkBriefLimit(ip, action) {
+    const over = action === 'enviar' ? track(briefSends, ip, LIMITS.DAY_MS, 5)
+        : action === 'guardar' ? track(briefSaves, ip, LIMITS.HOUR_MS, 60)
+            : track(briefReads, ip, LIMITS.HOUR_MS, 60);
+    if (!over) return null;
+    console.warn(`[guardrails] tope del brief (${action}): ${ip}`);
+    return 'Hiciste muchos intentos seguidos. Espera un rato o escríbenos por WhatsApp al +56 9 5414 6176.';
+}
+
 const ALLOWED_HOSTS = [
     'interfaz360.cl',
     'www.interfaz360.cl',

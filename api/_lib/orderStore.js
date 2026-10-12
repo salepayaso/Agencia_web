@@ -7,7 +7,7 @@
 import { supabaseConfig } from './leadStore.js';
 import { escapeHtml, avisosFrom } from './leads.js';
 
-function rest(path, { method = 'GET', body, prefer } = {}) {
+export function rest(path, { method = 'GET', body, prefer } = {}) {
     const config = supabaseConfig();
     if (!config) throw new Error('Falta SUPABASE_SERVICE_ROLE_KEY o SUPABASE_URL');
     return fetch(`${config.url}/rest/v1/${path}`, {
@@ -22,7 +22,7 @@ function rest(path, { method = 'GET', body, prefer } = {}) {
     });
 }
 
-async function rows(res, label) {
+export async function rows(res, label) {
     if (!res.ok) {
         console.error(`[orders] ${label}:`, res.status, await res.text());
         throw new Error(`Supabase ${label} ${res.status}`);

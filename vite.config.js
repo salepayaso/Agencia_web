@@ -162,6 +162,33 @@ const contactDevApi = () => ({
   },
 });
 
+// Corre un handler de api/ como lo haría Vercel: req.body, req.query, res.status() y res.json().
+async function runVercelHandler(server, req, res, file) {
+  const route = new URL(req.url, 'http://localhost');
+  const chunks = [];
+  for await (const chunk of req) chunks.push(chunk);
+  const raw = Buffer.concat(chunks).toString('utf-8');
+  const type = String(req.headers['content-type'] || '');
+  try {
+    req.body = type.includes('json') ? JSON.parse(raw || '{}')
+      : type.includes('urlencoded') ? Object.fromEntries(new URLSearchParams(raw)) : {};
+  } catch {
+    req.body = {};
+  }
+  req.query = Object.fromEntries(route.searchParams);
+
+  const vercelRes = Object.assign(res, {
+    status(code) { res.statusCode = code; return vercelRes; },
+    json(payload) {
+      res.setHeader('Content-Type', 'application/json');
+      res.end(JSON.stringify(payload));
+      return vercelRes;
+    },
+  });
+  const { default: handler } = await server.ssrLoadModule(file);
+  await handler(req, vercelRes);
+}
+
 // Sirve los pagos en línea en desarrollo local (npm run dev):
 //   /api/webpay/crear y retorno, contra la integración de Transbank (tarjetas de prueba).
 //   /api/mercadopago/crear y retorno, con MP_ACCESS_TOKEN de prueba (TEST-…). El
@@ -171,36 +198,21 @@ const paymentDevApi = (gateway) => ({
   name: `${gateway}-dev-api`,
   configureServer(server) {
     server.middlewares.use(`/api/${gateway}`, async (req, res) => {
-      const route = new URL(req.url, 'http://localhost');
-      const name = route.pathname.replace(/^\//, '');
+      const name = new URL(req.url, 'http://localhost').pathname.replace(/^\//, '');
       if (!['crear', 'retorno'].includes(name)) {
         res.statusCode = 404;
         return res.end();
       }
-
-      const chunks = [];
-      for await (const chunk of req) chunks.push(chunk);
-      const raw = Buffer.concat(chunks).toString('utf-8');
-      const type = String(req.headers['content-type'] || '');
-      try {
-        req.body = type.includes('json') ? JSON.parse(raw || '{}')
-          : type.includes('urlencoded') ? Object.fromEntries(new URLSearchParams(raw)) : {};
-      } catch {
-        req.body = {};
-      }
-      req.query = Object.fromEntries(route.searchParams);
-
-      const vercelRes = Object.assign(res, {
-        status(code) { res.statusCode = code; return vercelRes; },
-        json(payload) {
-          res.setHeader('Content-Type', 'application/json');
-          res.end(JSON.stringify(payload));
-          return vercelRes;
-        },
-      });
-      const { default: handler } = await server.ssrLoadModule(`./api/${gateway}/${name}.js`);
-      await handler(req, vercelRes);
+      await runVercelHandler(server, req, res, `./api/${gateway}/${name}.js`);
     });
+  },
+});
+
+// Sirve /api/brief en desarrollo local (necesita SUPABASE_SERVICE_ROLE_KEY en .env).
+const briefDevApi = () => ({
+  name: 'brief-dev-api',
+  configureServer(server) {
+    server.middlewares.use('/api/brief', (req, res) => runVercelHandler(server, req, res, './api/brief.js'));
   },
 });
 
@@ -217,6 +229,7 @@ export default defineConfig(({ mode }) => {
     contactDevApi(),
     paymentDevApi('webpay'),
     paymentDevApi('mercadopago'),
+    briefDevApi(),
     ViteImageOptimizer({
       png: {
         quality: 80,

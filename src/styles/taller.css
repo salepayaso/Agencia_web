@@ -536,6 +536,47 @@
   & .pill { font-size: 11px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; border: 1px solid var(--ink); padding: 4px 7px; white-space: nowrap; }
   & .pill.hot { background: var(--signal); border-color: var(--signal); color: #fff; }
   & .pill.ok { border-color: var(--ok); color: var(--ok); }
+  /* Brief por enlace (/brief/:token) */
+  & .brief-grid { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 32px; align-items: start; }
+  @media (max-width: 960px) { & .brief-grid { grid-template-columns: minmax(0, 1fr); } }
+  & .brief-steps { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); border-bottom: 1.5px solid var(--ink); }
+  & .brief-steps li + li { border-left: 1.5px solid var(--ink); }
+  & .brief-steps button { width: 100%; display: flex; align-items: center; gap: 8px; background: none; border: 0; padding: 12px 14px; font-size: 12px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-2); text-align: left; cursor: pointer; }
+  & .brief-steps i { font-style: normal; flex: none; display: inline-grid; place-items: center; width: 22px; height: 22px; border: 1.5px solid currentColor; letter-spacing: 0; }
+  & .brief-steps .on button { background: var(--paper-2); color: var(--ink); }
+  & .brief-steps .on i { background: var(--signal); border-color: var(--signal); color: #fff; }
+  & .brief-steps .done button { color: var(--ink); }
+  & .brief-steps .done i { background: var(--ink); border-color: var(--ink); color: #fff; }
+  @media (max-width: 560px) { & .brief-steps span { display: none; } & .brief-steps button { justify-content: center; } }
+  & .brief-form { gap: 24px; padding: 22px; }
+  & .brief-q { border: 0; margin: 0; padding: 0; display: grid; gap: 10px; min-width: 0; }
+  & .brief-q legend { padding: 0; margin-bottom: 10px; font-size: 16px; font-weight: 700; }
+  & .brief-q > p.muted { margin: -6px 0 0; font-size: 14px; }
+  & .brief-choices { display: grid; gap: 10px; }
+  & .brief-choices.c2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  & .brief-choices.c3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  @media (max-width: 640px) { & .brief-choices.c2, & .brief-choices.c3 { grid-template-columns: minmax(0, 1fr); } }
+  & .brief-choices button { display: grid; gap: 3px; align-content: start; text-align: left; border: 1.5px solid var(--ink); background: var(--white); padding: 12px 14px; color: var(--ink); cursor: pointer; }
+  & .brief-choices button b { font-size: 15px; }
+  & .brief-choices button small { font-size: 13px; color: var(--ink-2); }
+  & .brief-choices button[aria-pressed="true"] { background: var(--ink); color: var(--paper); box-shadow: 4px 4px 0 var(--signal); }
+  & .brief-choices button[aria-pressed="true"] small { color: var(--mute); }
+  & .brief-choices button:not([aria-pressed="true"]):hover { background: var(--paper-2); }
+  & .brief-check { display: flex; gap: 10px; align-items: flex-start; font-size: 15px; cursor: pointer; }
+  & .brief-check input { width: 18px; height: 18px; margin-top: 3px; accent-color: var(--signal); flex: none; }
+  & .brief-nav { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; border-top: 1px solid var(--rule); padding-top: 18px; }
+  & .brief-side { background: var(--ink); color: var(--mute); padding: 22px; display: grid; gap: 14px; box-shadow: 10px 10px 0 var(--signal); }
+  & .brief-side .eyebrow { color: #8fa0bd; }
+  & .brief-side ol { margin: 0; padding-left: 20px; display: grid; gap: 10px; font-size: 15px; }
+  & .brief-side b { color: #fff; }
+  & .brief-side p { margin: 0; font-size: 13px; border-top: 1px solid #2a3852; padding-top: 12px; }
+  & .brief-summary { margin: 0; padding: 6px 18px 14px; display: grid; }
+  & .brief-summary div { display: grid; grid-template-columns: 150px minmax(0, 1fr); gap: 12px; padding: 9px 0; border-bottom: 1px solid var(--rule); font-size: 15px; }
+  & .brief-summary div:last-child { border-bottom: 0; }
+  & .brief-summary dt { color: var(--ink-2); font-weight: 600; }
+  & .brief-summary dd { margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; }
+  @media (max-width: 560px) { & .brief-summary div { grid-template-columns: minmax(0, 1fr); gap: 2px; } }
+
   &.loading { min-height: 100vh; display: grid; place-items: center; }
   &.loading .seal { display: inline-grid; place-items: center; width: 56px; height: 56px; background: var(--signal); color: #fff; font: 900 18px/1 var(--display); animation: tcBlink 1.4s infinite; }
 }
