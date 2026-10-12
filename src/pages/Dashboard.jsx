@@ -799,7 +799,7 @@ const Support = ({ user, profile, tickets, composing, setComposing, onCreated })
 
     const submit = async (e) => {
         e.preventDefault();
-        if (form.title.trim().length < 4) return setError('Escribe un asunto corto, por ejemplo "Cambiar foto de portada".');
+        if (form.title.trim().length < 3) return setError('El asunto es muy breve. Escribe al menos 3 letras, por ejemplo "Cambiar foto de portada".');
         if (form.description.trim().length < 10) return setError('Cuéntanos un poco más para poder ayudarte.');
         setSending(true);
         setError('');
