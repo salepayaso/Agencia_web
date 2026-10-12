@@ -208,11 +208,12 @@ const paymentDevApi = (gateway) => ({
   },
 });
 
-// Sirve /api/brief en desarrollo local (necesita SUPABASE_SERVICE_ROLE_KEY en .env).
+// Sirve /api/brief y /api/cotizacion en desarrollo local (necesita SUPABASE_SERVICE_ROLE_KEY en .env).
 const briefDevApi = () => ({
   name: 'brief-dev-api',
   configureServer(server) {
     server.middlewares.use('/api/brief', (req, res) => runVercelHandler(server, req, res, './api/brief.js'));
+    server.middlewares.use('/api/cotizacion', (req, res) => runVercelHandler(server, req, res, './api/cotizacion.js'));
   },
 });
 

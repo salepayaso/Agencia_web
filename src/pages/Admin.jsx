@@ -10,6 +10,8 @@ import {
     HOSTING_PLANS, PAY_METHODS, DOC_TITLES, cleanDomain,
 } from '../lib/portal';
 import { QUOTE_STATUS, briefNumber, briefRows, cleanBrief } from '../data/brief';
+import { quoteNumber, quoteTotals, quoteError, cleanQuote, draftQuote, clp as money } from '../data/quote';
+import QuoteDocument from '../components/QuoteDocument';
 
 // Panel de administración (/admin): cotizaciones, pedidos, clientes y soporte sin entrar a Supabase.
 // Solo para cuentas en la tabla admins (supabase_scripts/admin_panel_2026_09_30.sql).
@@ -47,15 +49,17 @@ const Admin = () => {
     const [quotes, setQuotes] = useState([]);
     const [documents, setDocuments] = useState([]);
     const [notes, setNotes] = useState({});
+    const [templates, setTemplates] = useState([]);
 
     const load = useCallback(async () => {
-        const [p, o, t, q, d, n] = await Promise.all([
+        const [p, o, t, q, d, n, tp] = await Promise.all([
             supabase.from('profiles').select('*').order('created_at', { ascending: false }),
             supabase.from('orders').select('*').order('created_at', { ascending: false }),
             supabase.from('tickets').select('*').order('created_at', { ascending: false }),
             supabase.from('quotes').select('*').order('created_at', { ascending: false }),
             supabase.from('documents').select('*').order('created_at', { ascending: false }),
             supabase.from('client_notes').select('*'),
+            supabase.from('quote_templates').select('*').eq('active', true).order('sort'),
         ]);
         setProfiles(p.data || []);
         setOrders(o.data || []);
@@ -63,6 +67,7 @@ const Admin = () => {
         setQuotes(q.data || []);
         setDocuments(d.data || []);
         setNotes(Object.fromEntries((n.data || []).map((x) => [x.user_id, x.note])));
+        setTemplates(tp.data || []);
     }, []);
 
     useEffect(() => {
@@ -137,7 +142,7 @@ const Admin = () => {
                             {tab === 'hoy' && (
                                 <Today newBriefs={newBriefs} waiting={waiting} paid={paid} openTickets={openTickets} expiring={expiring} goTo={setTab} />
                             )}
-                            {tab === 'cotizaciones' && <Quotes quotes={quotes} onChanged={load} />}
+                            {tab === 'cotizaciones' && <Quotes quotes={quotes} templates={templates} onChanged={load} />}
                             {tab === 'pedidos' && <Orders orders={orders} byId={byId} onChanged={load} />}
                             {tab === 'clientes' && <Clients profiles={profiles} orders={orders} documents={documents} notes={notes} onChanged={load} />}
                             {tab === 'soporte' && <Tickets tickets={tickets} byId={byId} onChanged={load} />}
@@ -193,7 +198,7 @@ const CLOSED = ['publicado', 'cancelada'];
 // (enviar la cotización) y la 3 (aceptación y pago).
 const MANUAL_STATUS = ['brief_pendiente', 'brief_recibido', 'en_preparacion', 'cancelada'];
 
-const Quotes = ({ quotes, onChanged }) => {
+const Quotes = ({ quotes, templates, onChanged }) => {
     const [all, setAll] = useState(false);
     const [created, setCreated] = useState(null);
     const list = all ? quotes : quotes.filter((q) => !CLOSED.includes(q.status));
@@ -207,7 +212,7 @@ const Quotes = ({ quotes, onChanged }) => {
                     <b>{all ? 'Todos los proyectos' : 'Proyectos en curso'}</b>
                     <button type="button" className="textlink" onClick={() => setAll((v) => !v)}>{all ? 'Ver solo en curso' : `Ver todos (${quotes.length})`}</button>
                 </div>
-                {list.length ? list.map((q) => <QuoteRow key={q.id} quote={q} onChanged={onChanged} />) : (
+                {list.length ? list.map((q) => <QuoteRow key={q.id} quote={q} templates={templates} onChanged={onChanged} />) : (
                     <p className="empty">No hay proyectos {all ? '' : 'en curso'}. Crea un brief cuando termines de conversar con un cliente.</p>
                 )}
             </section>
@@ -284,7 +289,8 @@ const LinkBox = ({ quote: q, onClose }) => {
     );
 };
 
-const QuoteRow = ({ quote: q, onChanged }) => {
+const QuoteRow = ({ quote: q, templates, onChanged }) => {
+    const [editing, setEditing] = useState(false);
     const [status, setStatus] = useState(q.status);
     const [note, setNote] = useState(q.admin_note || '');
     const [open, setOpen] = useState(false);
@@ -336,13 +342,186 @@ const QuoteRow = ({ quote: q, onChanged }) => {
                 <button type="button" className="btn signal" disabled={busy} onClick={save}>{busy ? 'Guardando…' : 'Guardar →'}</button>
             </div>
             <div className="admin-actions">
+                {q.status !== 'cancelada' && (
+                    <button type="button" className="btn" onClick={() => setEditing((v) => !v)}>
+                        {editing ? 'Cerrar cotización' : EDITABLE_QUOTE.includes(q.status) ? (q.quote ? 'Editar cotización' : 'Preparar cotización') : 'Ver cotización'}
+                    </button>
+                )}
                 <button type="button" className="textlink" onClick={() => setShowLink((v) => !v)}>{showLink ? 'Ocultar enlace' : 'Enlace del brief'}</button>
+                {q.quote_sent_at && <a className="textlink" href={quoteLink(q)} target="_blank" rel="noreferrer">Página de la cotización</a>}
                 {wa && <a className="textlink" href={wa} target="_blank" rel="noreferrer">WhatsApp</a>}
                 {email && <a className="textlink" href={`mailto:${email}`}>Correo</a>}
             </div>
+            {q.accepted_at && <p className="alert ok" style={{ margin: 0 }}>Aceptada el {new Date(q.accepted_at).toLocaleDateString('es-CL')}. Envíale los datos para el anticipo.</p>}
             {showLink && <LinkBox quote={q} onClose={() => setShowLink(false)} />}
+            {editing && <QuoteEditor quote={q} templates={templates} onChanged={onChanged} />}
             {error && <p className="alert" role="alert">{error}</p>}
         </article>
+    );
+};
+
+// Editor de la cotización ------------------------------------------------------------------
+const EDITABLE_QUOTE = ['brief_pendiente', 'brief_recibido', 'en_preparacion', 'cotizacion_enviada'];
+const quoteLink = (q) => `${window.location.origin}/cotizacion/${q.token}`;
+const quoteMessage = (q, doc) => {
+    const first = (doc.client.contact || q.client_name || '').trim().split(' ')[0];
+    return `Hola ${first}, te enviamos tu cotización ${quoteNumber(q)} al correo. También la puedes ver, descargar y aceptar aquí: ${quoteLink(q)}\nEquipo Interfaz 360`;
+};
+
+const QuoteEditor = ({ quote: q, templates, onChanged }) => {
+    const editable = EDITABLE_QUOTE.includes(q.status);
+    const [doc, setDoc] = useState(() => (q.quote ? cleanQuote(q.quote) : draftQuote(q, cleanBrief(q.brief), templates)));
+    const [tab, setTab] = useState(editable ? 'detalle' : 'vista');
+    const [busy, setBusy] = useState('');
+    const [msg, setMsg] = useState(null);
+    const [sentNow, setSentNow] = useState(false);
+    const t = quoteTotals(doc.items);
+
+    const setClient = (k) => (e) => setDoc((d) => ({ ...d, client: { ...d.client, [k]: e.target.value } }));
+    const setItem = (n, k, v) => setDoc((d) => ({ ...d, items: d.items.map((i, j) => (j === n ? { ...i, [k]: v } : i)) }));
+    const removeItem = (n) => setDoc((d) => ({ ...d, items: d.items.filter((_, j) => j !== n) }));
+    const moveItem = (n, dir) => setDoc((d) => {
+        const items = [...d.items];
+        const m = n + dir;
+        if (m < 0 || m >= items.length) return d;
+        [items[n], items[m]] = [items[m], items[n]];
+        return { ...d, items };
+    });
+    const addItem = (id) => {
+        const tpl = templates.find((x) => x.id === id);
+        const item = tpl ? { title: tpl.title, sub: tpl.sub || '', includes: tpl.includes || [], amount: tpl.amount } : { title: 'Ítem nuevo', sub: '', includes: [], amount: 0 };
+        setDoc((d) => ({ ...d, items: [...d.items, item] }));
+    };
+
+    const saveDraft = async () => {
+        const clean = cleanQuote(doc);
+        const { error } = await supabase.rpc('admin_save_quote', { p_id: q.id, p_quote: clean });
+        if (error) {
+            setMsg({ ok: false, text: errText(error) });
+            return false;
+        }
+        return true;
+    };
+
+    const save = async () => {
+        setBusy('guardar');
+        setMsg(null);
+        if (await saveDraft()) {
+            setMsg({ ok: true, text: 'Borrador guardado. El cliente todavía no lo ve.' });
+            onChanged();
+        }
+        setBusy('');
+    };
+
+    const send = async () => {
+        const problem = quoteError(cleanQuote(doc));
+        if (problem) return setMsg({ ok: false, text: problem });
+        const again = q.status === 'cotizacion_enviada';
+        if (!window.confirm(`${again ? '¿Reenviar' : '¿Enviar'} la cotización a ${doc.client.email}? Total ${money(t.total)} IVA incluido.`)) return;
+        setBusy('enviar');
+        setMsg(null);
+        try {
+            if (!(await saveDraft())) return;
+            const { data: { session } } = await supabase.auth.getSession();
+            const res = await fetch('/api/cotizacion', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${session?.access_token || ''}` },
+                body: JSON.stringify({ action: 'send', id: q.id }),
+            });
+            const json = await res.json().catch(() => ({}));
+            if (!res.ok) return setMsg({ ok: false, text: json.error || 'No se pudo enviar. Intenta de nuevo.' });
+            setSentNow(true);
+            setMsg({ ok: true, text: json.mailed ? `Enviada a ${doc.client.email}. Vence en 15 días.` : 'Quedó como enviada, pero el correo falló: mándale el enlace por WhatsApp.' });
+            onChanged();
+        } catch {
+            setMsg({ ok: false, text: 'No se pudo enviar. Revisa tu conexión.' });
+        } finally {
+            setBusy('');
+        }
+    };
+
+    return (
+        <div className="client-editor">
+            <div className="tabs" role="tablist" aria-label="Cotización">
+                {editable && <button type="button" role="tab" aria-selected={tab === 'detalle'} onClick={() => setTab('detalle')}>Detalle</button>}
+                {editable && <button type="button" role="tab" aria-selected={tab === 'cliente'} onClick={() => setTab('cliente')}>Cliente</button>}
+                <button type="button" role="tab" aria-selected={tab === 'vista'} onClick={() => setTab('vista')}>Vista previa</button>
+            </div>
+
+            {tab === 'detalle' && (
+                <div style={{ display: 'grid', gap: 14 }}>
+                    <label className="field">Qué vamos a hacer <em>(lo primero que lee el cliente)</em>
+                        <textarea value={doc.summary} onChange={(e) => setDoc((d) => ({ ...d, summary: e.target.value }))} maxLength={1500} rows={3} />
+                    </label>
+                    {doc.items.map((i, n) => (
+                        <div key={n} className={`qe-item${i.amount < 0 ? ' discount' : ''}`}>
+                            <div className="admin-form">
+                                <label className="field">Ítem<input value={i.title} onChange={(e) => setItem(n, 'title', e.target.value)} maxLength={150} /></label>
+                                <label className="field">Monto neto <em>(negativo = descuento)</em>
+                                    <input type="number" step="1000" value={i.amount} onChange={(e) => setItem(n, 'amount', Number(e.target.value))} />
+                                </label>
+                                <label className="field wide">Bajada<input value={i.sub} onChange={(e) => setItem(n, 'sub', e.target.value)} maxLength={300} /></label>
+                                {i.amount >= 0 && (
+                                    <label className="field wide">Incluye <em>(uno por línea)</em>
+                                        <textarea value={i.includes.join('\n')} onChange={(e) => setItem(n, 'includes', e.target.value.split('\n'))} rows={Math.max(3, i.includes.length)} style={{ minHeight: 0 }} />
+                                    </label>
+                                )}
+                            </div>
+                            <div className="admin-actions">
+                                <button type="button" className="textlink" onClick={() => moveItem(n, -1)} disabled={n === 0}>↑ Subir</button>
+                                <button type="button" className="textlink" onClick={() => moveItem(n, 1)} disabled={n === doc.items.length - 1}>↓ Bajar</button>
+                                <button type="button" className="textlink" onClick={() => removeItem(n)}>Quitar ítem</button>
+                            </div>
+                        </div>
+                    ))}
+                    <div className="admin-actions">
+                        <select className="admin-input" style={{ maxWidth: 360 }} value="" onChange={(e) => e.target.value && addItem(e.target.value)} aria-label="Agregar ítem">
+                            <option value="">+ Agregar ítem…</option>
+                            {templates.map((x) => <option key={x.id} value={x.id}>{x.title} ({money(x.amount)})</option>)}
+                            <option value="__blank">Ítem en blanco</option>
+                        </select>
+                    </div>
+                </div>
+            )}
+
+            {tab === 'cliente' && (
+                <div className="admin-form">
+                    <label className="field">Nombre o razón social<input value={doc.client.name} onChange={setClient('name')} maxLength={150} /></label>
+                    <label className="field">RUT<input value={doc.client.rut} onChange={setClient('rut')} maxLength={20} /></label>
+                    <label className="field">Rubro<input value={doc.client.rubro} onChange={setClient('rubro')} maxLength={120} /></label>
+                    <label className="field">Contacto<input value={doc.client.contact} onChange={setClient('contact')} maxLength={100} /></label>
+                    <label className="field">Correo <em>(ahí se envía)</em><input type="email" value={doc.client.email} onChange={setClient('email')} maxLength={254} autoCapitalize="none" /></label>
+                    <label className="field">WhatsApp<input type="tel" value={doc.client.phone} onChange={setClient('phone')} maxLength={30} /></label>
+                </div>
+            )}
+
+            {tab === 'vista' && <QuoteDocument q={q} doc={cleanQuote(doc)} />}
+
+            <div className="qe-totals">
+                <span>Neto <b>{money(t.neto)}</b></span>
+                <span>IVA <b>{money(t.iva)}</b></span>
+                <span>Total <b>{money(t.total)}</b></span>
+                <span>Anticipo 50 % <b>{money(t.anticipo)}</b></span>
+            </div>
+
+            {msg && <p className={msg.ok ? 'alert ok' : 'alert'} role="status">{msg.text}</p>}
+            {(sentNow || (q.quote_sent_at && !editable)) && (
+                <div className="admin-actions">
+                    <a className="textlink" href={quoteLink(q)} target="_blank" rel="noreferrer">Abrir como la ve el cliente</a>
+                    <button type="button" className="textlink" onClick={() => copyText(quoteMessage(q, doc))}>Copiar mensaje para WhatsApp</button>
+                    {waLink(doc.client.phone) && <a className="textlink" href={`${waLink(doc.client.phone)}?text=${encodeURIComponent(quoteMessage(q, doc))}`} target="_blank" rel="noreferrer">Avisar por WhatsApp</a>}
+                </div>
+            )}
+            {editable && (
+                <div className="admin-actions">
+                    <button type="button" className="btn" disabled={!!busy} onClick={save}>{busy === 'guardar' ? 'Guardando…' : 'Guardar borrador'}</button>
+                    <button type="button" className="btn signal" disabled={!!busy} onClick={send}>
+                        {busy === 'enviar' ? 'Enviando…' : q.status === 'cotizacion_enviada' ? 'Reenviar al cliente →' : 'Enviar al cliente →'}
+                    </button>
+                    {q.status === 'cotizacion_enviada' && <span className="muted" style={{ fontSize: 13 }}>Reenviar la actualiza y le da 15 días más.</span>}
+                </div>
+            )}
+        </div>
     );
 };
 

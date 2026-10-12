@@ -7,6 +7,7 @@ import {
     METAS, MATERIAL, SITIO_ACTUAL, TIPOS, PRODUCTOS, DOMINIO, PLAZOS, VIAS,
     briefError, briefRows,
 } from '../data/brief';
+import { QUOTE_VISIBLE } from '../data/quote';
 
 // Brief por enlace personal (/brief/:token). Lo crea el equipo en /admin después
 // de conversar con el cliente; el cliente lo llena sin cuenta, puede guardar y
@@ -128,10 +129,17 @@ const BriefPage = () => {
 
                         {state === 'ready' && !info.editable && (
                             <>
-                                <Message title="Ya estamos con tu cotización">
-                                    Recibimos tu información y estamos preparando tu cotización, así que el formulario ya no se puede cambiar.
-                                    Si necesitas agregar algo, escríbenos por WhatsApp al {WHATSAPP}.
-                                </Message>
+                                {QUOTE_VISIBLE.includes(info.status) ? (
+                                    <Message title="Tu cotización está lista">
+                                        Ya te la enviamos por correo. También la puedes ver, descargar y aceptar aquí:{' '}
+                                        <Link to={`/cotizacion/${token}`} className="textlink">Ver mi cotización →</Link>
+                                    </Message>
+                                ) : (
+                                    <Message title="Ya estamos con tu cotización">
+                                        Recibimos tu información y estamos preparando tu cotización, así que el formulario ya no se puede cambiar.
+                                        Si necesitas agregar algo, escríbenos por WhatsApp al {WHATSAPP}.
+                                    </Message>
+                                )}
                                 <Summary b={b} />
                             </>
                         )}

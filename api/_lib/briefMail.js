@@ -6,9 +6,9 @@ import { briefRows, briefNumber, TIPOS } from '../../src/data/brief.js';
 
 // Al cliente le escribimos desde contacto@, que es un buzón real y recibe sus respuestas.
 // Sin AVISOS_FROM (desarrollo local) el dominio no está configurado: se usa el remitente de prueba.
-const clientesFrom = () => (process.env.AVISOS_FROM ? 'Interfaz 360 <contacto@interfaz360.cl>' : avisosFrom());
+export const clientesFrom = () => (process.env.AVISOS_FROM ? 'Interfaz 360 <contacto@interfaz360.cl>' : avisosFrom());
 
-async function send(payload, label) {
+export async function sendMail(payload, label) {
     const apiKey = process.env.RESEND_API_KEY;
     if (!apiKey) {
         console.error(`[brief] ${label} sin enviar: falta RESEND_API_KEY`);
@@ -43,7 +43,7 @@ export function sendBriefToTeam(quote, brief, { origin, again }) {
         ? '<p style="background:#fbe3da;padding:10px 12px;margin:0 0 12px;">Quería arreglar un sitio hecho por otros: en el formulario se le dijo que no lo hacemos y que le ofrecemos uno nuevo.</p>'
         : '';
 
-    return send({
+    return sendMail({
         from: avisosFrom(),
         to: [destino],
         ...(brief.correo ? { reply_to: brief.correo } : {}),
@@ -71,7 +71,7 @@ export function sendBriefReceipt(quote, brief, { origin }) {
         reunion: 'te escribimos para coordinar una reunión por Meet y revisarla juntos',
     }[brief.via];
 
-    return send({
+    return sendMail({
         from: clientesFrom(),
         to: [brief.correo],
         reply_to: 'contacto@interfaz360.cl',

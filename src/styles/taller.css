@@ -583,6 +583,14 @@
   & .brief-summary dd { margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; }
   @media (max-width: 560px) { & .brief-summary div { grid-template-columns: minmax(0, 1fr); gap: 2px; } }
 
+  /* Cotización: barra para aceptar (/cotizacion/:token) y editor en /admin */
+  & .quote-bar { max-width: 210mm; width: 100%; margin-inline: auto; }
+  & .quote-bar-head { display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; }
+  & .qe-item { border: 1.5px solid var(--rule); background: var(--white); padding: 14px; display: grid; gap: 10px; }
+  & .qe-item.discount { border-color: var(--signal); }
+  & .qe-totals { display: flex; flex-wrap: wrap; gap: 8px 20px; font-size: 15px; font-variant-numeric: tabular-nums; }
+  & .qe-totals b { font-size: 17px; }
+
   &.loading { min-height: 100vh; display: grid; place-items: center; }
   &.loading .seal { display: inline-grid; place-items: center; width: 56px; height: 56px; background: var(--signal); color: #fff; font: 900 18px/1 var(--display); animation: tcBlink 1.4s infinite; }
 }
@@ -591,4 +599,87 @@
 
 @media (prefers-reduced-motion: reduce) {
   .tc *, .tc *::before, .tc *::after { animation: none !important; transition: none !important; }
+}
+
+/* ---------- Cotización (documento A4, src/components/QuoteDocument.jsx) ---------- */
+.quote-doc { display: grid; gap: 28px; color: var(--ink); font: 13px/1.5 var(--body); }
+.quote-doc .qd-sheet { background: var(--white); border: 1.5px solid var(--ink); box-shadow: 6px 6px 0 var(--ink); padding: 40px 44px 28px; display: flex; flex-direction: column; gap: 22px; max-width: 210mm; width: 100%; margin-inline: auto; }
+.quote-doc h2 { margin: 0 0 10px; font: 800 17px/1.1 var(--display); font-stretch: 85%; text-transform: uppercase; letter-spacing: .02em; }
+.quote-doc .qd-label { margin: 0 0 8px; font: 700 10.5px/1 var(--display); letter-spacing: .12em; text-transform: uppercase; color: var(--ink-2); }
+.quote-doc .qd-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 20px; flex-wrap: wrap; }
+.quote-doc .qd-mark { font: 800 22px/1 var(--display); font-stretch: 96%; text-transform: uppercase; display: inline-flex; align-items: center; }
+.quote-doc .qd-mark span { background: var(--signal); color: #fff; font-weight: 900; margin-left: .16em; padding: .13em .16em .09em; line-height: .74; }
+.quote-doc .qd-issuer { margin: 10px 0 0; font-size: 12px; color: var(--ink-2); }
+.quote-doc .qd-id { text-align: right; }
+.quote-doc .qd-id h1 { margin: 0; font: 900 34px/.9 var(--display); font-stretch: 78%; text-transform: uppercase; }
+.quote-doc .qd-num { display: inline-block; margin-top: 8px; background: var(--ink); color: #fff; font: 700 13px/1 var(--display); padding: 6px 8px; letter-spacing: .04em; font-variant-numeric: tabular-nums; }
+.quote-doc .qd-id dl { margin: 10px 0 0; display: grid; grid-template-columns: auto auto; gap: 2px 14px; justify-content: end; font-size: 12px; font-variant-numeric: tabular-nums; }
+.quote-doc .qd-id dt { color: var(--ink-2); }
+.quote-doc .qd-id dd { margin: 0; font-weight: 600; }
+.quote-doc .qd-client { border: 1.5px solid var(--ink); display: grid; grid-template-columns: 1fr 1fr; }
+.quote-doc .qd-client > div { padding: 12px 14px; min-width: 0; }
+.quote-doc .qd-client > div + div { border-left: 1.5px solid var(--ink); }
+.quote-doc .qd-name { font: 800 18px/1.15 var(--display); font-stretch: 90%; margin-bottom: 4px; }
+.quote-doc .qd-kv { margin: 0; display: grid; grid-template-columns: 78px 1fr; gap: 3px 10px; font-size: 12.5px; }
+.quote-doc .qd-kv dt { color: var(--ink-2); }
+.quote-doc .qd-kv dd { margin: 0; min-width: 0; overflow-wrap: anywhere; }
+.quote-doc .qd-summary { margin: 0; max-width: 62ch; font-size: 14px; white-space: pre-wrap; }
+.quote-doc .qd-table { overflow-x: auto; }
+.quote-doc table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+.quote-doc thead th { text-align: left; font: 700 10.5px/1 var(--display); letter-spacing: .12em; text-transform: uppercase; color: #fff; background: var(--ink); padding: 9px 10px; }
+.quote-doc th.amt, .quote-doc td.amt { text-align: right; white-space: nowrap; }
+.quote-doc tbody td { padding: 12px 10px; border-bottom: 1.5px solid var(--rule); vertical-align: top; }
+.quote-doc td.amt { font-weight: 600; }
+.quote-doc tr.discount td.amt { color: var(--signal); }
+.quote-doc .qd-item { font-weight: 700; font-size: 14px; }
+.quote-doc .qd-sub { color: var(--ink-2); font-size: 12.5px; margin-top: 2px; }
+.quote-doc .qd-inc { margin: 8px 0 0; padding: 0; list-style: none; display: grid; grid-template-columns: 1fr 1fr; gap: 3px 16px; font-size: 12.5px; }
+.quote-doc .qd-inc li { padding-left: 14px; position: relative; }
+.quote-doc .qd-inc li::before { content: ""; position: absolute; left: 0; top: .55em; width: 6px; height: 6px; background: var(--signal); }
+.quote-doc .qd-totals { display: flex; justify-content: flex-end; }
+.quote-doc .qd-totals dl { margin: 0; min-width: 280px; display: grid; grid-template-columns: 1fr auto; font-variant-numeric: tabular-nums; }
+.quote-doc .qd-totals dt, .quote-doc .qd-totals dd { margin: 0; padding: 6px 10px; }
+.quote-doc .qd-totals dd { text-align: right; font-weight: 600; }
+.quote-doc .qd-totals .grand { background: var(--signal); color: #fff; font: 900 20px/1.1 var(--display); font-stretch: 85%; padding: 10px; }
+.quote-doc .qd-totals .fine { grid-column: 1 / -1; font-size: 11.5px; color: var(--ink-2); font-weight: 400; padding-top: 6px; }
+.quote-doc .qd-pay { display: grid; grid-template-columns: 1fr 1fr; border: 1.5px solid var(--ink); }
+.quote-doc .qd-pay > div { padding: 14px; display: grid; gap: 4px; }
+.quote-doc .qd-pay > div + div { border-left: 1.5px solid var(--ink); }
+.quote-doc .qd-pay b { font: 900 30px/1 var(--display); font-stretch: 78%; }
+.quote-doc .qd-pay span { font-weight: 700; font-size: 15px; font-variant-numeric: tabular-nums; }
+.quote-doc .qd-pay small { color: var(--ink-2); font-size: 12.5px; }
+.quote-doc .qd-fine { margin: 8px 0 0; font-size: 12.5px; color: var(--ink-2); max-width: 75ch; }
+.quote-doc .qd-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; }
+.quote-doc .qd-list { margin: 0; padding: 0; list-style: none; display: grid; gap: 6px; }
+.quote-doc .qd-list li { padding-left: 18px; position: relative; }
+.quote-doc .qd-list.yes li::before { content: "✓"; position: absolute; left: 0; color: var(--signal); font-weight: 700; }
+.quote-doc .qd-list.no li::before { content: "—"; position: absolute; left: 0; color: var(--ink-2); }
+.quote-doc .qd-steps { margin: 0; padding: 0; list-style: none; display: grid; grid-template-columns: repeat(5, 1fr); border: 1.5px solid var(--ink); counter-reset: s; }
+.quote-doc .qd-steps li { padding: 12px 10px; counter-increment: s; font-size: 12.5px; }
+.quote-doc .qd-steps li + li { border-left: 1.5px solid var(--ink); }
+.quote-doc .qd-steps li::before { content: counter(s); display: block; font: 900 22px/1 var(--display); font-stretch: 78%; color: var(--signal); margin-bottom: 6px; }
+.quote-doc .qd-steps b { display: block; font-size: 13px; margin-bottom: 2px; }
+.quote-doc .qd-renew { border: 1.5px solid var(--ink); background: var(--paper); padding: 12px 14px; display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+.quote-doc .qd-terms { margin: 0; padding-left: 18px; display: grid; gap: 5px; font-size: 12.5px; max-width: 80ch; }
+.quote-doc .qd-contact { font-size: 12.5px; border-top: 1px solid var(--rule); padding-top: 12px; }
+.quote-doc .qd-foot { margin-top: auto; padding-top: 10px; border-top: 1.5px solid var(--ink); display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; font-size: 11px; color: var(--ink-2); }
+@media (max-width: 640px) {
+  .quote-doc .qd-sheet { padding: 20px 16px 14px; box-shadow: 4px 4px 0 var(--ink); }
+  .quote-doc .qd-id { text-align: left; }
+  .quote-doc .qd-id dl { justify-content: start; }
+  .quote-doc .qd-client, .quote-doc .qd-pay, .quote-doc .qd-cols { grid-template-columns: minmax(0, 1fr); }
+  .quote-doc .qd-client > div + div, .quote-doc .qd-pay > div + div { border-left: 0; border-top: 1.5px solid var(--ink); }
+  .quote-doc .qd-inc, .quote-doc .qd-steps { grid-template-columns: minmax(0, 1fr); }
+  .quote-doc .qd-steps li + li { border-left: 0; border-top: 1.5px solid var(--ink); }
+  .quote-doc .qd-totals dl { min-width: 0; width: 100%; }
+}
+/* "Descargar PDF" imprime solo la cotización, una hoja A4 por página */
+@media print {
+  @page { size: A4; margin: 0; }
+  body * { visibility: hidden; }
+  .quote-doc, .quote-doc * { visibility: visible; }
+  .quote-doc { position: absolute; inset: 0 auto auto 0; width: 210mm; gap: 0; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .quote-doc .qd-sheet { border: 0; box-shadow: none; max-width: none; width: 210mm; min-height: 297mm; padding: 16mm 16mm 12mm; break-after: page; }
+  .quote-doc .qd-sheet:last-child { break-after: auto; }
+  .quote-doc .no-print { display: none !important; }
 }

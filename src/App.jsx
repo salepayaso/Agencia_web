@@ -23,6 +23,7 @@ const BusinessCard = lazy(() => import('./components/BusinessCard'));
 const PrivacyPage = lazy(() => import('./pages/PrivacyPage'));
 const TermsPage = lazy(() => import('./pages/TermsPage'));
 const BriefPage = lazy(() => import('./pages/BriefPage'));
+const QuotePage = lazy(() => import('./pages/QuotePage'));
 
 const AuthHandler = () => {
   const navigate = useNavigate();
@@ -67,6 +68,7 @@ function App() {
           <Route path="/privacidad" element={<PrivacyPage />} />
           <Route path="/terminos" element={<TermsPage />} />
           <Route path="/brief/:token" element={<BriefPage />} />
+          <Route path="/cotizacion/:token" element={<QuotePage />} />
           <Route
             path="/dashboard"
             element={
