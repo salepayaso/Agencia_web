@@ -9,7 +9,14 @@ import { logChatTurn } from './chatLog.js';
 
 // Nivel 1 del catálogo de agentes: FAQ, precios y agendamiento.
 // Suficiente para este caso de uso y con el costo por conversación más bajo.
-const MODEL = 'claude-haiku-4-5';
+const MODEL = 'claude-haiku-5-5';
+
+// Haiku 5.5 piensa antes de responder. En un chat comercial basta con poco:
+// 'low' es lo más rápido y barato. Subir a 'medium' si empieza a saltarse reglas.
+const EFFORT = 'low';
+
+const REFUSAL_REPLY =
+    'Eso no te lo puedo responder por acá. Si quieres, escríbenos por WhatsApp al +56 9 5414 6176 y lo vemos.';
 
 const LEAD_TOOL = {
     name: 'registrar_lead',
@@ -101,6 +108,7 @@ async function runAgent({ message, history, visitor }, emit) {
         const stream = client.messages.stream({
             model: MODEL,
             max_tokens: LIMITS.MAX_OUTPUT_TOKENS,
+            output_config: { effort: EFFORT },
             system,
             tools,
             messages,
@@ -112,6 +120,14 @@ async function runAgent({ message, history, visitor }, emit) {
         });
 
         const response = await stream.finalMessage();
+
+        // Los filtros de seguridad del modelo pueden negarse a responder. Sin
+        // texto escrito, el visitante vería una burbuja vacía.
+        if (response.stop_reason === 'refusal') {
+            if (!streamedText) emit({ type: 'delta', text: REFUSAL_REPLY });
+            emit({ type: 'done' });
+            return;
+        }
 
         if (response.stop_reason !== 'tool_use') {
             emit({ type: 'done' });

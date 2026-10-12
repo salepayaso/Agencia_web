@@ -5,7 +5,7 @@ export const LIMITS = {
     MAX_MESSAGE_CHARS: 800,     // un mensaje más largo que esto no es una consulta comercial
     MAX_HISTORY_TURNS: 24,      // 12 idas y vueltas por conversación
     MAX_HISTORY_CHARS: 12_000,  // tope total del historial (~3k tokens): el cliente lo manda y puede inflarlo
-    MAX_OUTPUT_TOKENS: 700,     // respuestas cortas: es un chat, no un informe
+    MAX_OUTPUT_TOKENS: 1500,    // incluye lo que el modelo piensa; el largo de la respuesta lo fija el prompt
     HOUR_MS: 3_600_000,
     MAX_PER_HOUR: 20,
     DAY_MS: 86_400_000,
