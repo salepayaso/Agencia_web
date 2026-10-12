@@ -175,20 +175,24 @@ export const PLANES = [
 export const EN_TODOS_LOS_PLANES = 'el portal de clientes y acompañamiento después de la entrega';
 
 // Precios al cliente que el sitio ya muestra (pedidos de dominio y portal).
+// Son netos: se cobran + IVA. El total a pagar sale de conIva().
 export const OFFERS = {
     dominio: {
         title: 'Dominio .cl',
-        years: { 1: { label: '1 año', price: 25000, note: 'Renovación anual $25.000' }, 2: { label: '2 años', price: 45000, note: 'Ahorras $5.000' } },
+        years: { 1: { label: '1 año', price: 25000, note: 'Renovación anual $25.000 + IVA' }, 2: { label: '2 años', price: 45000, note: 'Ahorras $5.000 + IVA' } },
     },
     hosting: {
         title: 'Hosting con correos',
-        years: { 1: { label: '1 año', price: 60000, note: 'Renovación anual $60.000' } },
+        years: { 1: { label: '1 año', price: 60000, note: 'Renovación anual $60.000 + IVA' } },
     },
     pack: {
         title: 'Pack hosting + dominio',
-        years: { 1: { label: '1 año', price: 75000, note: 'Renovación anual $75.000' } },
+        years: { 1: { label: '1 año', price: 75000, note: 'Renovación anual $75.000 + IVA' } },
     },
 };
+
+export const IVA = 0.19;
+export const conIva = (neto) => Math.round(neto * (1 + IVA));
 
 const pesos = (n) => `$${n.toLocaleString('es-CL')}`;
 
@@ -220,8 +224,8 @@ export function preciosPublicosParaAgente() {
     const { dominio, hosting, pack } = OFFERS;
     return [
         '## Dominios, Correos y Hosting (anual)',
-        `- Hosting con ${CORREOS_HOSTING} correos: ${pesos(hosting.years[1].price)} al año`,
-        `- Dominio .cl: 1 año ${pesos(dominio.years[1].price)}, 2 años ${pesos(dominio.years[2].price)}, renovación anual ${pesos(dominio.years[1].price)}`,
-        `- Pack hosting + dominio: ${pesos(pack.years[1].price)} al año`,
+        `- Hosting con ${CORREOS_HOSTING} correos: ${pesos(hosting.years[1].price)} + IVA al año`,
+        `- Dominio .cl: 1 año ${pesos(dominio.years[1].price)}, 2 años ${pesos(dominio.years[2].price)}, renovación anual ${pesos(dominio.years[1].price)}, todo + IVA`,
+        `- Pack hosting + dominio: ${pesos(pack.years[1].price)} + IVA al año`,
     ].join('\n');
 }

@@ -16,7 +16,7 @@ export default async function handler(req, res) {
 
     const pedido = await leerPedido(req);
     if (pedido.error) return res.status(pedido.status).json({ error: pedido.error });
-    const { user, kind, years, plan, domain, holder } = pedido;
+    const { user, kind, years, total, domain, holder } = pedido;
 
     let order = null;
     try {
@@ -31,7 +31,7 @@ export default async function handler(req, res) {
             years,
             payment_method: 'webpay',
             holder,
-            amount: plan.price,
+            amount: total,
         });
 
         // buy_order = lo que el cliente ve en su comprobante (máx. 26 caracteres).
@@ -40,7 +40,7 @@ export default async function handler(req, res) {
         const trx = await crearTransaccion({
             buyOrder,
             sessionId: String(order.id),
-            amount: plan.price,
+            amount: total,
             returnUrl: urlDeVuelta(req.headers.origin, '/api/webpay/retorno'),
         });
 

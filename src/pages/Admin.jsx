@@ -4,7 +4,7 @@ import { supabase } from '../supabase';
 import SEO from '../components/SEO';
 import Wordmark from '../components/Wordmark';
 import { PortalLoading } from '../components/ProtectedRoute';
-import { OFFERS, PAYS, clp, isOpenOrder, isUnpaidCard, orderStatus } from '../lib/orders';
+import { OFFERS, conIva, PAYS, clp, isOpenOrder, isUnpaidCard, orderStatus } from '../lib/orders';
 import { catLabel, TICKET_STATUS, isOpen, parseDate, fmt, daysFrom, dayWord, hasServices } from '../lib/portal';
 
 // Panel de administración (/admin): pedidos, clientes y soporte sin entrar a Supabase.
@@ -201,7 +201,7 @@ const OrderRow = ({ order: o, client, onChanged }) => {
                 <span className={`pill ${orderStatus(o).cls}`}>{orderStatus(o).label}</span>
             </div>
             <span className="meta">
-                N.º {o.id} · {new Date(o.created_at).toLocaleDateString('es-CL')} · {plan ? `${plan.label} · ${clp(plan.price)}` : ''} · {PAYS[o.payment_method]?.label || o.payment_method}
+                N.º {o.id} · {new Date(o.created_at).toLocaleDateString('es-CL')} · {plan ? `${plan.label} · ${clp(o.amount ?? conIva(plan.price))} IVA incl.` : ''} · {PAYS[o.payment_method]?.label || o.payment_method}
                 {o.payment_method === 'webpay' && o.payment_info?.authorization_code && ` · Aut. ${o.payment_info.authorization_code}${o.payment_info.card_last4 ? ` · **** ${o.payment_info.card_last4}` : ''}`}
                 {o.payment_method === 'mp' && o.payment_info?.mp_payment_id && ` · Pago MP ${o.payment_info.mp_payment_id}${o.payment_info.card_last4 ? ` · **** ${o.payment_info.card_last4}` : ''}`}
                 {o.payment_info?.revisar && ' · REVISAR MONTO'}

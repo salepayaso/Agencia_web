@@ -1,5 +1,5 @@
 import { supabase } from '../supabase';
-import { OFFERS } from '../data/catalogo';
+import { OFFERS, conIva } from '../data/catalogo';
 
 // Pedidos de dominio, hosting y pack desde el sitio y el portal.
 // - En línea (Webpay o Mercado Pago): el pedido lo crea el servidor
@@ -10,7 +10,7 @@ import { OFFERS } from '../data/catalogo';
 // Regla vigente: nunca registrar ni activar nada sin el pago recibido.
 
 // Precios al cliente: viven en src/data/catalogo.js junto con lo que incluye cada servicio.
-export { OFFERS };
+export { OFFERS, conIva };
 
 // Webpay se enciende por ambiente con VITE_PAGO_WEBPAY=si (Vercel), así el sitio
 // en línea no lo muestra hasta tener el código de comercio de Transbank.
@@ -139,7 +139,7 @@ export const placeOrder = async ({ user, kind, domain, years = 1, pay, holder, r
 
     const lines = [
         `${renewal ? 'RENOVACIÓN' : 'PEDIDO'}: ${offer.title}${domain ? ` · ${domain}` : ''}`,
-        `Plan: ${plan.label} · ${clp(plan.price)}`,
+        `Plan: ${plan.label} · ${clp(plan.price)} + IVA = ${clp(conIva(plan.price))}`,
         `Forma de pago elegida: ${PAYS[pay].label}`,
         `Cuenta de cliente: ${user ? `sí (${user.email})${saved ? ', pedido guardado en el portal' : ' — OJO: el pedido NO quedó guardado en el portal'}` : 'no'}`,
     ];

@@ -53,7 +53,7 @@ const TermsPage = () => {
                         <section>
                             <h2>Precios y cotizaciones</h2>
                             <ul>
-                                <li>Los precios están en pesos chilenos e indican si incluyen IVA.</li>
+                                <li>Los precios están en pesos chilenos y son netos: se les suma el IVA (19 %).</li>
                                 <li>
                                     Los <strong>dominios, el hosting y el pack</strong> tienen precio fijo publicado y se
                                     contratan directamente desde el sitio o el portal.

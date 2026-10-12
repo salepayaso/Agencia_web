@@ -17,7 +17,7 @@ export default async function handler(req, res) {
 
     const pedido = await leerPedido(req);
     if (pedido.error) return res.status(pedido.status).json({ error: pedido.error });
-    const { user, kind, years, plan, title, domain, holder } = pedido;
+    const { user, kind, years, plan, total, title, domain, holder } = pedido;
 
     let order = null;
     try {
@@ -32,7 +32,7 @@ export default async function handler(req, res) {
             years,
             payment_method: 'mp',
             holder,
-            amount: plan.price,
+            amount: total,
         });
 
         const pref = await crearPreferencia({

@@ -4,7 +4,7 @@
 // El monto NUNCA viene del navegador: sale de OFFERS (src/data/catalogo.js), el
 // mismo catálogo que muestra la página. Editar el navegador solo cambia QUÉ compra.
 
-import { OFFERS } from '../../src/data/catalogo.js';
+import { OFFERS, conIva } from '../../src/data/catalogo.js';
 import { userFromToken } from './orderStore.js';
 
 const texto = (v, max) => (typeof v === 'string' ? v.trim().slice(0, max) : '');
@@ -13,7 +13,8 @@ const cleanDomain = (v) => texto(v, 80).toLowerCase().replace(/^https?:\/\//, ''
 
 /**
  * Lee y valida el pedido. Devuelve { error, status } si algo no cuadra, o
- * { user, kind, years, plan, domain, holder } listo para guardar.
+ * { user, kind, years, plan, total, domain, holder } listo para guardar.
+ * total = lo que se cobra: el precio neto del catálogo + IVA.
  * Requiere sesión: el pedido queda a nombre de la cuenta validada contra Supabase Auth.
  */
 export async function leerPedido(req) {
@@ -41,7 +42,7 @@ export async function leerPedido(req) {
         address: texto(holder.address, 200),
     } : null;
 
-    return { user, kind, years, plan, title: offer.title, domain, holder: holderRow };
+    return { user, kind, years, plan, total: conIva(plan.price), title: offer.title, domain, holder: holderRow };
 }
 
 /**

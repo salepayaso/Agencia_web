@@ -5,6 +5,9 @@
 //
 // Ninguno de los dos archivos se sube al repositorio: el texto del prompt es
 // el activo del producto y el repo es publico. Ver api/_lib/prompt.js.
+//
+// Los planes y precios no van en el .txt: viven en src/data/catalogo.js y se
+// insertan donde estan las marcas {{CATALOGO}} y {{PRECIOS_PUBLICOS}}.
 
 import { readFileSync, writeFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
@@ -44,6 +47,14 @@ if (sobrantes.length) {
 for (const clave of ['gateIdConTelefono', 'gateIdSinTelefono']) {
     if (!bloques[clave].includes('{{NOMBRE}}')) {
         console.error(`El bloque ${clave} perdio la marca {{NOMBRE}}. Sin ella el agente no saluda por su nombre.`);
+        process.exit(1);
+    }
+}
+
+// Los planes y precios salen de src/data/catalogo.js; el prompt solo lleva la marca.
+for (const [clave, marca] of [['base', '{{CATALOGO}}'], ['pricing', '{{PRECIOS_PUBLICOS}}']]) {
+    if (!bloques[clave].includes(marca)) {
+        console.error(`El bloque ${clave} perdio la marca ${marca}. Sin ella el agente no ve el catalogo de src/data/catalogo.js.`);
         process.exit(1);
     }
 }

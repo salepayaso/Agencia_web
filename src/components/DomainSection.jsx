@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { OFFERS, PAYS, ACTIVE_PAYS, DEFAULT_PAY, payMethodsText, clp, rutOk, loadAccount, holderFromProfile, submitOrder as sendOrder } from '../lib/orders';
+import { OFFERS, conIva, PAYS, ACTIVE_PAYS, DEFAULT_PAY, payMethodsText, clp, rutOk, loadAccount, holderFromProfile, submitOrder as sendOrder } from '../lib/orders';
 
 // Buscador de dominios .cl con compra en 3 pasos: datos del titular → plan y
 // forma de pago → listo.
@@ -168,7 +168,7 @@ const DomainSection = ({ embedded = false, kind = 'dominio', onOrdered, onCancel
                         <div>
                             <span className="ok">✓ {domain} está disponible</span>
                             <small>
-                                {kind === 'pack' ? `Pack hosting + dominio ${clp(fromPrice)} al año` : `Desde ${clp(fromPrice)} al año`}
+                                {kind === 'pack' ? `Pack hosting + dominio ${clp(fromPrice)} + IVA al año` : `Desde ${clp(fromPrice)} + IVA al año`}
                                 {' · '}buscar no lo reserva: se asegura al pagar
                             </small>
                         </div>
@@ -261,13 +261,13 @@ const DomainSection = ({ embedded = false, kind = 'dominio', onOrdered, onCancel
                                     <label key={id}>
                                         <input type="radio" name="plan" value={id} checked={years === id} onChange={(e) => setYears(e.target.value)} />
                                         <span><b>{p.label}</b><small>{p.note}</small></span>
-                                        <strong>{clp(p.price)}</strong>
+                                        <strong>{clp(p.price)} + IVA</strong>
                                     </label>
                                 ))}
                             </fieldset>
                             <div className="sum">
                                 <span><b>{kind === 'pack' ? `Hosting + ${domain}` : domain}</b> · {plan.label}</span>
-                                <span>Total <b>{clp(plan.price)}</b></span>
+                                <span>Total <b>{clp(conIva(plan.price))}</b> IVA incluido</span>
                             </div>
                             <fieldset className="pay">
                                 <legend>¿Cómo quieres pagar?</legend>
@@ -289,8 +289,8 @@ const DomainSection = ({ embedded = false, kind = 'dominio', onOrdered, onCancel
                             <div className="bnav">
                                 <button className="btn signal" type="submit" disabled={sending}>
                                     {PAYS[pay]?.online
-                                        ? (sending ? `Abriendo ${PAYS[pay].site}…` : `Pagar con ${PAYS[pay].site} · ${clp(plan.price)} →`)
-                                        : (sending ? 'Enviando…' : `Confirmar pedido · ${clp(plan.price)} →`)}
+                                        ? (sending ? `Abriendo ${PAYS[pay].site}…` : `Pagar con ${PAYS[pay].site} · ${clp(conIva(plan.price))} →`)
+                                        : (sending ? 'Enviando…' : `Confirmar pedido · ${clp(conIva(plan.price))} →`)}
                                 </button>
                                 <button className="link" type="button" onClick={() => setStep(1)}>← Volver</button>
                             </div>

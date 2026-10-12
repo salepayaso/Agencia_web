@@ -5,7 +5,7 @@ import SEO from '../components/SEO';
 import Wordmark from '../components/Wordmark';
 import { PortalLoading } from '../components/ProtectedRoute';
 import DomainSection from '../components/DomainSection';
-import { OFFERS, PAYS, ACTIVE_PAYS, DEFAULT_PAY, clp, submitOrder, rutOk, isOpenOrder, isUnpaidCard, isOnlineOrder, orderStatus } from '../lib/orders';
+import { OFFERS, conIva, PAYS, ACTIVE_PAYS, DEFAULT_PAY, clp, submitOrder, rutOk, isOpenOrder, isUnpaidCard, isOnlineOrder, orderStatus } from '../lib/orders';
 import { CATEGORIES, catLabel, TICKET_STATUS as STATUS, isOpen, parseDate, fmt, daysFrom, dayWord, hasServices, firstName } from '../lib/portal';
 
 // Portal del cliente ("Tu cuenta, en orden"): dominio, plan y pagos, correos,
@@ -219,19 +219,19 @@ const Dashboard = () => {
 const OFFER_CARDS = [
     {
         id: 'dominio',
-        price: `Desde ${clp(OFFERS.dominio.years[1].price)}`,
+        price: `Desde ${clp(OFFERS.dominio.years[1].price)} + IVA`,
         desc: 'Tu dominio .cl registrado a tu nombre. Te avisamos antes de que venza.',
         cta: 'Buscar dominio →',
     },
     {
         id: 'hosting',
-        price: clp(OFFERS.hosting.years[1].price),
+        price: `${clp(OFFERS.hosting.years[1].price)} + IVA`,
         desc: 'Espacio para tu sitio y correos con el nombre de tu empresa. Al activarlo te enviamos los accesos de cPanel por correo.',
         cta: 'Contratar hosting →',
     },
     {
         id: 'pack',
-        price: clp(OFFERS.pack.years[1].price),
+        price: `${clp(OFFERS.pack.years[1].price)} + IVA`,
         desc: `Hosting con correos + dominio .cl, todo listo para partir. Ahorras ${clp(OFFERS.dominio.years[1].price + OFFERS.hosting.years[1].price - OFFERS.pack.years[1].price)} al año.`,
         cta: 'Contratar pack →',
         hot: true,
@@ -296,7 +296,7 @@ const Hire = ({ user, profile, orders, renewing, setRenewing, onOrdered }) => {
                                 <span className={`pill ${st.cls}`}>{st.label}</span>
                             </div>
                             <span className="meta">
-                                {new Date(o.created_at).toLocaleDateString('es-CL')}{plan ? ` · ${plan.label} · ${clp(plan.price)}` : ''} · {PAYS[o.payment_method]?.label}
+                                {new Date(o.created_at).toLocaleDateString('es-CL')}{plan ? ` · ${plan.label} · ${clp(o.amount ?? conIva(plan.price))} IVA incl.` : ''} · {PAYS[o.payment_method]?.label}
                             </span>
                             {o.admin_note && <div className="reply"><b>Nota de Interfaz 360</b>{o.admin_note}</div>}
                             {isUnpaidCard(o) && (
@@ -367,7 +367,7 @@ const RenewDomain = ({ user, profile, onDone, onCancel }) => {
     const [sending, setSending] = useState(false);
     const [error, setError] = useState('');
     const [done, setDone] = useState(false);
-    const price = OFFERS.dominio.years[years].price;
+    const price = conIva(OFFERS.dominio.years[years].price);
 
     const submit = async (e) => {
         e.preventDefault();
@@ -409,7 +409,7 @@ const RenewDomain = ({ user, profile, onDone, onCancel }) => {
                         <div className="toggles" role="radiogroup" aria-label="Años de renovación">
                             {Object.entries(OFFERS.dominio.years).map(([y, p]) => (
                                 <button key={y} type="button" role="radio" aria-checked={years === Number(y)} aria-pressed={years === Number(y)} onClick={() => setYears(Number(y))}>
-                                    {p.label} · {clp(p.price)}
+                                    {p.label} · {clp(p.price)} + IVA
                                 </button>
                             ))}
                         </div>
@@ -444,7 +444,8 @@ const HostingOrder = ({ user, onDone, onCancel }) => {
     const [sending, setSending] = useState(false);
     const [error, setError] = useState('');
     const [done, setDone] = useState(false);
-    const price = OFFERS.hosting.years[1].price;
+    const neto = OFFERS.hosting.years[1].price;
+    const price = conIva(neto);
 
     const submit = async (e) => {
         e.preventDefault();
@@ -470,7 +471,7 @@ const HostingOrder = ({ user, onDone, onCancel }) => {
     return (
         <section className="panel">
             <div className="box-title">
-                <b>Hosting con correos · {clp(price)} al año</b>
+                <b>Hosting con correos · {clp(neto)} + IVA al año</b>
                 <button type="button" className="textlink" onClick={onCancel}>Cerrar</button>
             </div>
             {done ? (
