@@ -650,18 +650,6 @@ const Overview = ({ profile, user, documents, tickets, orders, onNewRequest, onR
                     </div>
                 </section>
 
-                {profile?.hosting_plan && (
-                    <section className="panel">
-                        <div className="box-title"><b>Hosting</b><span className="muted">{profile?.hosting_plan}</span></div>
-                        <div className="box-body">
-                            <p className="muted" style={{ margin: 0, fontSize: 15 }}>
-                                Espacio usado: <b style={{ color: 'var(--ink)' }}>{profile?.disk_usage || '0%'}</b>
-                                {profile?.storage_limit ? ` de ${profile.storage_limit}` : ''}
-                            </p>
-                        </div>
-                    </section>
-                )}
-
                 <section className="panel">
                     <div className="box-title"><b>Tu acceso</b></div>
                     <div className="box-body" style={{ fontSize: 15 }}>

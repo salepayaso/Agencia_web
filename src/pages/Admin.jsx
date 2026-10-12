@@ -189,6 +189,9 @@ const copyText = async (value) => {
 };
 
 const CLOSED = ['publicado', 'cancelada'];
+// Estados que hoy se pueden elegir a mano. Los demás llegan con la etapa 2
+// (enviar la cotización) y la 3 (aceptación y pago).
+const MANUAL_STATUS = ['brief_pendiente', 'brief_recibido', 'en_preparacion', 'cancelada'];
 
 const Quotes = ({ quotes, onChanged }) => {
     const [all, setAll] = useState(false);
@@ -324,7 +327,10 @@ const QuoteRow = ({ quote: q, onChanged }) => {
             )}
             <div className="admin-actions">
                 <select className="admin-input" style={{ maxWidth: 240 }} value={status} onChange={(e) => setStatus(e.target.value)} aria-label="Estado">
-                    {Object.entries(QUOTE_STATUS).map(([id, s]) => <option key={id} value={id}>{s.label}</option>)}
+                    {Object.entries(QUOTE_STATUS).map(([id, s]) => {
+                        const soon = !MANUAL_STATUS.includes(id) && id !== q.status;
+                        return <option key={id} value={id} disabled={soon}>{s.label}{soon ? ' (próximamente)' : ''}</option>;
+                    })}
                 </select>
                 <input className="admin-input" value={note} onChange={(e) => setNote(e.target.value)} maxLength={1000} placeholder="Nota interna (no la ve el cliente)" aria-label="Nota interna" />
                 <button type="button" className="btn signal" disabled={busy} onClick={save}>{busy ? 'Guardando…' : 'Guardar →'}</button>
@@ -505,9 +511,13 @@ const ClientEditor = ({ profile: p, documents, note, onClose, onChanged }) => {
     const saveProfile = async (fields) => {
         setMsg(null);
         const { error } = await supabase.rpc('admin_update_profile', { p_id: p.id, p: fields });
-        if (error) return setMsg({ ok: false, text: errText(error) });
+        if (error) {
+            setMsg({ ok: false, text: errText(error) });
+            return false;
+        }
         setMsg({ ok: true, text: 'Guardado. El cliente ya lo ve en su portal.' });
         onChanged();
+        return true;
     };
 
     return (
@@ -613,18 +623,32 @@ const ServicesTab = ({ profile: p, onSave }) => {
     );
 };
 
+// El plan y el cupo se guardan con el botón; los correos se guardan al tiro al
+// agregarlos o quitarlos (antes había que agregar y además guardar, y se perdían).
 const HostingTab = ({ profile: p, onSave }) => {
     const { f, setF, set, busy, run } = useTabForm({
         hosting_plan: p.hosting_plan || '',
         storage_limit: p.storage_limit || '',
-        disk_usage: p.disk_usage || '',
         email_count: p.email_count || '',
-        emails: Array.isArray(p.additional_emails) ? p.additional_emails.filter(Boolean) : [],
     });
+    const [emails, setEmails] = useState(Array.isArray(p.additional_emails) ? p.additional_emails.filter(Boolean) : []);
     const [newEmail, setNewEmail] = useState('');
+    const [mailBusy, setMailBusy] = useState(false);
     const [error, setError] = useState('');
     const known = HOSTING_PLANS.some((h) => h.id === f.hosting_plan);
     const limit = parseInt(f.email_count, 10) || 0;
+
+    const saveEmails = async (list) => {
+        setMailBusy(true);
+        setError('');
+        // Si la lista supera el cupo guardado, el cupo sube junto con ella.
+        const fields = { additional_emails: list, ...(list.length > limit ? { email_count: String(list.length) } : {}) };
+        if (await onSave(fields)) {
+            setEmails(list);
+            if (fields.email_count) setF((x) => ({ ...x, email_count: fields.email_count }));
+        }
+        setMailBusy(false);
+    };
 
     // Al elegir un plan de la lista, el espacio y el cupo de correos se completan solos.
     const pickPlan = (e) => {
@@ -637,20 +661,18 @@ const HostingTab = ({ profile: p, onSave }) => {
         }));
     };
 
-    const addEmail = () => {
+    const addEmail = async () => {
         const e = newEmail.trim().toLowerCase();
         setError('');
         if (!/^[^\s@<>"]+@[^\s@<>"]+\.[^\s@<>"]{2,}$/.test(e)) return setError('Escribe un correo completo, por ejemplo contacto@minegocio.cl.');
-        if (f.emails.includes(e)) return setError('Ese correo ya está en la lista.');
-        if (limit && f.emails.length >= limit) return setError(`El plan tiene ${limit} correos. Sube el cupo si contrató más.`);
-        setF((x) => ({ ...x, emails: [...x.emails, e] }));
+        if (emails.includes(e)) return setError('Ese correo ya está en la lista.');
+        await saveEmails([...emails, e]);
         setNewEmail('');
     };
 
     const submit = (e) => {
         e.preventDefault();
-        const { emails, ...rest } = f;
-        run(() => onSave({ ...rest, additional_emails: emails }));
+        run(() => onSave(f));
     };
 
     return (
@@ -662,30 +684,28 @@ const HostingTab = ({ profile: p, onSave }) => {
                     {f.hosting_plan && !known && <option value={f.hosting_plan}>Plan anterior: {f.hosting_plan}</option>}
                 </select>
             </label>
-            <label className="field">Espacio contratado<input value={f.storage_limit} onChange={set('storage_limit')} placeholder="5 GB" /></label>
-            <label className="field">Espacio usado <em>(míralo en cPanel)</em><input value={f.disk_usage} onChange={set('disk_usage')} placeholder="12%" /></label>
-            <label className="field">Cupo de correos<input type="number" min="0" max="50" value={f.email_count} onChange={set('email_count')} /></label>
+            <label className="field">Cupo de correos <em>(el cliente ve "2 de 5")</em><input type="number" min="0" max="50" value={f.email_count} onChange={set('email_count')} /></label>
+            <SaveButton busy={busy} />
 
-            <div className="wide" style={{ display: 'grid', gap: 8 }}>
-                <span className="field">Correos del cliente ({f.emails.length}{limit ? ` de ${limit}` : ''})</span>
-                {f.emails.length > 0 && (
+            <div className="wide" style={{ display: 'grid', gap: 8, borderTop: '1px solid var(--rule)', paddingTop: 16 }}>
+                <span className="field">Correos del cliente ({emails.length}{limit ? ` de ${limit}` : ''}) · se guardan al tiro</span>
+                {emails.length > 0 && (
                     <ul className="mail-list" style={{ margin: 0 }}>
-                        {f.emails.map((m) => (
+                        {emails.map((m) => (
                             <li key={m}>
                                 <code>{m}</code>
-                                <button type="button" onClick={() => setF((x) => ({ ...x, emails: x.emails.filter((y) => y !== m) }))}>Quitar</button>
+                                <button type="button" disabled={mailBusy} onClick={() => window.confirm(`¿Quitar ${m} del portal del cliente?`) && saveEmails(emails.filter((y) => y !== m))}>Quitar</button>
                             </li>
                         ))}
                     </ul>
                 )}
                 <div className="admin-actions">
                     <input className="admin-input" type="email" value={newEmail} onChange={(e) => setNewEmail(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); addEmail(); } }} placeholder={`contacto@${p.domain_name || 'minegocio.cl'}`} autoCapitalize="none" aria-label="Nuevo correo" />
-                    <button type="button" className="btn" onClick={addEmail}>Agregar</button>
+                    <button type="button" className="btn" disabled={mailBusy} onClick={addEmail}>{mailBusy ? 'Guardando…' : 'Agregar'}</button>
                 </div>
-                <span className="muted" style={{ fontSize: 13 }}>Primero créalo en cPanel; aquí solo se anota para que el cliente lo vea en su portal.</span>
+                {error && <p className="alert" role="alert">{error}</p>}
+                <span className="muted" style={{ fontSize: 13 }}>Primero créalo en cPanel; aquí solo se anota para que el cliente lo vea en su portal. Si pasas el cupo, el cupo sube solo.</span>
             </div>
-            {error && <p className="alert wide" role="alert">{error}</p>}
-            <SaveButton busy={busy} />
         </form>
     );
 };
