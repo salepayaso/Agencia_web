@@ -96,6 +96,14 @@ const Dashboard = () => {
         load();
     }, [navigate, loadTickets, loadOrders, pago]);
 
+    // Si la sesión se cierra en otra pestaña (o vence), esta deja de mostrar la cuenta
+    useEffect(() => {
+        const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
+            if (event === 'SIGNED_OUT') navigate('/login', { replace: true });
+        });
+        return () => subscription.unsubscribe();
+    }, [navigate]);
+
     const logout = async () => {
         await supabase.auth.signOut();
         navigate('/login', { replace: true });
@@ -230,6 +238,8 @@ const OFFER_CARDS = [
 ];
 
 // Renovación del dominio de la ficha: ¿ya hay un pedido en curso para él?
+const SESSION_CLOSED = 'Tu sesión se cerró. Entra de nuevo a tu cuenta para hacer el pedido.';
+
 const renewalInProgress = (profile, orders) =>
     orders.some((o) => o.kind === 'dominio' && o.domain === profile?.domain_name && isOpenOrder(o));
 
@@ -369,8 +379,9 @@ const RenewDomain = ({ user, profile, onDone, onCancel }) => {
         } catch (err) {
             setError(err?.message === 'limite_diario'
                 ? 'Llegaste al máximo de pedidos por hoy. Si necesitas algo más, escríbenos en Soporte.'
-                : pay === 'webpay' ? 'No pudimos abrir el pago con tarjeta. Intenta de nuevo o elige transferencia.'
-                    : 'No pudimos enviar la renovación. Intenta de nuevo en un momento.');
+                : err?.message === 'sin_sesion' ? SESSION_CLOSED
+                    : pay === 'webpay' ? 'No pudimos abrir el pago con tarjeta. Intenta de nuevo o elige transferencia.'
+                        : 'No pudimos enviar la renovación. Intenta de nuevo en un momento.');
         } finally {
             setSending(false);
         }
@@ -447,8 +458,9 @@ const HostingOrder = ({ user, onDone, onCancel }) => {
         } catch (err) {
             setError(err?.message === 'limite_diario'
                 ? 'Llegaste al máximo de pedidos por hoy. Si necesitas algo más, escríbenos en Soporte.'
-                : pay === 'webpay' ? 'No pudimos abrir el pago con tarjeta. Intenta de nuevo o elige transferencia.'
-                    : 'No pudimos enviar el pedido. Intenta de nuevo en un momento.');
+                : err?.message === 'sin_sesion' ? SESSION_CLOSED
+                    : pay === 'webpay' ? 'No pudimos abrir el pago con tarjeta. Intenta de nuevo o elige transferencia.'
+                        : 'No pudimos enviar el pedido. Intenta de nuevo en un momento.');
         } finally {
             setSending(false);
         }

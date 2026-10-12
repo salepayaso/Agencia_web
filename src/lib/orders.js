@@ -94,6 +94,7 @@ export const holderFromProfile = (profile, user) => ({
  *   'dominio' normal; al activarlo, la base extiende el vencimiento (trigger
  *   order_activated en admin_panel_2026_09_30.sql).
  * Lanza error si la cuenta llegó al tope diario de pedidos ('limite_diario'),
+ * si la sesión se cerró mientras la página seguía abierta ('sin_sesion'),
  * o si el aviso por correo falla y tampoco se pudo guardar.
  */
 export const placeOrder = async ({ user, kind, domain, years = 1, pay, holder, renewal = false }) => {
@@ -102,6 +103,10 @@ export const placeOrder = async ({ user, kind, domain, years = 1, pay, holder, r
     let saved = false;
 
     if (user) {
+        // La página puede seguir mostrando la cuenta aunque la sesión se cerró en otra
+        // pestaña: sin sesión la base rechaza el pedido, así que no avisamos uno fantasma
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session) throw new Error('sin_sesion');
         const holderRow = holder && {
             holder_kind: holder.kind === 'e' ? 'empresa' : 'persona',
             holder_name: holder.name.trim(),
@@ -128,7 +133,7 @@ export const placeOrder = async ({ user, kind, domain, years = 1, pay, holder, r
         `${renewal ? 'RENOVACIÓN' : 'PEDIDO'}: ${offer.title}${domain ? ` · ${domain}` : ''}`,
         `Plan: ${plan.label} · ${clp(plan.price)}`,
         `Forma de pago elegida: ${PAYS[pay].label}`,
-        `Cuenta de cliente: ${user ? `sí (${user.email})${saved ? ', pedido guardado en el portal' : ''}` : 'no'}`,
+        `Cuenta de cliente: ${user ? `sí (${user.email})${saved ? ', pedido guardado en el portal' : ' — OJO: el pedido NO quedó guardado en el portal'}` : 'no'}`,
     ];
     if (holder) {
         lines.push(

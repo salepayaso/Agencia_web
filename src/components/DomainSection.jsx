@@ -112,7 +112,7 @@ const DomainSection = ({ embedded = false, kind = 'dominio', onOrdered, onCancel
             setFormError(err?.message === 'limite_diario'
                 ? 'Llegaste al máximo de pedidos por hoy. Si necesitas algo más, escríbenos por WhatsApp.'
                 : err?.message === 'sin_sesion'
-                    ? 'Tu sesión se cerró. Entra de nuevo a tu cuenta para pagar con tarjeta.'
+                    ? 'Tu sesión se cerró. Entra de nuevo a tu cuenta para hacer el pedido.'
                     : pay === 'webpay'
                         ? 'No pudimos abrir el pago con tarjeta. Intenta de nuevo o elige transferencia.'
                         : 'No pudimos enviar el pedido. Intenta de nuevo o escríbenos por WhatsApp.');
