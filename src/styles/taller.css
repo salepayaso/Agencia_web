@@ -499,6 +499,12 @@
   & .admin-input:focus { border-color: var(--ink); outline: none; box-shadow: 3px 3px 0 var(--signal); }
   & .admin-form { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px; }
   & .admin-form .wide { grid-column: 1 / -1; }
+  & .client-editor { display: grid; gap: 18px; margin-top: 8px; padding: 18px; background: var(--paper); border: 1.5px solid var(--ink); }
+  & .client-editor .tabs { width: 100%; }
+  & .client-editor .field em { color: var(--ink-2); }
+  & .client-editor .field em.st-warn { color: #b07a00; }
+  & .client-editor .field em.st-bad { color: var(--signal); }
+  & .client-editor .doc-list .admin-actions button { padding: 6px 10px; }
   & .portal-head .portal-lede { margin: 12px 0 0; font-size: 17px; color: var(--ink-2); max-width: 52ch; }
   & .portal-grid { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr); gap: 32px; align-items: start; padding-bottom: 80px; }
   @media (max-width: 960px) { & .portal-grid { grid-template-columns: minmax(0, 1fr); } }

@@ -650,7 +650,7 @@ const Overview = ({ profile, user, documents, tickets, orders, onNewRequest, onR
                     </div>
                 </section>
 
-                {(profile?.hosting_plan || profile?.disk_usage) && (
+                {profile?.hosting_plan && (
                     <section className="panel">
                         <div className="box-title"><b>Hosting</b><span className="muted">{profile?.hosting_plan}</span></div>
                         <div className="box-body">

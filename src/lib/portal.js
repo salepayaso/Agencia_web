@@ -16,6 +16,19 @@ export const TICKET_STATUS = {
 };
 export const isOpen = (t) => t.status !== 'solved';
 
+// Opciones fijas de la ficha (las elige el admin; el cliente ve el nombre del plan).
+// Un plan que no está en la lista es de un contrato anterior y se respeta tal cual.
+export const HOSTING_PLANS = [
+    { id: 'Hosting con correos', storage: '5 GB', emails: '5' },
+    { id: 'Pack hosting + dominio', storage: '5 GB', emails: '5' },
+];
+export const PAY_METHODS = ['Transferencia', 'Tarjeta (Webpay)', 'Mercado Pago'];
+export const DOC_TITLES = ['Contrato', 'Factura', 'Boleta', 'Cotización', 'Informe de entrega', 'Guía de configuración de correo', 'Certificado de dominio'];
+
+// "https://www.MiNegocio.cl/inicio" → "minegocio.cl"
+export const cleanDomain = (v) => String(v || '').trim().toLowerCase()
+    .replace(/^https?:\/\//, '').replace(/^www\./, '').replace(/\/.*$/, '');
+
 // Fechas 'AAAA-MM-DD' como fecha local (sin correrse un día por la zona horaria)
 export const parseDate = (v) => {
     if (!v) return null;

@@ -4,15 +4,20 @@ import { supabase } from '../supabase';
 import SEO from '../components/SEO';
 import Wordmark from '../components/Wordmark';
 import { PortalLoading } from '../components/ProtectedRoute';
-import { OFFERS, conIva, PAYS, clp, isOpenOrder, isUnpaidCard, orderStatus } from '../lib/orders';
-import { catLabel, TICKET_STATUS, isOpen, parseDate, fmt, daysFrom, dayWord, hasServices } from '../lib/portal';
+import { OFFERS, conIva, PAYS, clp, rutOk, isOpenOrder, isUnpaidCard, orderStatus } from '../lib/orders';
+import {
+    catLabel, TICKET_STATUS, isOpen, parseDate, fmt, daysFrom, dayWord, hasServices,
+    HOSTING_PLANS, PAY_METHODS, DOC_TITLES, cleanDomain,
+} from '../lib/portal';
 import { QUOTE_STATUS, briefNumber, briefRows, cleanBrief } from '../data/brief';
 
 // Panel de administración (/admin): cotizaciones, pedidos, clientes y soporte sin entrar a Supabase.
 // Solo para cuentas en la tabla admins (supabase_scripts/admin_panel_2026_09_30.sql).
 // Lee con las políticas "Admin can view all ..." y cambia datos SOLO con las
-// funciones admin_update_order / admin_update_ticket / admin_update_client
-// (y admin_create_brief / admin_update_quote, de cotizaciones_2026_10_12.sql),
+// funciones admin_update_order / admin_update_ticket,
+// admin_create_brief / admin_update_quote (cotizaciones_2026_10_12.sql) y
+// admin_update_profile / admin_set_client_note / admin_add_document /
+// admin_delete_document (fichas_admin_2026_10_12.sql),
 // que vuelven a revisar is_admin() en la base. Ocultar esta página no es la
 // seguridad: la seguridad está en la base.
 
@@ -20,6 +25,8 @@ const ERRORS = {
     no_autorizado: 'Tu cuenta no tiene permiso de administrador.',
     estado_invalido: 'Ese estado no es válido.',
     falta_nombre: 'Escribe el nombre del cliente.',
+    falta_titulo: 'Escribe el título del documento.',
+    correos_invalidos: 'La lista de correos no es válida.',
 };
 const errText = (e) => ERRORS[Object.keys(ERRORS).find((k) => (e?.message || '').includes(k))] || 'No se pudo guardar. Intenta de nuevo.';
 
@@ -38,18 +45,24 @@ const Admin = () => {
     const [orders, setOrders] = useState([]);
     const [tickets, setTickets] = useState([]);
     const [quotes, setQuotes] = useState([]);
+    const [documents, setDocuments] = useState([]);
+    const [notes, setNotes] = useState({});
 
     const load = useCallback(async () => {
-        const [p, o, t, q] = await Promise.all([
+        const [p, o, t, q, d, n] = await Promise.all([
             supabase.from('profiles').select('*').order('created_at', { ascending: false }),
             supabase.from('orders').select('*').order('created_at', { ascending: false }),
             supabase.from('tickets').select('*').order('created_at', { ascending: false }),
             supabase.from('quotes').select('*').order('created_at', { ascending: false }),
+            supabase.from('documents').select('*').order('created_at', { ascending: false }),
+            supabase.from('client_notes').select('*'),
         ]);
         setProfiles(p.data || []);
         setOrders(o.data || []);
         setTickets(t.data || []);
         setQuotes(q.data || []);
+        setDocuments(d.data || []);
+        setNotes(Object.fromEntries((n.data || []).map((x) => [x.user_id, x.note])));
     }, []);
 
     useEffect(() => {
@@ -126,7 +139,7 @@ const Admin = () => {
                             )}
                             {tab === 'cotizaciones' && <Quotes quotes={quotes} onChanged={load} />}
                             {tab === 'pedidos' && <Orders orders={orders} byId={byId} onChanged={load} />}
-                            {tab === 'clientes' && <Clients profiles={profiles} orders={orders} onChanged={load} />}
+                            {tab === 'clientes' && <Clients profiles={profiles} orders={orders} documents={documents} notes={notes} onChanged={load} />}
                             {tab === 'soporte' && <Tickets tickets={tickets} byId={byId} onChanged={load} />}
                         </div>
                     </div>
@@ -411,7 +424,18 @@ const OrderRow = ({ order: o, client, onChanged }) => {
 };
 
 // Clientes -------------------------------------------------------------------------------
-const Clients = ({ profiles, orders, onChanged }) => {
+// Avisos de la ficha que piden acción: fechas vencidas o datos que faltan.
+const clientWarnings = (p) => {
+    const out = [];
+    const exp = daysFrom(parseDate(p.domain_expires));
+    const pay = daysFrom(parseDate(p.next_payment_date));
+    if (p.domain_name && exp === null) out.push('Dominio sin fecha de vencimiento: no le llegará el aviso de renovación');
+    if (p.domain_name && p.domain_name !== cleanDomain(p.domain_name)) out.push(`El dominio debería ser ${cleanDomain(p.domain_name)}`);
+    if (pay !== null && pay < 0) out.push('El próximo pago tiene una fecha que ya pasó');
+    return out;
+};
+
+const Clients = ({ profiles, orders, documents, notes, onChanged }) => {
     const [q, setQ] = useState('');
     const [editing, setEditing] = useState(null);
     const term = q.trim().toLowerCase();
@@ -426,9 +450,11 @@ const Clients = ({ profiles, orders, onChanged }) => {
             </div>
             {list.map((p) => {
                 const mine = orders.filter((o) => o.user_id === p.id);
+                const docs = documents.filter((d) => d.user_id === p.id);
                 const active = hasServices(p, mine);
                 const exp = parseDate(p.domain_expires);
                 const left = daysFrom(exp);
+                const warnings = clientWarnings(p);
                 return (
                     <article className="ticket" key={p.id}>
                         <div className="t-top">
@@ -436,18 +462,21 @@ const Clients = ({ profiles, orders, onChanged }) => {
                             <span className={`pill ${active ? 'ok' : ''}`}>{active ? 'Cliente' : 'Sin servicios'}</span>
                         </div>
                         <span className="meta">
-                            {p.contact_email || p.email}{p.phone ? ` · ${p.phone}` : ''} · {mine.length} {mine.length === 1 ? 'pedido' : 'pedidos'}
+                            {p.contact_email || p.email}{p.phone ? ` · ${p.phone}` : ''} · {mine.length} {mine.length === 1 ? 'pedido' : 'pedidos'} · {docs.length} {docs.length === 1 ? 'documento' : 'documentos'}
                         </span>
                         <p className="desc">
                             {p.domain_name || p.active_web || 'Sin dominio ni sitio'}
                             {exp && <> · vence {fmt(exp)} <b className={left < 0 ? 'st-bad' : left <= 30 ? 'st-warn' : ''}>({left < 0 ? `vencido hace ${-left} ${dayWord(left)}` : `quedan ${left} ${dayWord(left)}`})</b></>}
+                            {p.hosting_plan && <> · {p.hosting_plan}</>}
                             {p.rut && <><br />Titular: {p.holder_name || '—'} · RUT {p.rut}</>}
+                            {notes[p.id] && <><br /><i>Nota: {notes[p.id]}</i></>}
                         </p>
+                        {warnings.map((w) => <p key={w} className="st-warn" style={{ margin: 0, fontSize: 13, fontWeight: 700 }}>⚠ {w}</p>)}
                         {editing === p.id ? (
-                            <ClientForm profile={p} onClose={() => setEditing(null)} onSaved={() => { setEditing(null); onChanged(); }} />
+                            <ClientEditor profile={p} documents={docs} note={notes[p.id] || ''} onClose={() => setEditing(null)} onChanged={onChanged} />
                         ) : (
                             <div className="admin-actions">
-                                <button type="button" className="btn" onClick={() => setEditing(p.id)}>Editar servicios</button>
+                                <button type="button" className="btn" onClick={() => setEditing(p.id)}>Editar ficha</button>
                                 {waLink(p.phone) && <a className="textlink" href={waLink(p.phone)} target="_blank" rel="noreferrer">WhatsApp</a>}
                             </div>
                         )}
@@ -459,45 +488,95 @@ const Clients = ({ profiles, orders, onChanged }) => {
     );
 };
 
-const ClientForm = ({ profile: p, onClose, onSaved }) => {
-    const [f, setF] = useState({
+const CLIENT_TABS = [
+    ['servicios', 'Servicios'],
+    ['hosting', 'Hosting y correos'],
+    ['titular', 'Titular'],
+    ['documentos', 'Documentos'],
+    ['nota', 'Nota interna'],
+];
+
+// Ficha del cliente con pestañas. Cada pestaña guarda solo sus campos.
+const ClientEditor = ({ profile: p, documents, note, onClose, onChanged }) => {
+    const [tab, setTab] = useState('servicios');
+    const [msg, setMsg] = useState(null); // { ok, text }
+
+    // Guarda los campos de la pestaña con admin_update_profile.
+    const saveProfile = async (fields) => {
+        setMsg(null);
+        const { error } = await supabase.rpc('admin_update_profile', { p_id: p.id, p: fields });
+        if (error) return setMsg({ ok: false, text: errText(error) });
+        setMsg({ ok: true, text: 'Guardado. El cliente ya lo ve en su portal.' });
+        onChanged();
+    };
+
+    return (
+        <div className="client-editor">
+            <div className="tabs" role="tablist" aria-label="Secciones de la ficha">
+                {CLIENT_TABS.map(([id, label]) => (
+                    <button key={id} type="button" role="tab" aria-selected={tab === id} onClick={() => { setTab(id); setMsg(null); }}>
+                        {label}{id === 'documentos' && documents.length > 0 && <span className="count">{documents.length}</span>}
+                    </button>
+                ))}
+            </div>
+            {tab === 'servicios' && <ServicesTab profile={p} onSave={saveProfile} />}
+            {tab === 'hosting' && <HostingTab profile={p} onSave={saveProfile} />}
+            {tab === 'titular' && <HolderTab profile={p} onSave={saveProfile} />}
+            {tab === 'documentos' && <DocumentsTab profile={p} documents={documents} onChanged={onChanged} />}
+            {tab === 'nota' && <NoteTab profile={p} note={note} onSaved={(text) => { setMsg({ ok: true, text }); onChanged(); }} />}
+            {msg && <p className={msg.ok ? 'alert ok' : 'alert'} role="status">{msg.text}</p>}
+            <div><button type="button" className="textlink" onClick={onClose}>Cerrar ficha</button></div>
+        </div>
+    );
+};
+
+// Formulario de una pestaña: estado propio + botón Guardar.
+const useTabForm = (initial) => {
+    const [f, setF] = useState(initial);
+    const [busy, setBusy] = useState(false);
+    const set = (k) => (e) => setF((x) => ({ ...x, [k]: e.target.value }));
+    const run = async (fn) => {
+        setBusy(true);
+        try { await fn(); } finally { setBusy(false); }
+    };
+    return { f, setF, set, busy, run };
+};
+
+const SaveButton = ({ busy }) => (
+    <div className="admin-actions wide">
+        <button type="submit" className="btn signal" disabled={busy}>{busy ? 'Guardando…' : 'Guardar →'}</button>
+    </div>
+);
+
+const ServicesTab = ({ profile: p, onSave }) => {
+    const { f, setF, set, busy, run } = useTabForm({
         domain_name: p.domain_name || '',
         domain_expires: p.domain_expires || '',
         active_web: p.active_web || '',
         site_status: p.site_status || 'online',
-        hosting_plan: p.hosting_plan || '',
         billing_cycle: p.billing_cycle || '',
         payment_method: p.payment_method || '',
         next_payment_date: p.next_payment_date || '',
     });
-    const [busy, setBusy] = useState(false);
-    const [error, setError] = useState('');
-    const set = (k) => (e) => setF((x) => ({ ...x, [k]: e.target.value }));
+    const exp = daysFrom(parseDate(f.domain_expires));
+    const pay = daysFrom(parseDate(f.next_payment_date));
+    const legacyPay = f.payment_method && !PAY_METHODS.includes(f.payment_method);
 
-    const submit = async (e) => {
+    const submit = (e) => {
         e.preventDefault();
-        setBusy(true);
-        setError('');
-        const { error: err } = await supabase.rpc('admin_update_client', {
-            p_id: p.id,
-            p_domain_name: f.domain_name,
-            p_domain_expires: f.domain_expires || null,
-            p_active_web: f.active_web,
-            p_site_status: f.site_status,
-            p_hosting_plan: f.hosting_plan,
-            p_billing_cycle: f.billing_cycle,
-            p_payment_method: f.payment_method,
-            p_next_payment_date: f.next_payment_date || null,
-        });
-        setBusy(false);
-        if (err) return setError(errText(err));
-        onSaved();
+        run(() => onSave({ ...f, domain_name: cleanDomain(f.domain_name) }));
     };
 
     return (
         <form className="admin-form" onSubmit={submit} noValidate>
-            <label className="field">Dominio<input value={f.domain_name} onChange={set('domain_name')} placeholder="minegocio.cl" autoCapitalize="none" /></label>
-            <label className="field">Vence el<input type="date" value={f.domain_expires} onChange={set('domain_expires')} /></label>
+            <label className="field">Dominio
+                <input value={f.domain_name} onChange={set('domain_name')} onBlur={() => setF((x) => ({ ...x, domain_name: cleanDomain(x.domain_name) }))} placeholder="minegocio.cl" autoCapitalize="none" />
+            </label>
+            <label className="field">Vence el
+                <input type="date" value={f.domain_expires} onChange={set('domain_expires')} />
+                {f.domain_name && !f.domain_expires && <em className="st-warn">Sin fecha no hay aviso de renovación</em>}
+                {exp !== null && exp < 0 && <em className="st-bad">Ya venció</em>}
+            </label>
             <label className="field">Sitio web<input value={f.active_web} onChange={set('active_web')} placeholder="www.minegocio.cl" autoCapitalize="none" /></label>
             <label className="field">Estado del sitio
                 <select value={f.site_status} onChange={set('site_status')}>
@@ -506,7 +585,6 @@ const ClientForm = ({ profile: p, onClose, onSaved }) => {
                     <option value="caido">Caído</option>
                 </select>
             </label>
-            <label className="field">Plan de hosting<input value={f.hosting_plan} onChange={set('hosting_plan')} placeholder="Hosting con correos" /></label>
             <label className="field">Ciclo de pago
                 <select value={f.billing_cycle} onChange={set('billing_cycle')}>
                     <option value="">Sin definir</option>
@@ -514,13 +592,254 @@ const ClientForm = ({ profile: p, onClose, onSaved }) => {
                     <option value="mensual">Mensual</option>
                 </select>
             </label>
-            <label className="field">Medio de pago (lo ve el cliente)<input value={f.payment_method} onChange={set('payment_method')} placeholder="Transferencia" /></label>
-            <label className="field">Próximo pago<input type="date" value={f.next_payment_date} onChange={set('next_payment_date')} /></label>
-            {error && <p className="alert wide" role="alert">{error}</p>}
-            <div className="admin-actions wide">
-                <button type="submit" className="btn signal" disabled={busy}>{busy ? 'Guardando…' : 'Guardar →'}</button>
-                <button type="button" className="textlink" onClick={onClose}>Cancelar</button>
+            <label className="field">Medio de pago <em>(lo ve el cliente)</em>
+                <select value={f.payment_method} onChange={set('payment_method')}>
+                    <option value="">Sin definir</option>
+                    {PAY_METHODS.map((m) => <option key={m} value={m}>{m}</option>)}
+                    {legacyPay && <option value={f.payment_method}>{f.payment_method} (anterior)</option>}
+                </select>
+            </label>
+            <label className="field">Próximo pago
+                <input type="date" value={f.next_payment_date} onChange={set('next_payment_date')} />
+                {pay !== null && pay < 0 && <em className="st-bad">Esta fecha ya pasó</em>}
+                {f.domain_expires && f.next_payment_date !== f.domain_expires && (
+                    <button type="button" className="textlink" style={{ justifySelf: 'start', textTransform: 'none', letterSpacing: 0 }} onClick={() => setF((x) => ({ ...x, next_payment_date: x.domain_expires }))}>
+                        Igual al vencimiento del dominio
+                    </button>
+                )}
+            </label>
+            <SaveButton busy={busy} />
+        </form>
+    );
+};
+
+const HostingTab = ({ profile: p, onSave }) => {
+    const { f, setF, set, busy, run } = useTabForm({
+        hosting_plan: p.hosting_plan || '',
+        storage_limit: p.storage_limit || '',
+        disk_usage: p.disk_usage || '',
+        email_count: p.email_count || '',
+        emails: Array.isArray(p.additional_emails) ? p.additional_emails.filter(Boolean) : [],
+    });
+    const [newEmail, setNewEmail] = useState('');
+    const [error, setError] = useState('');
+    const known = HOSTING_PLANS.some((h) => h.id === f.hosting_plan);
+    const limit = parseInt(f.email_count, 10) || 0;
+
+    // Al elegir un plan de la lista, el espacio y el cupo de correos se completan solos.
+    const pickPlan = (e) => {
+        const plan = HOSTING_PLANS.find((h) => h.id === e.target.value);
+        setF((x) => ({
+            ...x,
+            hosting_plan: e.target.value,
+            ...(plan ? { storage_limit: plan.storage, email_count: plan.emails } : {}),
+            ...(e.target.value === '' ? { storage_limit: '', email_count: '' } : {}),
+        }));
+    };
+
+    const addEmail = () => {
+        const e = newEmail.trim().toLowerCase();
+        setError('');
+        if (!/^[^\s@<>"]+@[^\s@<>"]+\.[^\s@<>"]{2,}$/.test(e)) return setError('Escribe un correo completo, por ejemplo contacto@minegocio.cl.');
+        if (f.emails.includes(e)) return setError('Ese correo ya está en la lista.');
+        if (limit && f.emails.length >= limit) return setError(`El plan tiene ${limit} correos. Sube el cupo si contrató más.`);
+        setF((x) => ({ ...x, emails: [...x.emails, e] }));
+        setNewEmail('');
+    };
+
+    const submit = (e) => {
+        e.preventDefault();
+        const { emails, ...rest } = f;
+        run(() => onSave({ ...rest, additional_emails: emails }));
+    };
+
+    return (
+        <form className="admin-form" onSubmit={submit} noValidate>
+            <label className="field">Plan de hosting <em>(lo ve el cliente)</em>
+                <select value={f.hosting_plan} onChange={pickPlan}>
+                    <option value="">Sin hosting</option>
+                    {HOSTING_PLANS.map((h) => <option key={h.id} value={h.id}>{h.id} ({h.emails} correos, {h.storage})</option>)}
+                    {f.hosting_plan && !known && <option value={f.hosting_plan}>Plan anterior: {f.hosting_plan}</option>}
+                </select>
+            </label>
+            <label className="field">Espacio contratado<input value={f.storage_limit} onChange={set('storage_limit')} placeholder="5 GB" /></label>
+            <label className="field">Espacio usado <em>(míralo en cPanel)</em><input value={f.disk_usage} onChange={set('disk_usage')} placeholder="12%" /></label>
+            <label className="field">Cupo de correos<input type="number" min="0" max="50" value={f.email_count} onChange={set('email_count')} /></label>
+
+            <div className="wide" style={{ display: 'grid', gap: 8 }}>
+                <span className="field">Correos del cliente ({f.emails.length}{limit ? ` de ${limit}` : ''})</span>
+                {f.emails.length > 0 && (
+                    <ul className="mail-list" style={{ margin: 0 }}>
+                        {f.emails.map((m) => (
+                            <li key={m}>
+                                <code>{m}</code>
+                                <button type="button" onClick={() => setF((x) => ({ ...x, emails: x.emails.filter((y) => y !== m) }))}>Quitar</button>
+                            </li>
+                        ))}
+                    </ul>
+                )}
+                <div className="admin-actions">
+                    <input className="admin-input" type="email" value={newEmail} onChange={(e) => setNewEmail(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); addEmail(); } }} placeholder={`contacto@${p.domain_name || 'minegocio.cl'}`} autoCapitalize="none" aria-label="Nuevo correo" />
+                    <button type="button" className="btn" onClick={addEmail}>Agregar</button>
+                </div>
+                <span className="muted" style={{ fontSize: 13 }}>Primero créalo en cPanel; aquí solo se anota para que el cliente lo vea en su portal.</span>
             </div>
+            {error && <p className="alert wide" role="alert">{error}</p>}
+            <SaveButton busy={busy} />
+        </form>
+    );
+};
+
+const HolderTab = ({ profile: p, onSave }) => {
+    const { f, set, busy, run } = useTabForm({
+        client_name: p.client_name || '',
+        contact_email: p.contact_email || '',
+        phone: p.phone || '',
+        holder_kind: p.holder_kind || 'persona',
+        holder_name: p.holder_name || '',
+        rut: p.rut || '',
+        address: p.address || '',
+    });
+    const badRut = f.rut.trim() && !rutOk(f.rut);
+
+    return (
+        <form className="admin-form" onSubmit={(e) => { e.preventDefault(); run(() => onSave(f)); }} noValidate>
+            <label className="field">Nombre en el portal<input value={f.client_name} onChange={set('client_name')} maxLength={120} /></label>
+            <label className="field">Correo de contacto<input type="email" value={f.contact_email} onChange={set('contact_email')} placeholder={p.email} autoCapitalize="none" /></label>
+            <label className="field">Teléfono / WhatsApp<input type="tel" value={f.phone} onChange={set('phone')} maxLength={30} /></label>
+            <label className="field">Titular de los dominios
+                <select value={f.holder_kind} onChange={set('holder_kind')}>
+                    <option value="persona">Persona</option>
+                    <option value="empresa">Empresa</option>
+                </select>
+            </label>
+            <label className="field">{f.holder_kind === 'empresa' ? 'Razón social' : 'Nombre completo'}<input value={f.holder_name} onChange={set('holder_name')} maxLength={120} /></label>
+            <label className="field">RUT
+                <input value={f.rut} onChange={set('rut')} maxLength={20} placeholder="76.123.456-7" />
+                {badRut && <em className="st-bad">El dígito verificador no calza</em>}
+            </label>
+            <label className="field wide">Dirección<input value={f.address} onChange={set('address')} maxLength={200} /></label>
+            <SaveButton busy={busy} />
+        </form>
+    );
+};
+
+// Nombre de archivo seguro para el bucket: sin tildes ni espacios.
+const safeFileName = (name) => name.normalize('NFD').replace(/[̀-ͯ]/g, '')
+    .replace(/[^a-zA-Z0-9.]+/g, '-').replace(/^-+|-+$/g, '').toLowerCase().slice(-80);
+
+const MAX_DOC_BYTES = 10 * 1024 * 1024;
+
+const DocumentsTab = ({ profile: p, documents, onChanged }) => {
+    const [title, setTitle] = useState('');
+    const [file, setFile] = useState(null);
+    const [inputKey, setInputKey] = useState(0);
+    const [busy, setBusy] = useState(null);
+    const [msg, setMsg] = useState(null);
+
+    const upload = async (e) => {
+        e.preventDefault();
+        setMsg(null);
+        if (title.trim().length < 2) return setMsg({ ok: false, text: 'Escribe el título que verá el cliente.' });
+        if (!file) return setMsg({ ok: false, text: 'Elige el archivo.' });
+        if (file.size > MAX_DOC_BYTES) return setMsg({ ok: false, text: 'El archivo pesa más de 10 MB.' });
+        setBusy('subir');
+        // Carpeta por cliente: el archivo es solo de este documento.
+        const path = `${p.id}/${Date.now()}-${safeFileName(file.name)}`;
+        const { error: upErr } = await supabase.storage.from('documents').upload(path, file, { contentType: file.type });
+        if (upErr) {
+            setBusy(null);
+            return setMsg({ ok: false, text: /mime|type/i.test(upErr.message) ? 'Solo PDF, JPG, PNG o WEBP.' : 'No se pudo subir el archivo. Intenta de nuevo.' });
+        }
+        const { error: rpcErr } = await supabase.rpc('admin_add_document', { p_user: p.id, p_title: title, p_path: path });
+        if (rpcErr) {
+            await supabase.storage.from('documents').remove([path]);
+            setBusy(null);
+            return setMsg({ ok: false, text: errText(rpcErr) });
+        }
+        setBusy(null);
+        setTitle('');
+        setFile(null);
+        setInputKey((k) => k + 1);
+        setMsg({ ok: true, text: 'Listo: el cliente ya lo ve en Documentos.' });
+        onChanged();
+    };
+
+    const open = async (d) => {
+        const { data } = await supabase.storage.from('documents').createSignedUrl(d.file_url, 60);
+        if (data?.signedUrl) window.open(data.signedUrl, '_blank', 'noopener');
+        else setMsg({ ok: false, text: `No se pudo abrir "${d.title}".` });
+    };
+
+    const remove = async (d) => {
+        if (!window.confirm(`¿Quitar "${d.title}" del portal del cliente?`)) return;
+        setBusy(d.id);
+        setMsg(null);
+        const { data: path, error } = await supabase.rpc('admin_delete_document', { p_id: d.id });
+        // El archivo se borra solo si es de la carpeta de este cliente: los
+        // antiguos (en la raíz del bucket) pueden estar compartidos con otros.
+        if (!error && path?.startsWith(`${p.id}/`)) await supabase.storage.from('documents').remove([path]);
+        setBusy(null);
+        if (error) return setMsg({ ok: false, text: errText(error) });
+        onChanged();
+    };
+
+    return (
+        <div className="admin-form">
+            <div className="wide">
+                {documents.length ? (
+                    <ul className="doc-list" style={{ border: '1px solid var(--rule)' }}>
+                        {documents.map((d) => (
+                            <li key={d.id}>
+                                <span>{d.title}<small>{new Date(d.created_at).toLocaleDateString('es-CL')}</small></span>
+                                <span className="admin-actions" style={{ flex: 'none' }}>
+                                    <button type="button" onClick={() => open(d)}>Ver</button>
+                                    <button type="button" onClick={() => remove(d)} disabled={busy === d.id}>{busy === d.id ? 'Quitando…' : 'Quitar'}</button>
+                                </span>
+                            </li>
+                        ))}
+                    </ul>
+                ) : <p className="muted" style={{ margin: 0 }}>Este cliente no tiene documentos.</p>}
+            </div>
+            <form className="admin-form wide" onSubmit={upload} noValidate>
+                <label className="field">Título <em>(lo ve el cliente)</em>
+                    <input list="doc-titles" value={title} onChange={(e) => setTitle(e.target.value)} maxLength={120} placeholder="Contrato, Factura N.º 12…" />
+                    <datalist id="doc-titles">{DOC_TITLES.map((t) => <option key={t} value={t} />)}</datalist>
+                </label>
+                <label className="field">Archivo <em>(PDF o imagen, hasta 10 MB)</em>
+                    <input key={inputKey} type="file" accept="application/pdf,image/jpeg,image/png,image/webp" onChange={(e) => setFile(e.target.files?.[0] || null)} />
+                </label>
+                <div className="admin-actions wide">
+                    <button type="submit" className="btn signal" disabled={busy === 'subir'}>{busy === 'subir' ? 'Subiendo…' : 'Subir documento →'}</button>
+                </div>
+            </form>
+            {msg && <p className={msg.ok ? 'alert ok wide' : 'alert wide'} role="status">{msg.text}</p>}
+        </div>
+    );
+};
+
+const NoteTab = ({ profile: p, note, onSaved }) => {
+    const [text, setText] = useState(note);
+    const [busy, setBusy] = useState(false);
+    const [error, setError] = useState('');
+
+    const submit = async (e) => {
+        e.preventDefault();
+        setBusy(true);
+        setError('');
+        const { error: err } = await supabase.rpc('admin_set_client_note', { p_id: p.id, p_note: text });
+        setBusy(false);
+        if (err) return setError(errText(err));
+        onSaved('Nota guardada. El cliente no la ve.');
+    };
+
+    return (
+        <form className="admin-form" onSubmit={submit} noValidate>
+            <label className="field wide">Nota interna <em>(solo la ves tú: otros dominios, acuerdos, contrato anterior…)</em>
+                <textarea value={text} onChange={(e) => setText(e.target.value)} maxLength={3000} rows={5} />
+            </label>
+            {error && <p className="alert wide" role="alert">{error}</p>}
+            <SaveButton busy={busy} />
         </form>
     );
 };
