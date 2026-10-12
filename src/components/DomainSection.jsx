@@ -113,8 +113,8 @@ const DomainSection = ({ embedded = false, kind = 'dominio', onOrdered, onCancel
                 ? 'Llegaste al máximo de pedidos por hoy. Si necesitas algo más, escríbenos por WhatsApp.'
                 : err?.message === 'sin_sesion'
                     ? 'Tu sesión se cerró. Entra de nuevo a tu cuenta para hacer el pedido.'
-                    : pay === 'webpay'
-                        ? 'No pudimos abrir el pago con tarjeta. Intenta de nuevo o elige transferencia.'
+                    : PAYS[pay]?.online
+                        ? `No pudimos abrir el pago en ${PAYS[pay].site}. Intenta de nuevo o elige transferencia.`
                         : 'No pudimos enviar el pedido. Intenta de nuevo o escríbenos por WhatsApp.');
         } finally {
             setSending(false);
@@ -272,14 +272,14 @@ const DomainSection = ({ embedded = false, kind = 'dominio', onOrdered, onCancel
                             <fieldset className="pay">
                                 <legend>¿Cómo quieres pagar?</legend>
                                 {ACTIVE_PAYS.map(([id, p]) => {
-                                    // Tarjeta pide cuenta: el pedido pagado queda en el portal
+                                    // Los pagos en línea piden cuenta: el pedido pagado queda en el portal
                                     const locked = p.needsAccount && !loggedIn;
                                     return (
                                         <label key={id} aria-disabled={locked || undefined} style={locked ? { opacity: 0.6 } : undefined}>
                                             <input type="radio" name="pay" value={id} checked={pay === id} disabled={locked} onChange={(e) => setPay(e.target.value)} />
                                             <span>
                                                 <b>{p.label}</b>
-                                                <small>{locked ? <><Link to="/login">Entra o crea tu cuenta</Link> para pagar con tarjeta</> : p.note}</small>
+                                                <small>{locked ? <><Link to="/login">Entra o crea tu cuenta</Link> para pagar en línea</> : p.note}</small>
                                             </span>
                                         </label>
                                     );
@@ -288,8 +288,8 @@ const DomainSection = ({ embedded = false, kind = 'dominio', onOrdered, onCancel
                             {formError && <p className="err" role="alert">{formError}</p>}
                             <div className="bnav">
                                 <button className="btn signal" type="submit" disabled={sending}>
-                                    {pay === 'webpay'
-                                        ? (sending ? 'Abriendo Webpay…' : `Pagar con Webpay · ${clp(plan.price)} →`)
+                                    {PAYS[pay]?.online
+                                        ? (sending ? `Abriendo ${PAYS[pay].site}…` : `Pagar con ${PAYS[pay].site} · ${clp(plan.price)} →`)
                                         : (sending ? 'Enviando…' : `Confirmar pedido · ${clp(plan.price)} →`)}
                                 </button>
                                 <button className="link" type="button" onClick={() => setStep(1)}>← Volver</button>

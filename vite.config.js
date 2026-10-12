@@ -162,13 +162,15 @@ const contactDevApi = () => ({
   },
 });
 
-// Sirve /api/webpay/crear y /api/webpay/retorno en desarrollo local (npm run dev),
-// contra el ambiente de integración de Transbank (tarjetas de prueba).
-// Necesita SUPABASE_SERVICE_ROLE_KEY en .env. En producción Vercel usa api/webpay/*.js.
-const webpayDevApi = () => ({
-  name: 'webpay-dev-api',
+// Sirve los pagos en línea en desarrollo local (npm run dev):
+//   /api/webpay/crear y retorno, contra la integración de Transbank (tarjetas de prueba).
+//   /api/mercadopago/crear y retorno, con MP_ACCESS_TOKEN de prueba (TEST-…). El
+//   webhook no llega a localhost: el pago se registra al volver de Mercado Pago.
+// Necesita SUPABASE_SERVICE_ROLE_KEY en .env. En producción Vercel usa api/<pasarela>/*.js.
+const paymentDevApi = (gateway) => ({
+  name: `${gateway}-dev-api`,
   configureServer(server) {
-    server.middlewares.use('/api/webpay', async (req, res) => {
+    server.middlewares.use(`/api/${gateway}`, async (req, res) => {
       const route = new URL(req.url, 'http://localhost');
       const name = route.pathname.replace(/^\//, '');
       if (!['crear', 'retorno'].includes(name)) {
@@ -196,7 +198,7 @@ const webpayDevApi = () => ({
           return vercelRes;
         },
       });
-      const { default: handler } = await server.ssrLoadModule(`./api/webpay/${name}.js`);
+      const { default: handler } = await server.ssrLoadModule(`./api/${gateway}/${name}.js`);
       await handler(req, vercelRes);
     });
   },
@@ -213,7 +215,8 @@ export default defineConfig(({ mode }) => {
     domainCheckDevApi(),
     chatDevApi(),
     contactDevApi(),
-    webpayDevApi(),
+    paymentDevApi('webpay'),
+    paymentDevApi('mercadopago'),
     ViteImageOptimizer({
       png: {
         quality: 80,

@@ -13,31 +13,13 @@
 
 import { OFFERS } from '../../src/data/catalogo.js';
 import { confirmarTransaccion, estaAprobada } from '../_lib/webpay.js';
-import { getOrder, getOrderByToken, updatePendingOrder, sendPaymentNotice } from '../_lib/orderStore.js';
-import { supabaseConfig } from '../_lib/leadStore.js';
+import { getOrder, getOrderByToken, updatePendingOrder, sendPaymentNotice, emailDe } from '../_lib/orderStore.js';
+import { volverAlPortal } from '../_lib/checkout.js';
 
-const volver = (res, estado, pedido) => {
-    const qs = new URLSearchParams({ pago: estado, ...(pedido ? { pedido: String(pedido) } : {}) });
-    res.statusCode = 303;
-    res.setHeader('Location', `/dashboard?${qs}`);
-    res.end();
-};
+const volver = volverAlPortal;
 
 // Vercel ya parsea el formulario en req.body; el querystring cubre la llegada por GET.
 const campos = (req) => ({ ...(req.query || {}), ...(typeof req.body === 'object' && req.body ? req.body : {}) });
-
-async function emailDe(userId) {
-    const config = supabaseConfig();
-    try {
-        const r = await fetch(`${config.url}/rest/v1/profiles?id=eq.${userId}&select=email,contact_email`, {
-            headers: { apikey: config.key, Authorization: `Bearer ${config.key}` },
-        });
-        const [p] = await r.json();
-        return p?.contact_email || p?.email || '';
-    } catch {
-        return '';
-    }
-}
 
 export default async function handler(req, res) {
     const { token_ws: tokenWs, TBK_TOKEN: tbkToken } = campos(req);

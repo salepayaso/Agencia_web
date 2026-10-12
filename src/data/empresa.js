@@ -12,6 +12,6 @@ export const EMPRESA = {
 };
 
 // Fecha visible en las páginas legales. Cambiarla cada vez que se modifiquen.
-export const LEGAL_ACTUALIZADO = '4 de octubre de 2026';
+export const LEGAL_ACTUALIZADO = '11 de octubre de 2026';
 
 export const pendiente = (valor, etiqueta) => valor || `[${etiqueta} por completar]`;

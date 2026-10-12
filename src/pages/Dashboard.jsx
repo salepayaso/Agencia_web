@@ -5,7 +5,7 @@ import SEO from '../components/SEO';
 import Wordmark from '../components/Wordmark';
 import { PortalLoading } from '../components/ProtectedRoute';
 import DomainSection from '../components/DomainSection';
-import { OFFERS, PAYS, ACTIVE_PAYS, DEFAULT_PAY, clp, submitOrder, rutOk, isOpenOrder, isUnpaidCard, orderStatus } from '../lib/orders';
+import { OFFERS, PAYS, ACTIVE_PAYS, DEFAULT_PAY, clp, submitOrder, rutOk, isOpenOrder, isUnpaidCard, isOnlineOrder, orderStatus } from '../lib/orders';
 import { CATEGORIES, catLabel, TICKET_STATUS as STATUS, isOpen, parseDate, fmt, daysFrom, dayWord, hasServices, firstName } from '../lib/portal';
 
 // Portal del cliente ("Tu cuenta, en orden"): dominio, plan y pagos, correos,
@@ -25,11 +25,12 @@ const parseEmails = (raw) => {
     }
 };
 
-// Vuelta desde Webpay: api/webpay/retorno.js manda a /dashboard?pago=<estado>&pedido=<id>
+// Vuelta desde Webpay o Mercado Pago: api/webpay/retorno.js y api/mercadopago/retorno.js mandan a /dashboard?pago=<estado>&pedido=<id>
 const PAGO_MSG = {
     ok: { cls: 'ok', t: (n) => `Pago recibido${n ? ` (pedido N.º ${n})` : ''}. Lo activamos dentro de un día hábil y te avisamos aquí.` },
     rechazado: { cls: '', t: () => 'El pago fue rechazado y no se hizo ningún cobro. Puedes intentarlo de nuevo o elegir transferencia.' },
-    anulado: { cls: '', t: () => 'Anulaste el pago en Webpay. No se hizo ningún cobro.' },
+    anulado: { cls: '', t: () => 'Saliste del pago sin completarlo. No se hizo ningún cobro.' },
+    proceso: { cls: '', t: (n) => `Tu pago${n ? ` del pedido N.º ${n}` : ''} está en revisión en Mercado Pago. Te avisamos aquí apenas se apruebe.` },
     error: { cls: '', t: (n) => `No pudimos confirmar el pago${n ? ` del pedido N.º ${n}` : ''}. Si ves un cargo en tu tarjeta, escríbenos en Soporte y lo revisamos.` },
 };
 
@@ -89,7 +90,7 @@ const Dashboard = () => {
             setDocuments(docs || []);
             const [, ords] = await Promise.all([loadTickets(u.id), loadOrders(u.id)]);
             setTab(pago || !hasServices(p, ords) ? 'contratar' : 'resumen');
-            // El aviso de Webpay se muestra una vez: si recarga, no vuelve a salir
+            // El aviso del pago se muestra una vez: si recarga, no vuelve a salir
             if (pago) window.history.replaceState(null, '', '/dashboard');
             setLoading(false);
         };
@@ -299,13 +300,13 @@ const Hire = ({ user, profile, orders, renewing, setRenewing, onOrdered }) => {
                             </span>
                             {o.admin_note && <div className="reply"><b>Nota de Interfaz 360</b>{o.admin_note}</div>}
                             {isUnpaidCard(o) && (
-                                <p className="desc">El pago con tarjeta no se completó y no se hizo ningún cobro. Si aún lo quieres, haz el pedido de nuevo.</p>
+                                <p className="desc">El pago en línea no se completó y no se hizo ningún cobro. Si aún lo quieres, haz el pedido de nuevo.</p>
                             )}
                             {o.status === 'pendiente' && !isUnpaidCard(o) && !o.admin_note && (
                                 <p className="desc">Te escribimos al correo con {o.payment_method === 'tr' ? 'los datos para transferir' : 'el enlace de pago'}.</p>
                             )}
-                            {o.status === 'pagado' && o.payment_method === 'webpay' && !o.admin_note && (
-                                <p className="desc">Pagaste con tarjeta{o.payment_info?.card_last4 ? ` terminada en ${o.payment_info.card_last4}` : ''}. Lo activamos dentro de un día hábil y te avisamos aquí.</p>
+                            {o.status === 'pagado' && isOnlineOrder(o) && !o.admin_note && (
+                                <p className="desc">Pagaste {o.payment_method === 'mp' ? 'con Mercado Pago' : 'con tarjeta'}{o.payment_info?.card_last4 ? ` terminada en ${o.payment_info.card_last4}` : ''}. Lo activamos dentro de un día hábil y te avisamos aquí.</p>
                             )}
                         </article>
                     );
@@ -380,7 +381,7 @@ const RenewDomain = ({ user, profile, onDone, onCancel }) => {
             setError(err?.message === 'limite_diario'
                 ? 'Llegaste al máximo de pedidos por hoy. Si necesitas algo más, escríbenos en Soporte.'
                 : err?.message === 'sin_sesion' ? SESSION_CLOSED
-                    : pay === 'webpay' ? 'No pudimos abrir el pago con tarjeta. Intenta de nuevo o elige transferencia.'
+                    : PAYS[pay]?.online ? `No pudimos abrir el pago en ${PAYS[pay].site}. Intenta de nuevo o elige transferencia.`
                         : 'No pudimos enviar la renovación. Intenta de nuevo en un momento.');
         } finally {
             setSending(false);
@@ -425,11 +426,11 @@ const RenewDomain = ({ user, profile, onDone, onCancel }) => {
                     {error && <p className="alert" role="alert">{error}</p>}
                     <div style={{ display: 'flex', gap: 14, alignItems: 'center', flexWrap: 'wrap' }}>
                         <button type="submit" className="btn signal" disabled={sending}>
-                            {pay === 'webpay'
-                                ? (sending ? 'Abriendo Webpay…' : `Pagar con Webpay · ${clp(price)} →`)
+                            {PAYS[pay]?.online
+                                ? (sending ? `Abriendo ${PAYS[pay].site}…` : `Pagar con ${PAYS[pay].site} · ${clp(price)} →`)
                                 : (sending ? 'Enviando…' : `Confirmar renovación · ${clp(price)} →`)}
                         </button>
-                        <span className="muted" style={{ fontSize: 13 }}>{pay === 'webpay' ? 'Pagas en Webpay, el sitio seguro de Transbank.' : 'No se cobra ahora: te enviamos el pago por correo.'}</span>
+                        <span className="muted" style={{ fontSize: 13 }}>{PAYS[pay]?.online ? PAYS[pay].siteNote : 'No se cobra ahora: te enviamos el pago por correo.'}</span>
                     </div>
                 </form>
             )}
@@ -459,7 +460,7 @@ const HostingOrder = ({ user, onDone, onCancel }) => {
             setError(err?.message === 'limite_diario'
                 ? 'Llegaste al máximo de pedidos por hoy. Si necesitas algo más, escríbenos en Soporte.'
                 : err?.message === 'sin_sesion' ? SESSION_CLOSED
-                    : pay === 'webpay' ? 'No pudimos abrir el pago con tarjeta. Intenta de nuevo o elige transferencia.'
+                    : PAYS[pay]?.online ? `No pudimos abrir el pago en ${PAYS[pay].site}. Intenta de nuevo o elige transferencia.`
                         : 'No pudimos enviar el pedido. Intenta de nuevo en un momento.');
         } finally {
             setSending(false);
@@ -497,11 +498,11 @@ const HostingOrder = ({ user, onDone, onCancel }) => {
                     {error && <p className="alert" role="alert">{error}</p>}
                     <div style={{ display: 'flex', gap: 14, alignItems: 'center', flexWrap: 'wrap' }}>
                         <button type="submit" className="btn signal" disabled={sending}>
-                            {pay === 'webpay'
-                                ? (sending ? 'Abriendo Webpay…' : `Pagar con Webpay · ${clp(price)} →`)
+                            {PAYS[pay]?.online
+                                ? (sending ? `Abriendo ${PAYS[pay].site}…` : `Pagar con ${PAYS[pay].site} · ${clp(price)} →`)
                                 : (sending ? 'Enviando…' : `Confirmar pedido · ${clp(price)} →`)}
                         </button>
-                        <span className="muted" style={{ fontSize: 13 }}>{pay === 'webpay' ? 'Pagas en Webpay, el sitio seguro de Transbank.' : 'No se cobra ahora: te enviamos el pago por correo.'}</span>
+                        <span className="muted" style={{ fontSize: 13 }}>{PAYS[pay]?.online ? PAYS[pay].siteNote : 'No se cobra ahora: te enviamos el pago por correo.'}</span>
                     </div>
                 </form>
             )}

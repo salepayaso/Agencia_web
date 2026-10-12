@@ -1,4 +1,4 @@
-// Pedidos pagados con Webpay: acceso a Supabase con la service role (REST, sin SDK,
+// Pedidos pagados en línea (Webpay o Mercado Pago): acceso a Supabase con la service role (REST, sin SDK,
 // igual que leadStore.js) y el aviso por correo cuando entra un pago.
 // La service role salta RLS y el trigger de límite diario, así que las reglas
 // que en el portal pone la base (dueño del pedido, 5 pedidos al día) se
@@ -74,6 +74,16 @@ export async function updatePendingOrder(id, patch) {
     return order || null;
 }
 
+/** Correo de contacto de la cuenta, para el aviso de pago. */
+export async function emailDe(userId) {
+    try {
+        const [p] = await rows(await rest(`profiles?id=eq.${userId}&select=email,contact_email`), 'perfil');
+        return p?.contact_email || p?.email || '';
+    } catch {
+        return '';
+    }
+}
+
 const clp = (n) => `$${Number(n).toLocaleString('es-CL')}`;
 
 /** Aviso al equipo de un pago aprobado. Si falla, el pago igual queda registrado. */
@@ -86,6 +96,7 @@ export async function sendPaymentNotice(order, { title, email }) {
     }
     const h = order.holder || {};
     const info = order.payment_info || {};
+    const medio = order.payment_method === 'mp' ? 'Mercado Pago' : 'Webpay';
     const fila = (k, v) => (v ? `<tr><td style="padding:6px 0;color:#666;width:150px;"><strong>${k}:</strong></td><td style="padding:6px 0;">${escapeHtml(String(v))}</td></tr>` : '');
 
     try {
@@ -96,16 +107,17 @@ export async function sendPaymentNotice(order, { title, email }) {
                 from: avisosFrom(),
                 to: [destino],
                 ...(email ? { reply_to: email } : {}),
-                subject: `💳 Pago Webpay recibido — pedido N.º ${order.id} · ${clp(order.amount)}`,
+                subject: `💳 Pago ${medio} recibido — pedido N.º ${order.id} · ${clp(order.amount)}`,
                 html: `
                     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-                        <h2 style="color:#e8471c;margin-bottom:4px;">Pago con Webpay aprobado</h2>
+                        <h2 style="color:#e8471c;margin-bottom:4px;">Pago con ${medio} aprobado</h2>
                         <p style="color:#666;margin-top:0;">Queda como "Pago recibido" en /admin. Falta activarlo.</p>
                         <table style="width:100%;border-collapse:collapse;">
                             ${fila('Pedido', `N.º ${order.id} · ${title}${order.domain ? ` · ${order.domain}` : ''}`)}
                             ${fila('Plan', `${order.years} año${order.years > 1 ? 's' : ''}`)}
                             ${fila('Monto', clp(order.amount))}
                             ${fila('Orden de compra', order.buy_order)}
+                            ${fila('N.º de pago MP', info.mp_payment_id)}
                             ${fila('Autorización', info.authorization_code)}
                             ${fila('Tarjeta', info.card_last4 ? `**** ${info.card_last4} (${info.payment_type_code || ''})` : '')}
                             ${fila('Cuenta', email)}

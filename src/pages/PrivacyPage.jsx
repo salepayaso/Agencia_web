@@ -146,6 +146,11 @@ const PrivacyPage = () => {
                                     <strong>Transbank</strong> (Chile): procesa los pagos con tarjeta vía Webpay.
                                     Nosotros no vemos ni guardamos los datos de tu tarjeta: solo el resultado del pago y los últimos 4 dígitos.
                                 </li>
+                                <li>
+                                    <strong>Mercado Pago</strong> (Chile): procesa los pagos que hagas con Mercado Pago. Le entregamos
+                                    el correo de tu cuenta y el detalle de la compra; los datos de tu tarjeta o de tu cuenta de Mercado Pago
+                                    los ingresas en su sitio y nosotros solo recibimos el resultado del pago y los últimos 4 dígitos.
+                                </li>
                             </ul>
                             <p>
                                 También podemos entregar datos cuando una ley o una autoridad competente lo exija.

@@ -2,8 +2,9 @@ import { supabase } from '../supabase';
 import { OFFERS } from '../data/catalogo';
 
 // Pedidos de dominio, hosting y pack desde el sitio y el portal.
-// - Tarjeta (Webpay): se cobra en línea; el pedido lo crea el servidor
-//   (api/webpay/crear.js) y queda "Pago recibido" solo. Requiere cuenta.
+// - En línea (Webpay o Mercado Pago): el pedido lo crea el servidor
+//   (api/webpay/crear.js, api/mercadopago/crear.js) y queda "Pago recibido"
+//   solo cuando la pasarela confirma el cobro. Requiere cuenta.
 // - Transferencia: el pedido no cobra; queda guardado (si la persona tiene
 //   cuenta), nos llega por correo y coordinamos el pago.
 // Regla vigente: nunca registrar ni activar nada sin el pago recibido.
@@ -15,13 +16,16 @@ export { OFFERS };
 // en línea no lo muestra hasta tener el código de comercio de Transbank.
 // En `npm run dev` siempre está encendido (usa el comercio de prueba).
 const WEBPAY_ON = import.meta.env.DEV || import.meta.env.VITE_PAGO_WEBPAY === 'si';
+// Mercado Pago, igual con VITE_PAGO_MP=si. No hay credenciales públicas de prueba:
+// también en `npm run dev` necesita VITE_PAGO_MP=si y MP_ACCESS_TOKEN en .env.
+const MP_ON = import.meta.env.VITE_PAGO_MP === 'si';
 
 // active: si el cliente la puede elegir hoy. Para encender o apagar una, cambiar
 // a true/false: el pedido, el portal y los textos se ajustan solos.
-// Mercado Pago queda oculto (sin pedidos nuevos); se mantiene para leer pedidos antiguos.
+// online: se paga en la página de la pasarela (site) y requiere cuenta.
 export const PAYS = {
-    webpay: { label: 'Tarjeta', note: 'Débito o crédito vía Webpay', active: WEBPAY_ON, needsAccount: true },
-    mp: { label: 'Mercado Pago', note: 'Tarjeta o saldo, con un link de pago', active: false },
+    webpay: { label: 'Tarjeta', note: 'Débito o crédito vía Webpay', active: WEBPAY_ON, needsAccount: true, online: true, site: 'Webpay', siteNote: 'Pagas en Webpay, el sitio seguro de Transbank.' },
+    mp: { label: 'Mercado Pago', note: 'Tarjeta o saldo de Mercado Pago', active: MP_ON, needsAccount: true, online: true, site: 'Mercado Pago', siteNote: 'Pagas en el sitio seguro de Mercado Pago.' },
     tr: { label: 'Transferencia', note: 'Activamos al confirmar el depósito', active: true },
 };
 
@@ -42,9 +46,13 @@ export const ORDER_STATUS = {
     cancelado: { label: 'Cancelado', cls: '' },
 };
 
-// Pedido con tarjeta que nunca volvió de Webpay (cerró la pestaña o se cortó):
-// no hubo cobro. No cuenta como pedido en curso ni se confirma a mano.
-export const isUnpaidCard = (o) => o.status === 'pendiente' && o.payment_method === 'webpay';
+// Pedido pagado en línea: Webpay, o Mercado Pago creado por el servidor (trae
+// monto). Los de Mercado Pago sin monto son del link de pago manual (antiguos).
+export const isOnlineOrder = (o) => o.payment_method === 'webpay' || (o.payment_method === 'mp' && o.amount != null);
+
+// Pedido en línea que nunca se pagó (cerró la pestaña, se cortó o rechazaron
+// la tarjeta): no hubo cobro. No cuenta como pedido en curso ni se confirma a mano.
+export const isUnpaidCard = (o) => o.status === 'pendiente' && isOnlineOrder(o);
 export const isOpenOrder = (o) => o.status === 'pagado' || (o.status === 'pendiente' && !isUnpaidCard(o));
 export const orderStatus = (o) => (isUnpaidCard(o)
     ? { label: 'Pago sin completar', cls: '' }
@@ -172,17 +180,13 @@ export const placeOrder = async ({ user, kind, domain, years = 1, pay, holder, r
     return { saved, mailed };
 };
 
-/**
- * Paga con tarjeta: el servidor guarda el pedido con el precio del catálogo y abre
- * la transacción; aquí solo se envía el navegador a Webpay (POST con token_ws).
- * Al terminar, Transbank vuelve a /api/webpay/retorno y de ahí a /dashboard?pago=…
- * Lanza 'limite_diario', 'sin_sesion' u 'order_failed'.
- */
-export const payWithWebpay = async ({ user, kind, domain, years = 1, holder }) => {
+// Abre el pago en línea: el servidor guarda el pedido con el precio del catálogo y
+// devuelve a dónde ir. Lanza 'limite_diario', 'sin_sesion' u 'order_failed'.
+const startOnline = async ({ user, kind, domain, years = 1, holder }, endpoint, payment) => {
     const { data: { session } } = await supabase.auth.getSession();
     if (!session) throw new Error('sin_sesion');
 
-    const res = await fetch('/api/webpay/crear', {
+    const res = await fetch(endpoint, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${session.access_token}` },
         body: JSON.stringify({ kind, domain, years: Number(years), holder: holder || null }),
@@ -190,7 +194,7 @@ export const payWithWebpay = async ({ user, kind, domain, years = 1, holder }) =
     const json = await res.json().catch(() => ({}));
     if (res.status === 429 && json.error === 'limite_diario') throw new Error('limite_diario');
     if (res.status === 401) throw new Error('sin_sesion');
-    if (!res.ok || !json.url || !json.token) throw new Error('order_failed');
+    if (!res.ok || !json.url) throw new Error('order_failed');
 
     // Los datos del titular quedan en la ficha para la próxima compra
     if (holder && user) {
@@ -203,7 +207,17 @@ export const payWithWebpay = async ({ user, kind, domain, years = 1, holder }) =
         }).eq('id', user.id);
     }
 
-    window.dataLayer?.push({ event: 'begin_checkout', order_kind: kind, domain_name: domain, plan_years: years, payment: 'webpay' });
+    window.dataLayer?.push({ event: 'begin_checkout', order_kind: kind, domain_name: domain, plan_years: years, payment });
+    return json;
+};
+
+/**
+ * Paga con tarjeta en Webpay: el navegador va a Transbank con un POST (token_ws).
+ * Al terminar, Transbank vuelve a /api/webpay/retorno y de ahí a /dashboard?pago=…
+ */
+export const payWithWebpay = async (args) => {
+    const json = await startOnline(args, '/api/webpay/crear', 'webpay');
+    if (!json.token) throw new Error('order_failed');
 
     const form = document.createElement('form');
     form.method = 'POST';
@@ -219,5 +233,19 @@ export const payWithWebpay = async ({ user, kind, domain, years = 1, holder }) =
     return new Promise(() => {});
 };
 
-/** Pedido con la forma de pago elegida: tarjeta va a Webpay, lo demás por correo. */
-export const submitOrder = (args) => (args.pay === 'webpay' ? payWithWebpay(args) : placeOrder(args));
+/**
+ * Paga en Mercado Pago (Checkout Pro): el navegador va a su página de pago.
+ * Al terminar vuelve a /api/mercadopago/retorno y de ahí a /dashboard?pago=…
+ */
+export const payWithMercadoPago = async (args) => {
+    const json = await startOnline(args, '/api/mercadopago/crear', 'mp');
+    window.location.assign(json.url);
+    return new Promise(() => {});
+};
+
+/** Pedido con la forma de pago elegida: en línea va a la pasarela, lo demás por correo. */
+export const submitOrder = (args) => (
+    args.pay === 'webpay' ? payWithWebpay(args)
+        : args.pay === 'mp' ? payWithMercadoPago(args)
+            : placeOrder(args)
+);

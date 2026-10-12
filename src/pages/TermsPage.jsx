@@ -86,7 +86,7 @@ const TermsPage = () => {
                                     <strong>Mensualidades</strong> (por ejemplo, asistentes de IA): se pagan por período
                                     adelantado.
                                 </li>
-                                <li>Medios disponibles: transferencia bancaria y tarjeta de débito o crédito vía Webpay (Transbank), según se muestre al pagar.</li>
+                                <li>Medios disponibles: transferencia bancaria y tarjeta de débito o crédito vía Webpay (Transbank) y Mercado Pago, según se muestre al pagar.</li>
                                 <li>
                                     Si el dominio no se renueva y paga en su fecha de vencimiento, se suspende ese mismo día.
                                     Puedes reactivarlo desde tu portal (o escribiéndonos) pagando la renovación.

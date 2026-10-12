@@ -130,7 +130,7 @@ const Admin = () => {
 // Hoy: lo que requiere acción ----------------------------------------------------------
 const Today = ({ waiting, paid, openTickets, expiring, goTo }) => {
     const tiles = [
-        { n: waiting.length, t: 'Esperando pago', d: 'Envía los datos de transferencia. Los pagos con tarjeta llegan solos a "Pagados".', go: 'pedidos' },
+        { n: waiting.length, t: 'Esperando pago', d: 'Envía los datos de transferencia. Los pagos con Webpay o Mercado Pago llegan solos a "Pagados".', go: 'pedidos' },
         { n: paid.length, t: 'Pagados por activar', d: 'Registra el dominio o activa el hosting y márcalos activos.', go: 'pedidos' },
         { n: openTickets.length, t: 'Solicitudes abiertas', d: 'Respondemos dentro de un día hábil.', go: 'soporte' },
         { n: expiring.length, t: 'Dominios por vencer', d: 'Vencen en 30 días o menos (o ya vencieron).', go: 'clientes' },
@@ -203,6 +203,8 @@ const OrderRow = ({ order: o, client, onChanged }) => {
             <span className="meta">
                 N.º {o.id} · {new Date(o.created_at).toLocaleDateString('es-CL')} · {plan ? `${plan.label} · ${clp(plan.price)}` : ''} · {PAYS[o.payment_method]?.label || o.payment_method}
                 {o.payment_method === 'webpay' && o.payment_info?.authorization_code && ` · Aut. ${o.payment_info.authorization_code}${o.payment_info.card_last4 ? ` · **** ${o.payment_info.card_last4}` : ''}`}
+                {o.payment_method === 'mp' && o.payment_info?.mp_payment_id && ` · Pago MP ${o.payment_info.mp_payment_id}${o.payment_info.card_last4 ? ` · **** ${o.payment_info.card_last4}` : ''}`}
+                {o.payment_info?.revisar && ' · REVISAR MONTO'}
             </span>
             <p className="desc">
                 <b>{clientLabel(client)}</b>{email ? ` · ${email}` : ''}
