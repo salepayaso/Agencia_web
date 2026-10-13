@@ -103,7 +103,7 @@ const QuotePage = () => {
                                     {data.accepted ? (
                                         <div className="box-body">
                                             <p className="alert ok" style={{ margin: 0 }}>
-                                                ¡Aceptada! Gracias por confiar en nosotros. Te enviamos por correo los datos para el anticipo
+                                                ¡Aceptada! Gracias por confiar en nosotros. Te enviaremos por correo los datos para pagar el anticipo
                                                 de {clp(t.anticipo)} y partimos apenas lo recibamos.
                                             </p>
                                             <div className="admin-actions">

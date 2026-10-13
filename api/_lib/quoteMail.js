@@ -1,5 +1,7 @@
 // Correos de la cotización: el envío al cliente y la aceptación (aviso al equipo
 // y confirmación al cliente). Si un correo falla, el estado igual queda guardado.
+// Los correos al cliente NO llevan montos: el total y el anticipo están solo en la
+// cotización (pedido de la empresa). El aviso al equipo sí los lleva.
 
 import { escapeHtml, avisosFrom } from './leads.js';
 import { sendMail, clientesFrom } from './briefMail.js';
@@ -16,7 +18,6 @@ const cuerpo = (html) => `<div style="font-family: Arial, sans-serif; max-width:
 /** La cotización al cliente, con el enlace para verla, descargarla y aceptarla. */
 export function sendQuoteToClient(row, { origin }) {
     const doc = row.quote;
-    const t = quoteTotals(doc.items);
     const num = quoteNumber(row);
     return sendMail({
         from: clientesFrom(),
@@ -26,12 +27,7 @@ export function sendQuoteToClient(row, { origin }) {
         html: cuerpo(`
             <p>Hola ${firstName(doc.client.contact)}:</p>
             <p>Te enviamos la cotización para ${escapeHtml(doc.client.name)}, preparada con lo que nos contaste.</p>
-            <table style="width:100%;border-collapse:collapse;margin:8px 0 4px;font-size:15px;">
-                <tr><td style="padding:6px 0;color:#51607a;">Total</td><td style="padding:6px 0;text-align:right;font-weight:700;">${clp(t.total)} <span style="font-weight:400;color:#51607a;">IVA incluido</span></td></tr>
-                <tr><td style="padding:6px 0;color:#51607a;">Para partir (50 %)</td><td style="padding:6px 0;text-align:right;font-weight:700;">${clp(t.anticipo)}</td></tr>
-                <tr><td style="padding:6px 0;color:#51607a;">Válida hasta</td><td style="padding:6px 0;text-align:right;">${fecha(doc.valid_until)}</td></tr>
-            </table>
-            <p>En el enlace puedes ver el detalle, descargarla en PDF y aceptarla:</p>
+            <p>En el enlace puedes ver el detalle, descargarla en PDF y aceptarla. Es válida hasta el ${fecha(doc.valid_until)}.</p>
             ${boton(`${origin}/cotizacion/${row.token}`, 'Ver mi cotización')}
             <p>Si quieres cambiar algo o tienes dudas, responde este correo o escríbenos por WhatsApp y lo vemos.</p>
         `),
@@ -63,7 +59,6 @@ export function sendAcceptToTeam(row, { origin }) {
 /** Confirmación al cliente de que recibimos su aceptación. */
 export function sendAcceptReceipt(row, { origin }) {
     const doc = row.quote;
-    const t = quoteTotals(doc.items);
     return sendMail({
         from: clientesFrom(),
         to: [doc.client.email],
@@ -72,7 +67,7 @@ export function sendAcceptReceipt(row, { origin }) {
         html: cuerpo(`
             <p>Hola ${firstName(doc.client.contact)}:</p>
             <p>¡Gracias por confiar en nosotros! Recibimos tu aceptación de la cotización ${quoteNumber(row)}.</p>
-            <p>Para partir falta el anticipo de <strong>${clp(t.anticipo)}</strong> (50 % del total). Te enviaremos los datos de transferencia a este correo dentro de un día hábil.</p>
+            <p>Para partir falta el pago del anticipo (el 50 % que aparece en tu cotización). Te enviaremos los datos de pago a este correo dentro de un día hábil.</p>
             <p>Mientras tanto, puedes ir juntando tu logo, fotos y textos y mandárnoslos por WhatsApp o en una carpeta de Google Drive.</p>
             ${boton(`${origin}/cotizacion/${row.token}`, 'Ver mi cotización')}
         `),
