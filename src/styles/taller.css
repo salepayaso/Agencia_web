@@ -539,6 +539,9 @@
   & .ticket .desc { margin: 0; font-size: 15px; color: var(--ink-2); white-space: pre-wrap; }
   & .ticket .reply { margin-top: 6px; border-left: 3px solid var(--ok); background: #e8f5ec; padding: 10px 12px; font-size: 15px; }
   & .ticket .reply b { display: block; font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--ok); margin-bottom: 4px; }
+  & .ticket .reply { white-space: pre-wrap; }
+  & .ticket .reply.mine { border-left-color: var(--ink-2); background: var(--paper); }
+  & .ticket .reply.mine b { color: var(--ink-2); }
   & .pill { font-size: 11px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; border: 1px solid var(--ink); padding: 4px 7px; white-space: nowrap; }
   & .pill.hot { background: var(--signal); border-color: var(--signal); color: #fff; }
   & .pill.ok { border-color: var(--ok); color: var(--ok); }

@@ -60,9 +60,14 @@ const Dashboard = () => {
     const [isAdmin, setIsAdmin] = useState(false);
     const [pago] = useState(readPago);
 
+    // Cada solicitud con su conversación (ticket_messages). Sin esa tabla, se ve igual que antes.
     const loadTickets = useCallback(async (uid) => {
         const { data } = await supabase.from('tickets').select('*').eq('user_id', uid).order('created_at', { ascending: false });
-        setTickets(data || []);
+        const list = data || [];
+        const { data: msgs } = list.length
+            ? await supabase.from('ticket_messages').select('*').in('ticket_id', list.map((t) => t.id)).order('created_at')
+            : { data: [] };
+        setTickets(list.map((t) => ({ ...t, messages: (msgs || []).filter((m) => m.ticket_id === t.id) })));
     }, []);
 
     // Si la tabla orders aún no existe, simplemente no hay pedidos que mostrar
@@ -777,6 +782,68 @@ const MyData = ({ user, profile, onSaved }) => {
     );
 };
 
+// Responder dentro de la misma solicitud (client_reply_ticket). Si estaba resuelta,
+// vuelve a "En revisión". Nos avisa por correo igual que una solicitud nueva.
+const TicketReply = ({ ticket: t, user, profile, onSent }) => {
+    const [open, setOpen] = useState(false);
+    const [text, setText] = useState('');
+    const [sending, setSending] = useState(false);
+    const [error, setError] = useState('');
+    const solved = t.status === 'solved';
+    const waiting = !!t.admin_response || (t.messages || []).some((m) => m.author === 'equipo');
+
+    if (!open) {
+        return (
+            <div>
+                <button type="button" className="textlink" onClick={() => setOpen(true)}>
+                    {solved ? '¿Necesitas algo más? Responder' : waiting ? 'Responder' : 'Agregar información'}
+                </button>
+            </div>
+        );
+    }
+
+    const send = async (e) => {
+        e.preventDefault();
+        if (text.trim().length < 2) return setError('Escribe tu respuesta.');
+        setSending(true);
+        setError('');
+        const { error: err } = await supabase.rpc('client_reply_ticket', { p_ticket: t.id, p_body: text });
+        if (err) {
+            setSending(false);
+            return setError(/limite_diario/.test(err.message || '')
+                ? 'Llegaste al máximo de mensajes por hoy. Si es urgente, escríbenos por WhatsApp al +56 9 5414 6176.'
+                : 'No pudimos enviar tu respuesta. Intenta de nuevo en un momento.');
+        }
+        // Aviso interno, igual que una solicitud nueva. Si falla, la respuesta ya quedó guardada.
+        try {
+            const fd = new FormData();
+            fd.append('email', user.email);
+            fd.append('subject', `Respuesta en la solicitud: ${t.title}`);
+            fd.append('message', `Cliente: ${profile?.client_name || 'Sin nombre'}\nSolicitud: ${t.title}\n\n${text.trim()}`);
+            await fetch('https://formspree.io/f/mojvoerb', { method: 'POST', body: fd, headers: { Accept: 'application/json' } });
+        } catch {
+            // sin aviso, pero la respuesta está en la base
+        }
+        setSending(false);
+        setText('');
+        setOpen(false);
+        onSent();
+    };
+
+    return (
+        <form onSubmit={send} noValidate style={{ display: 'grid', gap: 10, marginTop: 6 }}>
+            <label className="field">{solved ? 'Tu mensaje (reabre la solicitud)' : 'Tu respuesta'}
+                <textarea value={text} onChange={(e) => setText(e.target.value)} maxLength={3000} rows={4} placeholder="Por ejemplo: los DNS que me pediste son…" />
+            </label>
+            {error && <p className="alert" role="alert">{error}</p>}
+            <div style={{ display: 'flex', gap: 14, alignItems: 'center', flexWrap: 'wrap' }}>
+                <button type="submit" className="btn signal" disabled={sending} style={{ padding: '10px 14px', fontSize: 14 }}>{sending ? 'Enviando…' : 'Enviar respuesta →'}</button>
+                <button type="button" className="textlink" onClick={() => { setOpen(false); setError(''); }}>Cancelar</button>
+            </div>
+        </form>
+    );
+};
+
 const Support = ({ user, profile, tickets, composing, setComposing, onCreated }) => {
     const [form, setForm] = useState(EMPTY_TICKET);
     const [sending, setSending] = useState(false);
@@ -851,6 +918,12 @@ const Support = ({ user, profile, tickets, composing, setComposing, onCreated })
                         {t.admin_response && (
                             <div className="reply"><b>Respuesta de Interfaz 360</b>{t.admin_response}</div>
                         )}
+                        {(t.messages || []).map((m) => (
+                            <div key={m.id} className={m.author === 'equipo' ? 'reply' : 'reply mine'}>
+                                <b>{m.author === 'equipo' ? 'Respuesta de Interfaz 360' : 'Tu respuesta'} · {new Date(m.created_at).toLocaleDateString('es-CL')}</b>{m.body}
+                            </div>
+                        ))}
+                        <TicketReply ticket={t} user={user} profile={profile} onSent={onCreated} />
                     </article>
                 )) : (
                     <p className="empty">No tienes solicitudes. Cuando pidas algo, podrás seguirlo aquí.</p>

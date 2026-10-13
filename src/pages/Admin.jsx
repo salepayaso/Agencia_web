@@ -31,6 +31,7 @@ const ERRORS = {
     estado_invalido: 'Ese estado no es válido.',
     falta_nombre: 'Escribe el nombre del cliente.',
     falta_titulo: 'Escribe el título del documento.',
+    solicitud_no_existe: 'La solicitud ya no existe.',
     correos_invalidos: 'La lista de correos no es válida.',
 };
 const errText = (e) => ERRORS[Object.keys(ERRORS).find((k) => (e?.message || '').includes(k))] || 'No se pudo guardar. Intenta de nuevo.';
@@ -53,9 +54,10 @@ const Admin = () => {
     const [documents, setDocuments] = useState([]);
     const [notes, setNotes] = useState({});
     const [templates, setTemplates] = useState([]);
+    const [ticketMessages, setTicketMessages] = useState([]);
 
     const load = useCallback(async () => {
-        const [p, o, t, q, d, n, tp] = await Promise.all([
+        const [p, o, t, q, d, n, tp, tm] = await Promise.all([
             supabase.from('profiles').select('*').order('created_at', { ascending: false }),
             supabase.from('orders').select('*').order('created_at', { ascending: false }),
             supabase.from('tickets').select('*').order('created_at', { ascending: false }),
@@ -63,6 +65,7 @@ const Admin = () => {
             supabase.from('documents').select('*').order('created_at', { ascending: false }),
             supabase.from('client_notes').select('*'),
             supabase.from('quote_templates').select('*').eq('active', true).order('sort'),
+            supabase.from('ticket_messages').select('*').order('created_at'),
         ]);
         setProfiles(p.data || []);
         setOrders(o.data || []);
@@ -71,6 +74,7 @@ const Admin = () => {
         setDocuments(d.data || []);
         setNotes(Object.fromEntries((n.data || []).map((x) => [x.user_id, x.note])));
         setTemplates(tp.data || []);
+        setTicketMessages(tm.data || []);
     }, []);
 
     useEffect(() => {
@@ -149,7 +153,7 @@ const Admin = () => {
                             {tab === 'cotizaciones' && <Quotes quotes={quotes} templates={templates} onChanged={load} />}
                             {tab === 'pedidos' && <Orders orders={orders} byId={byId} onChanged={load} />}
                             {tab === 'clientes' && <Clients profiles={profiles} orders={orders} documents={documents} notes={notes} onChanged={load} />}
-                            {tab === 'soporte' && <Tickets tickets={tickets} byId={byId} onChanged={load} />}
+                            {tab === 'soporte' && <Tickets tickets={tickets} messages={ticketMessages} byId={byId} onChanged={load} />}
                         </div>
                     </div>
                 </main>
@@ -1165,7 +1169,7 @@ const NoteTab = ({ profile: p, note, onSaved }) => {
 };
 
 // Soporte --------------------------------------------------------------------------------
-const Tickets = ({ tickets, byId, onChanged }) => {
+const Tickets = ({ tickets, messages, byId, onChanged }) => {
     const [all, setAll] = useState(false);
     const list = all ? tickets : tickets.filter(isOpen);
     return (
@@ -1174,25 +1178,29 @@ const Tickets = ({ tickets, byId, onChanged }) => {
                 <b>{all ? 'Todas las solicitudes' : 'Solicitudes abiertas'}</b>
                 <button type="button" className="textlink" onClick={() => setAll((v) => !v)}>{all ? 'Ver solo abiertas' : `Ver todas (${tickets.length})`}</button>
             </div>
-            {list.length ? list.map((t) => <TicketRow key={t.id} ticket={t} client={byId[t.user_id]} onChanged={onChanged} />) : (
+            {list.length ? list.map((t) => <TicketRow key={t.id} ticket={t} client={byId[t.user_id]} messages={messages.filter((m) => m.ticket_id === t.id)} onChanged={onChanged} />) : (
                 <p className="empty">No hay solicitudes {all ? '' : 'abiertas'}.</p>
             )}
         </section>
     );
 };
 
-const TicketRow = ({ ticket: t, client, onChanged }) => {
+// Conversación de la solicitud: descripción, primera respuesta antigua (admin_response)
+// y los mensajes (ticket_messages). Responder agrega un mensaje y fija el estado.
+const TicketRow = ({ ticket: t, client, messages, onChanged }) => {
     const [status, setStatus] = useState(TICKET_STATUS[t.status] ? t.status : 'pending');
-    const [reply, setReply] = useState(t.admin_response || '');
+    const [reply, setReply] = useState('');
     const [busy, setBusy] = useState(false);
     const [error, setError] = useState('');
+    const last = messages.at(-1);
 
     const save = async () => {
         setBusy(true);
         setError('');
-        const { error: err } = await supabase.rpc('admin_update_ticket', { p_id: t.id, p_status: status, p_response: reply });
+        const { error: err } = await supabase.rpc('admin_reply_ticket', { p_ticket: t.id, p_body: reply, p_status: status });
         setBusy(false);
         if (err) return setError(errText(err));
+        setReply('');
         onChanged();
     };
 
@@ -1202,16 +1210,25 @@ const TicketRow = ({ ticket: t, client, onChanged }) => {
                 <h3>{t.title}</h3>
                 <span className={`pill ${TICKET_STATUS[t.status]?.cls || 'hot'}`}>{TICKET_STATUS[t.status]?.label || t.status}</span>
             </div>
-            <span className="meta">{clientLabel(client)} · {catLabel(t.category)} · {new Date(t.created_at).toLocaleDateString('es-CL')}</span>
+            <span className="meta">
+                {clientLabel(client)} · {catLabel(t.category)} · {new Date(t.created_at).toLocaleDateString('es-CL')}
+                {last?.author === 'cliente' && <b className="st-bad"> · el cliente respondió</b>}
+            </span>
             <p className="desc">{t.description}</p>
-            <label className="field">Respuesta (la ve el cliente en su portal)
+            {t.admin_response && <div className="reply"><b>Tu respuesta</b>{t.admin_response}</div>}
+            {messages.map((m) => (
+                <div key={m.id} className={m.author === 'equipo' ? 'reply' : 'reply mine'}>
+                    <b>{m.author === 'equipo' ? 'Tu respuesta' : 'Cliente'} · {new Date(m.created_at).toLocaleString('es-CL', { dateStyle: 'short', timeStyle: 'short' })}</b>{m.body}
+                </div>
+            ))}
+            <label className="field">Nueva respuesta <em>(la ve el cliente en su portal; puede quedar vacía si solo cambias el estado)</em>
                 <textarea value={reply} onChange={(e) => setReply(e.target.value)} maxLength={3000} rows={3} />
             </label>
             <div className="admin-actions">
                 <select className="admin-input" style={{ maxWidth: 180 }} value={status} onChange={(e) => setStatus(e.target.value)} aria-label="Estado">
                     {Object.entries(TICKET_STATUS).map(([id, s]) => <option key={id} value={id}>{s.label}</option>)}
                 </select>
-                <button type="button" className="btn signal" disabled={busy} onClick={save}>{busy ? 'Guardando…' : 'Guardar →'}</button>
+                <button type="button" className="btn signal" disabled={busy} onClick={save}>{busy ? 'Guardando…' : reply.trim() ? 'Responder →' : 'Guardar estado →'}</button>
             </div>
             {error && <p className="alert" role="alert">{error}</p>}
         </article>
