@@ -19,6 +19,7 @@
 import crypto from 'node:crypto';
 import { OFFERS } from '../../src/data/catalogo.js';
 import { getOrder, updatePendingOrder, sendPaymentNotice, emailDe } from './orderStore.js';
+import { paymentIdFromRef, getPayment, getQuoteById, updatePendingPayment, settleQuotePayment } from './quotePayments.js';
 
 const API = 'https://api.mercadopago.com';
 
@@ -105,10 +106,13 @@ export function firmaValida(req, dataId) {
  * Consulta el pago a Mercado Pago y actualiza el pedido. Lo llaman el retorno y
  * el aviso, en cualquier orden y las veces que sea: solo el primero que ve el
  * pago aprobado lo marca "pagado" y manda el correo (updatePendingOrder).
- * Devuelve { estado, pedido } con estado = ok | rechazado | proceso | error.
+ * Devuelve { estado, pedido } con estado = ok | rechazado | proceso | error; si el pago
+ * es de una cotización, { estado, cotizacion: <token> }. origin = sitio, para los correos.
  */
-export async function procesarPago(paymentId) {
+export async function procesarPago(paymentId, origin) {
     const pago = await leerPago(paymentId);
+    const pagoCotizacion = paymentIdFromRef(pago.external_reference);
+    if (pagoCotizacion) return procesarPagoCotizacion(pago, pagoCotizacion, origin);
     const order = await getOrder(pago.external_reference);
 
     if (!order || order.payment_method !== 'mp') {
@@ -163,4 +167,42 @@ export async function procesarPago(paymentId) {
         await sendPaymentNotice(paid, { title: OFFERS[paid.kind]?.title || paid.kind, email: await emailDe(paid.user_id) });
     }
     return { estado: 'ok', pedido: order.id };
+}
+
+// Anticipo o saldo de una cotización: mismas reglas que un pedido.
+async function procesarPagoCotizacion(pago, id, origin) {
+    const p = await getPayment(id);
+    const quote = p ? await getQuoteById(p.quote_id) : null;
+    if (!p || !quote || p.method !== 'mp') {
+        console.error('[mercadopago] REVISAR A MANO — pago de cotización sin registro:', { pago: pago.id, ref: pago.external_reference });
+        return { estado: 'error' };
+    }
+    const salida = (estado) => ({ estado, cotizacion: quote.token });
+    const info = {
+        mp_preference_id: p.payment_info?.mp_preference_id || null,
+        mp_payment_id: pago.id,
+        status: pago.status,
+        status_detail: pago.status_detail || null,
+        payment_type_code: pago.payment_method_id || null,
+        card_last4: pago.card?.last_four_digits || null,
+        authorization_code: pago.authorization_code || null,
+        transaction_date: pago.date_approved || pago.date_created || null,
+    };
+
+    if (pago.status !== 'approved') {
+        if (p.status === 'pendiente') await updatePendingPayment(p.id, { payment_info: info });
+        return salida(['in_process', 'pending', 'authorized'].includes(pago.status) ? 'proceso' : 'rechazado');
+    }
+    if (p.status === 'pagado') return salida('ok');
+    if (p.status === 'cancelado') {
+        console.error('[mercadopago] REVISAR A MANO — pago aprobado en un pago de cotización cancelado:', { pago: p.id, mp: pago.id });
+        return salida('error');
+    }
+    if (pago.currency_id !== 'CLP' || Math.round(Number(pago.transaction_amount)) !== p.amount) {
+        console.error('[mercadopago] MONTO NO CALZA en cotización — revisar:', { pago: p.id, cobrado: pago.transaction_amount, esperado: p.amount });
+        await updatePendingPayment(p.id, { payment_info: { ...info, monto_cobrado: pago.transaction_amount, revisar: true } });
+        return salida('error');
+    }
+    await settleQuotePayment(p, { info, paidAt: pago.date_approved || new Date().toISOString(), origin });
+    return salida('ok');
 }

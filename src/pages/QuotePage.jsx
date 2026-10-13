@@ -1,22 +1,40 @@
 import { useState, useEffect } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useParams, useSearchParams } from 'react-router-dom';
 import Wordmark from '../components/Wordmark';
 import QuoteDocument from '../components/QuoteDocument';
 import { PortalLoading } from '../components/ProtectedRoute';
-import { quoteTotals, clp } from '../data/quote';
+import { quoteTotals, stageAmount, clp } from '../data/quote';
+import { PAYS } from '../lib/orders';
 
 // Cotización por enlace personal (/cotizacion/:token): el cliente la ve, la
-// descarga en PDF (imprimir → Guardar como PDF) y la acepta. Sin cuenta.
+// descarga en PDF (imprimir → Guardar como PDF), la acepta y paga el anticipo y
+// el saldo. Sin cuenta. Los pagos en línea usan las mismas pasarelas del portal
+// (se encienden con VITE_PAGO_WEBPAY / VITE_PAGO_MP); la transferencia la
+// confirma el equipo y los datos van por correo.
 
 const WHATSAPP = '+56 9 5414 6176';
 
+const PAGO_MSG = {
+    ok: { ok: true, text: '¡Pago recibido! Te llegó la confirmación por correo.' },
+    rechazado: { ok: false, text: 'El pago fue rechazado y no se hizo ningún cobro. Puedes intentarlo de nuevo o pagar por transferencia.' },
+    anulado: { ok: false, text: 'Saliste del pago antes de terminar. No se hizo ningún cobro.' },
+    proceso: { ok: true, text: 'Tu pago está en revisión en Mercado Pago. Te avisamos por correo apenas se confirme.' },
+    error: { ok: false, text: `No pudimos confirmar el pago. Si se hizo el cargo, escríbenos por WhatsApp al ${WHATSAPP} y lo revisamos.` },
+};
+
+const ONLINE = Object.entries(PAYS).filter(([, p]) => p.online && p.active);
+
+const fecha = (v) => new Date(v).toLocaleDateString('es-CL');
+
 const QuotePage = () => {
     const { token } = useParams();
+    const [params] = useSearchParams();
     const [state, setState] = useState('loading'); // loading | missing | error | ready
     const [data, setData] = useState(null);
     const [agree, setAgree] = useState(false);
-    const [busy, setBusy] = useState(false);
+    const [busy, setBusy] = useState('');
     const [error, setError] = useState('');
+    const pagoMsg = PAGO_MSG[params.get('pago')];
 
     // Enlace personal: fuera de los buscadores.
     useEffect(() => {
@@ -50,7 +68,7 @@ const QuotePage = () => {
     if (state === 'loading') return <PortalLoading />;
 
     const accept = async () => {
-        setBusy(true);
+        setBusy('accept');
         setError('');
         try {
             const res = await fetch('/api/cotizacion', {
@@ -65,7 +83,39 @@ const QuotePage = () => {
         } catch {
             setError('No pudimos registrar tu aceptación. Revisa tu conexión e intenta de nuevo.');
         } finally {
-            setBusy(false);
+            setBusy('');
+        }
+    };
+
+    // Va a la pasarela: Webpay con un POST de token_ws, Mercado Pago a su página.
+    const pay = async (method) => {
+        setBusy(method);
+        setError('');
+        try {
+            const res = await fetch(method === 'webpay' ? '/api/webpay/crear' : '/api/mercadopago/crear', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ quote: token, stage: data.due }),
+            });
+            const json = await res.json().catch(() => ({}));
+            if (!res.ok || !json.url) throw new Error(json.error || '');
+            if (method === 'webpay') {
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = json.url;
+                const input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = 'token_ws';
+                input.value = json.token;
+                form.appendChild(input);
+                document.body.appendChild(form);
+                form.submit();
+            } else {
+                window.location.assign(json.url);
+            }
+        } catch (err) {
+            setError(err.message || `No pudimos abrir el pago. Intenta de nuevo o paga por transferencia.`);
+            setBusy('');
         }
     };
 
@@ -100,42 +150,87 @@ const QuotePage = () => {
                         {state === 'ready' && (
                             <>
                                 <section className="panel quote-bar no-print">
-                                    {data.accepted ? (
-                                        <div className="box-body">
-                                            <p className="alert ok" style={{ margin: 0 }}>
-                                                ¡Aceptada! Gracias por confiar en nosotros. Te enviaremos por correo los datos para pagar el anticipo
-                                                de {clp(t.anticipo)} y partimos apenas lo recibamos.
-                                            </p>
-                                            <div className="admin-actions">
-                                                <button type="button" className="btn" onClick={() => window.print()}>Descargar PDF</button>
-                                            </div>
-                                        </div>
-                                    ) : data.expired ? (
-                                        <div className="box-body">
+                                    <div className="box-body">
+                                        {pagoMsg && <p className={pagoMsg.ok ? 'alert ok' : 'alert'} role="status" style={{ margin: 0 }}>{pagoMsg.text}</p>}
+
+                                        {!data.accepted && data.expired && (
                                             <p className="alert" style={{ margin: 0 }}>Esta cotización venció. Escríbenos por WhatsApp al {WHATSAPP} y te enviamos una actualizada.</p>
-                                        </div>
-                                    ) : (
-                                        <div className="box-body">
-                                            <div className="quote-bar-head">
-                                                <div>
-                                                    <span className="eyebrow">Total {clp(t.total)} IVA incluido</span>
-                                                    <p style={{ margin: '6px 0 0', fontSize: 15 }}>Para partir pagas el 50 %: <b>{clp(t.anticipo)}</b>.</p>
+                                        )}
+
+                                        {!data.accepted && !data.expired && (
+                                            <>
+                                                <div className="quote-bar-head">
+                                                    <div>
+                                                        <span className="eyebrow">Total {clp(t.total)} IVA incluido</span>
+                                                        <p style={{ margin: '6px 0 0', fontSize: 15 }}>Para partir pagas el 50 %: <b>{clp(t.anticipo)}</b>.</p>
+                                                    </div>
+                                                    <button type="button" className="btn" onClick={() => window.print()}>Descargar PDF</button>
                                                 </div>
-                                                <button type="button" className="btn" onClick={() => window.print()}>Descargar PDF</button>
-                                            </div>
-                                            <label className="brief-check">
-                                                <input type="checkbox" checked={agree} onChange={(e) => setAgree(e.target.checked)} />
-                                                <span>Leí el detalle y las condiciones, y acepto esta cotización.</span>
-                                            </label>
-                                            {error && <p className="alert" role="alert">{error}</p>}
-                                            <div className="admin-actions">
-                                                <button type="button" className="btn signal" disabled={!agree || busy} onClick={accept}>
-                                                    {busy ? 'Enviando…' : 'Aceptar cotización →'}
-                                                </button>
-                                                <span className="muted" style={{ fontSize: 13 }}>¿Quieres cambiar algo? Escríbenos por WhatsApp al {WHATSAPP}.</span>
-                                            </div>
-                                        </div>
-                                    )}
+                                                <label className="brief-check">
+                                                    <input type="checkbox" checked={agree} onChange={(e) => setAgree(e.target.checked)} />
+                                                    <span>Leí el detalle y las condiciones, y acepto esta cotización.</span>
+                                                </label>
+                                                <div className="admin-actions">
+                                                    <button type="button" className="btn signal" disabled={!agree || !!busy} onClick={accept}>
+                                                        {busy === 'accept' ? 'Enviando…' : 'Aceptar cotización →'}
+                                                    </button>
+                                                    <span className="muted" style={{ fontSize: 13 }}>¿Quieres cambiar algo? Escríbenos por WhatsApp al {WHATSAPP}.</span>
+                                                </div>
+                                            </>
+                                        )}
+
+                                        {data.accepted && (
+                                            <>
+                                                <div className="quote-bar-head">
+                                                    <div>
+                                                        <span className="eyebrow">Tu proyecto</span>
+                                                        <ol className="quote-progress">
+                                                            <li className="done">Aceptada</li>
+                                                            <li className={data.depositPaidAt ? 'done' : 'now'}>Anticipo{data.depositPaidAt ? ` · ${fecha(data.depositPaidAt)}` : ''}</li>
+                                                            <li className={data.balancePaidAt ? 'done' : data.depositPaidAt ? 'now' : ''}>En desarrollo</li>
+                                                            <li className={data.balancePaidAt ? 'done' : data.due === 'saldo' ? 'now' : ''}>Saldo{data.balancePaidAt ? ` · ${fecha(data.balancePaidAt)}` : ''}</li>
+                                                            <li className={data.publishedAt ? 'done' : data.balancePaidAt ? 'now' : ''}>Publicado</li>
+                                                        </ol>
+                                                    </div>
+                                                    <button type="button" className="btn" onClick={() => window.print()}>Descargar PDF</button>
+                                                </div>
+
+                                                {data.due && (
+                                                    <div className="quote-pay">
+                                                        <p style={{ margin: 0, fontSize: 16 }}>
+                                                            {data.due === 'anticipo' ? 'Para partir falta el anticipo' : 'Tu sitio está listo: falta el saldo'}{' '}
+                                                            de <b>{clp(stageAmount(data.quote, data.due))}</b> (50 %, IVA incluido).
+                                                        </p>
+                                                        {ONLINE.length > 0 && (
+                                                            <div className="admin-actions">
+                                                                {ONLINE.map(([id, p]) => (
+                                                                    <button key={id} type="button" className="btn signal" disabled={!!busy} onClick={() => pay(id)}>
+                                                                        {busy === id ? `Abriendo ${p.site}…` : `Pagar con ${p.site} →`}
+                                                                    </button>
+                                                                ))}
+                                                            </div>
+                                                        )}
+                                                        <p className="muted" style={{ margin: 0, fontSize: 14 }}>
+                                                            {ONLINE.length ? 'Si prefieres transferencia, ' : 'Pagas por transferencia: '}
+                                                            te enviaremos los datos por correo y confirmamos tu pago apenas llegue.
+                                                        </p>
+                                                    </div>
+                                                )}
+
+                                                {!data.due && !data.publishedAt && (
+                                                    <p className="alert ok" style={{ margin: 0 }}>
+                                                        {data.balancePaidAt
+                                                            ? 'Todo pagado. Estamos publicando tu sitio y te avisamos apenas esté en línea.'
+                                                            : data.depositPaidAt
+                                                                ? 'Recibimos tu anticipo y estamos trabajando en tu sitio. Te mostramos la primera versión en 10 días hábiles.'
+                                                                : 'Gracias por aceptar.'}
+                                                    </p>
+                                                )}
+                                                {data.publishedAt && <p className="alert ok" style={{ margin: 0 }}>¡Tu sitio está publicado! Tienes 30 días de garantía: si ves algún error, escríbenos.</p>}
+                                            </>
+                                        )}
+                                        {error && <p className="alert" role="alert" style={{ margin: 0 }}>{error}</p>}
+                                    </div>
                                 </section>
                                 <QuoteDocument q={data} doc={data.quote} />
                             </>

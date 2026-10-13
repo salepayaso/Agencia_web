@@ -586,6 +586,12 @@
   /* Cotización: barra para aceptar (/cotizacion/:token) y editor en /admin */
   & .quote-bar { max-width: 210mm; width: 100%; margin-inline: auto; }
   & .quote-bar-head { display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; }
+  & .quote-progress { list-style: none; margin: 8px 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: 6px; font-size: 13px; font-weight: 700; }
+  & .quote-progress li { border: 1.5px solid var(--rule); padding: 5px 9px; color: var(--ink-2); }
+  & .quote-progress li.done { border-color: var(--ok); color: var(--ok); }
+  & .quote-progress li.done::before { content: "✓ "; }
+  & .quote-progress li.now { border-color: var(--signal); background: var(--signal); color: #fff; }
+  & .quote-pay { display: grid; gap: 12px; border-top: 1px solid var(--rule); padding-top: 14px; }
   & .qe-item { border: 1.5px solid var(--rule); background: var(--white); padding: 14px; display: grid; gap: 10px; }
   & .qe-item.discount { border-color: var(--signal); }
   & .qe-totals { display: flex; flex-wrap: wrap; gap: 8px 20px; font-size: 15px; font-variant-numeric: tabular-nums; }

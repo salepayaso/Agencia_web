@@ -10,7 +10,9 @@ import {
     HOSTING_PLANS, PAY_METHODS, DOC_TITLES, cleanDomain,
 } from '../lib/portal';
 import { QUOTE_STATUS, briefNumber, briefRows, cleanBrief } from '../data/brief';
-import { quoteNumber, quoteTotals, quoteError, cleanQuote, draftQuote, DOMAIN_OWNER, clp as money } from '../data/quote';
+import {
+    quoteNumber, quoteTotals, quoteError, cleanQuote, draftQuote, DOMAIN_OWNER, STAGE_LABEL, pendingStage, stageAmount, clp as money,
+} from '../data/quote';
 import QuoteDocument from '../components/QuoteDocument';
 import { useConfirm } from '../lib/useConfirm';
 
@@ -90,6 +92,7 @@ const Admin = () => {
     const paid = orders.filter((o) => o.status === 'pagado');
     const openTickets = tickets.filter(isOpen);
     const newBriefs = quotes.filter((x) => x.status === 'brief_recibido');
+    const projectPayments = quotes.filter((x) => pendingStage(x));
     const expiring = profiles.filter((p) => {
         const d = daysFrom(parseDate(p.domain_expires));
         return d !== null && d <= 30;
@@ -132,7 +135,7 @@ const Admin = () => {
                             </div>
                             <div className="tabs" role="tablist" aria-label="Secciones del panel">
                                 {tabBtn('hoy', 'Hoy')}
-                                {tabBtn('cotizaciones', 'Cotizaciones', newBriefs.length)}
+                                {tabBtn('cotizaciones', 'Cotizaciones', newBriefs.length + projectPayments.length)}
                                 {tabBtn('pedidos', 'Pedidos', waiting.length + paid.length)}
                                 {tabBtn('clientes', 'Clientes')}
                                 {tabBtn('soporte', 'Soporte', openTickets.length)}
@@ -141,7 +144,7 @@ const Admin = () => {
 
                         <div style={{ paddingBottom: 80 }}>
                             {tab === 'hoy' && (
-                                <Today newBriefs={newBriefs} waiting={waiting} paid={paid} openTickets={openTickets} expiring={expiring} goTo={setTab} />
+                                <Today newBriefs={newBriefs} projectPayments={projectPayments} waiting={waiting} paid={paid} openTickets={openTickets} expiring={expiring} goTo={setTab} />
                             )}
                             {tab === 'cotizaciones' && <Quotes quotes={quotes} templates={templates} onChanged={load} />}
                             {tab === 'pedidos' && <Orders orders={orders} byId={byId} onChanged={load} />}
@@ -156,9 +159,10 @@ const Admin = () => {
 };
 
 // Hoy: lo que requiere acción ----------------------------------------------------------
-const Today = ({ newBriefs, waiting, paid, openTickets, expiring, goTo }) => {
+const Today = ({ newBriefs, projectPayments, waiting, paid, openTickets, expiring, goTo }) => {
     const tiles = [
         { n: newBriefs.length, t: 'Briefs por cotizar', d: 'Clientes que ya enviaron su brief: prepara la cotización.', go: 'cotizaciones' },
+        { n: projectPayments.length, t: 'Pagos de proyectos', d: 'Anticipos o saldos por cobrar. Si pagan en línea se confirman solos.', go: 'cotizaciones' },
         { n: waiting.length, t: 'Esperando pago', d: 'Envía los datos de transferencia. Los pagos con Webpay o Mercado Pago llegan solos a "Pagados".', go: 'pedidos' },
         { n: paid.length, t: 'Pagados por activar', d: 'Registra el dominio o activa el hosting y márcalos activos.', go: 'pedidos' },
         { n: openTickets.length, t: 'Solicitudes abiertas', d: 'Respondemos dentro de un día hábil.', go: 'soporte' },
@@ -353,7 +357,7 @@ const QuoteRow = ({ quote: q, templates, onChanged }) => {
                 {wa && <a className="textlink" href={wa} target="_blank" rel="noreferrer">WhatsApp</a>}
                 {email && <a className="textlink" href={`mailto:${email}`}>Correo</a>}
             </div>
-            {q.accepted_at && <p className="alert ok" style={{ margin: 0 }}>Aceptada el {new Date(q.accepted_at).toLocaleDateString('es-CL')}. Envíale los datos para el anticipo.</p>}
+            {q.accepted_at && <ProjectPayments quote={q} onChanged={onChanged} />}
             {showLink && <LinkBox quote={q} onClose={() => setShowLink(false)} />}
             {editing && <QuoteEditor quote={q} templates={templates} onChanged={onChanged} />}
             {error && <p className="alert" role="alert">{error}</p>}
@@ -362,6 +366,102 @@ const QuoteRow = ({ quote: q, templates, onChanged }) => {
 };
 
 // Editor de la cotización ------------------------------------------------------------------
+// Acción del admin en /api/cotizacion (envío, pagos, saldo, publicación), con su sesión.
+const adminQuoteApi = async (body) => {
+    const { data: { session } } = await supabase.auth.getSession();
+    const res = await fetch('/api/cotizacion', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${session?.access_token || ''}` },
+        body: JSON.stringify(body),
+    });
+    const json = await res.json().catch(() => ({}));
+    if (!res.ok) throw new Error(json.error || 'No se pudo completar. Intenta de nuevo.');
+    return json;
+};
+
+const shortDate = (v) => new Date(v).toLocaleDateString('es-CL');
+
+// Pagos y cierre del proyecto aceptado: anticipo → desarrollo → saldo → publicado.
+const ProjectPayments = ({ quote: q, onChanged }) => {
+    const [busy, setBusy] = useState('');
+    const [msg, setMsg] = useState(null);
+    const [site, setSite] = useState('');
+    const [confirm, dialog] = useConfirm();
+    const doc = cleanQuote(q.quote);
+    const due = pendingStage(q);
+
+    const run = async (key, ask, body, okText) => {
+        if (!(await confirm(ask))) return;
+        setBusy(key);
+        setMsg(null);
+        try {
+            const json = await adminQuoteApi({ id: q.id, ...body });
+            setMsg({ ok: true, text: json.mailed === false ? `${okText} Ojo: el correo al cliente falló, avísale por WhatsApp.` : okText });
+            onChanged();
+        } catch (err) {
+            setMsg({ ok: false, text: err.message });
+        } finally {
+            setBusy('');
+        }
+    };
+
+    const steps = [
+        `Aceptada el ${shortDate(q.accepted_at)}`,
+        q.deposit_paid_at ? `Anticipo pagado el ${shortDate(q.deposit_paid_at)}` : 'Anticipo pendiente',
+        q.balance_requested_at && `Saldo pedido el ${shortDate(q.balance_requested_at)}`,
+        q.balance_paid_at && `Saldo pagado el ${shortDate(q.balance_paid_at)}`,
+        q.published_at && `Publicado el ${shortDate(q.published_at)}`,
+    ].filter(Boolean);
+
+    return (
+        <div className="client-editor" style={{ gap: 12 }}>
+            {dialog}
+            <span className="meta">{steps.join(' · ')}</span>
+
+            {due && (
+                <div className="admin-actions">
+                    <span><b>{STAGE_LABEL[due]}: {money(stageAmount(doc, due))}</b> · si paga en línea se confirma solo.</span>
+                    <button type="button" className="btn signal" disabled={!!busy} onClick={() => run('pago', {
+                        title: `¿Recibiste la transferencia del ${due}?`,
+                        text: `${money(stageAmount(doc, due))} de ${doc.client.name}.\nAl cliente le llega el correo de pago recibido${due === 'anticipo' ? ' y el proyecto pasa a En desarrollo' : ''}.`,
+                        ok: 'Sí, confirmar pago',
+                    }, { action: 'confirm_payment', stage: due }, 'Pago confirmado.')}>
+                        {busy === 'pago' ? 'Confirmando…' : 'Confirmar transferencia →'}
+                    </button>
+                </div>
+            )}
+
+            {q.status === 'en_desarrollo' && q.deposit_paid_at && !q.balance_requested_at && (
+                <div className="admin-actions">
+                    <span>¿El cliente aprobó el sitio?</span>
+                    <button type="button" className="btn" disabled={!!busy} onClick={() => run('saldo', {
+                        title: '¿Pedir el pago del saldo?',
+                        text: `A ${doc.client.email} le llega el aviso de que su sitio está listo, con el enlace para pagar el saldo de ${money(stageAmount(doc, 'saldo'))}.`,
+                        ok: 'Pedir el saldo',
+                    }, { action: 'request_balance' }, 'Saldo pedido.')}>
+                        {busy === 'saldo' ? 'Enviando…' : 'Sitio listo: pedir el saldo →'}
+                    </button>
+                </div>
+            )}
+
+            {q.status === 'en_desarrollo' && q.balance_paid_at && (
+                <div className="admin-actions">
+                    <input className="admin-input" value={site} onChange={(e) => setSite(e.target.value)} placeholder="www.sudominio.cl (va en el correo)" aria-label="Dirección del sitio publicado" autoCapitalize="none" />
+                    <button type="button" className="btn signal" disabled={!!busy} onClick={() => run('publicar', {
+                        title: '¿Marcar como publicado?',
+                        text: `A ${doc.client.email} le llega el aviso de que su sitio está en línea${site ? ` (${site})` : ''}, con la garantía de 30 días.`,
+                        ok: 'Marcar publicado',
+                    }, { action: 'publish', site }, 'Proyecto publicado.')}>
+                        {busy === 'publicar' ? 'Guardando…' : 'Marcar publicado →'}
+                    </button>
+                </div>
+            )}
+
+            {msg && <p className={msg.ok ? 'alert ok' : 'alert'} role="status" style={{ margin: 0 }}>{msg.text}</p>}
+        </div>
+    );
+};
+
 const EDITABLE_QUOTE = ['brief_pendiente', 'brief_recibido', 'en_preparacion', 'cotizacion_enviada'];
 const quoteLink = (q) => `${window.location.origin}/cotizacion/${q.token}`;
 const quoteMessage = (q, doc) => {
@@ -438,19 +538,12 @@ const QuoteEditor = ({ quote: q, templates, onChanged }) => {
         setMsg(null);
         try {
             if (!(await saveDraft())) return;
-            const { data: { session } } = await supabase.auth.getSession();
-            const res = await fetch('/api/cotizacion', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${session?.access_token || ''}` },
-                body: JSON.stringify({ action: 'send', id: q.id }),
-            });
-            const json = await res.json().catch(() => ({}));
-            if (!res.ok) return setMsg({ ok: false, text: json.error || 'No se pudo enviar. Intenta de nuevo.' });
+            const json = await adminQuoteApi({ action: 'send', id: q.id });
             setSentNow(true);
             setMsg({ ok: true, text: json.mailed ? `Enviada a ${doc.client.email}. Vence en 15 días.` : 'Quedó como enviada, pero el correo falló: mándale el enlace por WhatsApp.' });
             onChanged();
-        } catch {
-            setMsg({ ok: false, text: 'No se pudo enviar. Revisa tu conexión.' });
+        } catch (err) {
+            setMsg({ ok: false, text: err.message || 'No se pudo enviar. Revisa tu conexión.' });
         } finally {
             setBusy('');
         }

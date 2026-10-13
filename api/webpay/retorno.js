@@ -8,6 +8,9 @@
 //   token_ws + TBK_TOKEN    → se le venció el plazo del formulario
 // Después mandamos al cliente a su portal con el resultado.
 //
+// Los pagos de cotizaciones (buy_order C360-…) están en quote_payments y vuelven a
+// /cotizacion/:token en vez del portal: ver retornoCotizacion() al final.
+//
 // La seguridad no está en quién llama sino en el commit: lo firma Transbank con
 // NUESTRO código de comercio, así que un token inventado nunca vuelve aprobado.
 
@@ -15,6 +18,9 @@ import { OFFERS } from '../../src/data/catalogo.js';
 import { confirmarTransaccion, estaAprobada } from '../_lib/webpay.js';
 import { getOrder, getOrderByToken, updatePendingOrder, sendPaymentNotice, emailDe } from '../_lib/orderStore.js';
 import { volverAlPortal } from '../_lib/checkout.js';
+import {
+    getPaymentByToken, getQuoteById, updatePendingPayment, settleQuotePayment, volverACotizacion, siteOrigin,
+} from '../_lib/quotePayments.js';
 
 const volver = volverAlPortal;
 
@@ -25,6 +31,10 @@ export default async function handler(req, res) {
     const { token_ws: tokenWs, TBK_TOKEN: tbkToken } = campos(req);
 
     try {
+        // Si la tabla de pagos de cotizaciones falla, el pedido del portal sigue su camino.
+        const pagoCotizacion = (tbkToken || tokenWs) ? await getPaymentByToken(tbkToken || tokenWs).catch(() => null) : null;
+        if (pagoCotizacion) return await retornoCotizacion(req, res, pagoCotizacion, { tokenWs, tbkToken });
+
         // Anuló o se le venció el plazo: nunca se cobró, solo se cierra el pedido.
         if (tbkToken) {
             const order = await getOrderByToken(tbkToken);
@@ -103,4 +113,46 @@ export default async function handler(req, res) {
         console.error('[webpay/retorno] REVISAR A MANO', { tokenWs, error: String(error) });
         return volver(res, 'error');
     }
+}
+
+// Pago del anticipo o del saldo de una cotización. Mismas reglas que un pedido:
+// commit, aprobado por Transbank, monto exacto y una sola vez.
+async function retornoCotizacion(req, res, pago0, { tokenWs, tbkToken }) {
+    const quote = await getQuoteById(pago0.quote_id);
+    const volver = (estado) => volverACotizacion(res, quote?.token, estado);
+
+    if (tbkToken) {
+        await updatePendingPayment(pago0.id, { status: 'cancelado' });
+        return volver('anulado');
+    }
+    if (pago0.status !== 'pendiente') return volver(pago0.status === 'pagado' ? 'ok' : 'rechazado');
+
+    const pago = await confirmarTransaccion(tokenWs);
+    if (pago.session_id !== `c${pago0.id}`) {
+        console.error('[webpay/retorno] REVISAR A MANO — pago de cotización que no calza:', { tokenWs, session: pago.session_id, pago: pago0.id });
+        return volver('error');
+    }
+
+    const info = {
+        authorization_code: pago.authorization_code || null,
+        payment_type_code: pago.payment_type_code || null,
+        installments_number: pago.installments_number ?? null,
+        card_last4: pago.card_detail?.card_number || null,
+        response_code: pago.response_code ?? null,
+        status: pago.status || null,
+        transaction_date: pago.transaction_date || null,
+    };
+
+    if (!estaAprobada(pago)) {
+        await updatePendingPayment(pago0.id, { status: 'cancelado', payment_info: info });
+        return volver('rechazado');
+    }
+    if (Math.round(Number(pago.amount)) !== pago0.amount) {
+        console.error('[webpay/retorno] MONTO NO CALZA en cotización — revisar:', { pago: pago0.id, cobrado: pago.amount, esperado: pago0.amount });
+        await updatePendingPayment(pago0.id, { payment_info: { ...info, monto_cobrado: pago.amount, revisar: true } });
+        return volver('error');
+    }
+
+    await settleQuotePayment(pago0, { info, origin: siteOrigin(req) });
+    return volver('ok');
 }

@@ -8,17 +8,28 @@
 
 import { procesarPago } from '../_lib/mercadopago.js';
 import { volverAlPortal } from '../_lib/checkout.js';
+import { paymentIdFromRef, getPayment, getQuoteById, volverACotizacion, siteOrigin } from '../_lib/quotePayments.js';
 
 export default async function handler(req, res) {
     const q = req.query || {};
     const paymentId = String(q.payment_id || q.collection_id || '');
     const pedido = /^\d+$/.test(String(q.external_reference || '')) ? q.external_reference : null;
 
+    const pagoCotizacion = paymentIdFromRef(q.external_reference);
+
     // Salió de Mercado Pago sin pagar: no hubo cobro y el pedido sigue pendiente.
-    if (!/^\d+$/.test(paymentId)) return volverAlPortal(res, 'anulado', pedido);
+    if (!/^\d+$/.test(paymentId)) {
+        if (pagoCotizacion) {
+            const p = await getPayment(pagoCotizacion).catch(() => null);
+            const quote = p ? await getQuoteById(p.quote_id).catch(() => null) : null;
+            return volverACotizacion(res, quote?.token, 'anulado');
+        }
+        return volverAlPortal(res, 'anulado', pedido);
+    }
 
     try {
-        const { estado, pedido: id } = await procesarPago(paymentId);
+        const { estado, pedido: id, cotizacion } = await procesarPago(paymentId, siteOrigin(req));
+        if (cotizacion) return volverACotizacion(res, cotizacion, estado);
         return volverAlPortal(res, estado, id || pedido);
     } catch (error) {
         console.error('[mercadopago/retorno] REVISAR A MANO', { paymentId, pedido, error: String(error) });

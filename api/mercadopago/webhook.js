@@ -8,6 +8,7 @@
 // lado responde 500 para que lo vuelva a mandar.
 
 import { procesarPago, firmaValida } from '../_lib/mercadopago.js';
+import { siteOrigin } from '../_lib/quotePayments.js';
 
 export default async function handler(req, res) {
     if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
@@ -24,7 +25,7 @@ export default async function handler(req, res) {
     }
 
     try {
-        const { estado } = await procesarPago(id);
+        const { estado } = await procesarPago(id, siteOrigin(req));
         return res.status(200).json({ ok: true, estado });
     } catch (error) {
         console.error('[mercadopago/webhook]', { id, error: String(error) });

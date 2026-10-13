@@ -2,16 +2,24 @@
 //
 // GET  /api/cotizacion?t=<token>              → la cotización enviada, para el cliente
 // POST /api/cotizacion { t, action: 'accept' } → el cliente la acepta
-// POST /api/cotizacion { id, action: 'send' }  → el admin la envía (sesión de admin en
-//                                                 Authorization: Bearer <token de Supabase>)
+// Acciones del admin (sesión de admin en Authorization: Bearer <token de Supabase>):
+// POST /api/cotizacion { id, action: 'send' }                       → la envía al cliente
+// POST /api/cotizacion { id, action: 'confirm_payment', stage }     → confirma una transferencia
+// POST /api/cotizacion { id, action: 'request_balance' }            → pide el saldo (sitio listo)
+// POST /api/cotizacion { id, action: 'publish', site }              → marca publicado y avisa
+//
+// Los pagos en línea del anticipo y el saldo van por /api/webpay y /api/mercadopago.
 //
 // El borrador lo guarda el admin directo en la base (admin_save_quote). Enviar pasa
 // por aquí porque además fija las fechas y manda el correo.
 
 import { checkBriefLimit, getClientIp, isAllowedOrigin } from './_lib/guardrails.js';
 import { rest, rows, userFromToken } from './_lib/orderStore.js';
-import { sendQuoteToClient, sendAcceptToTeam, sendAcceptReceipt } from './_lib/quoteMail.js';
-import { cleanQuote, quoteError, quoteNumber, QUOTE_VISIBLE, VALID_DAYS, isExpired } from '../src/data/quote.js';
+import { sendQuoteToClient, sendAcceptToTeam, sendAcceptReceipt, sendBalanceRequest, sendPublished } from './_lib/quoteMail.js';
+import { settleQuotePayment } from './_lib/quotePayments.js';
+import {
+    cleanQuote, quoteError, quoteNumber, QUOTE_VISIBLE, VALID_DAYS, isExpired, pendingStage, stageAmount,
+} from '../src/data/quote.js';
 
 const validToken = (t) => typeof t === 'string' && /^[a-f0-9]{64}$/.test(t);
 
@@ -41,6 +49,11 @@ const forClient = (row) => ({
     accepted: !!row.accepted_at,
     expired: isExpired(row),
     quote: cleanQuote(row.quote),
+    // Pagos: qué falta pagar ahora (anticipo | saldo | null) y las fechas de cada paso
+    due: pendingStage(row),
+    depositPaidAt: row.deposit_paid_at,
+    balancePaidAt: row.balance_paid_at,
+    publishedAt: row.published_at,
 });
 
 export default async function handler(req, res) {
@@ -61,14 +74,51 @@ export default async function handler(req, res) {
         const { action, t, id } = req.body || {};
         const origin = req.headers.origin;
 
-        // El admin envía la cotización ----------------------------------------------
-        if (action === 'send') {
+        // Acciones del admin -----------------------------------------------------------
+        const ADMIN_ACTIONS = ['send', 'confirm_payment', 'request_balance', 'publish'];
+        let row = null;
+        if (ADMIN_ACTIONS.includes(action)) {
             const session = String(req.headers.authorization || '').replace(/^Bearer\s+/i, '');
             const user = await userFromToken(session);
             if (!user || !(await isAdmin(user.id))) return res.status(403).json({ error: 'Tu cuenta no tiene permiso de administrador.' });
-
-            const row = await findBy(`id=eq.${Number(id)}`);
+            row = await findBy(`id=eq.${Number(id)}`);
             if (!row) return res.status(404).json({ error: 'La cotización no existe.' });
+        }
+
+        // Transferencia recibida: mismo efecto que un pago en línea (correo incluido).
+        if (action === 'confirm_payment') {
+            const { stage } = req.body;
+            if (pendingStage(row) !== stage) return res.status(409).json({ error: 'Ese pago no está pendiente.' });
+            const [payment] = await rows(await rest('quote_payments', {
+                method: 'POST',
+                body: { quote_id: row.id, stage, method: 'tr', amount: stageAmount(cleanQuote(row.quote), stage) },
+                prefer: 'return=representation',
+            }), 'registrar transferencia');
+            const updated = await settleQuotePayment(payment, { origin });
+            return res.status(200).json({ ok: !!updated });
+        }
+
+        // Sitio listo: se le pide el saldo al cliente.
+        if (action === 'request_balance') {
+            if (!row.deposit_paid_at || row.balance_paid_at) return res.status(409).json({ error: 'Primero tiene que estar pagado el anticipo.' });
+            const updated = await patch(row.id, ['en_desarrollo'], { balance_requested_at: new Date().toISOString() });
+            if (!updated) return res.status(409).json({ error: 'El proyecto no está en desarrollo.' });
+            const mailed = await sendBalanceRequest(updated, { origin });
+            return res.status(200).json({ ok: true, mailed });
+        }
+
+        // Publicado: cierra el proyecto y avisa al cliente.
+        if (action === 'publish') {
+            if (!row.balance_paid_at) return res.status(409).json({ error: 'Falta el pago del saldo.' });
+            const site = String(req.body.site || '').trim().slice(0, 200);
+            const updated = await patch(row.id, ['en_desarrollo'], { status: 'publicado', published_at: new Date().toISOString() });
+            if (!updated) return res.status(409).json({ error: 'El proyecto no está en desarrollo.' });
+            const mailed = await sendPublished(updated, { site, origin });
+            return res.status(200).json({ ok: true, mailed });
+        }
+
+        // El admin envía la cotización ----------------------------------------------
+        if (action === 'send') {
             const doc = cleanQuote(row.quote);
             const error = quoteError(doc);
             if (error) return res.status(400).json({ error });

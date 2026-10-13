@@ -143,6 +143,22 @@ export function quoteError(q) {
     return '';
 }
 
+// Pagos del proyecto: 50 % al aceptar (anticipo) y 50 % antes de publicar (saldo).
+export const STAGE_LABEL = { anticipo: 'Anticipo (50 %)', saldo: 'Saldo (50 %)' };
+
+/** El pago que corresponde ahora, o null. El saldo se cobra cuando el admin lo pide. */
+export const pendingStage = (row) => {
+    if (row.status === 'cancelada') return null;
+    if (row.status === 'aceptada' && !row.deposit_paid_at) return 'anticipo';
+    if (row.deposit_paid_at && row.balance_requested_at && !row.balance_paid_at) return 'saldo';
+    return null;
+};
+
+export const stageAmount = (doc, stage) => {
+    const t = quoteTotals(doc.items);
+    return stage === 'anticipo' ? t.anticipo : t.saldo;
+};
+
 /** ¿Venció? (solo importa mientras espera respuesta) */
 export const isExpired = (row) => row.status === 'cotizacion_enviada' && !!row.quote?.valid_until
     && new Date(row.quote.valid_until) < new Date();
