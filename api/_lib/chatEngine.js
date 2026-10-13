@@ -6,6 +6,7 @@ import { buildSystemPrompt } from './prompt.js';
 import { LIMITS, cleanPhone } from './guardrails.js';
 import { registerLead } from './leadStore.js';
 import { logChatTurn } from './chatLog.js';
+import { reservarRespuesta } from './agentQuota.js';
 
 // Nivel 1 del catálogo de agentes: FAQ, precios y agendamiento.
 // Suficiente para este caso de uso y con el costo por conversación más bajo.
@@ -79,6 +80,13 @@ export async function runChatTurn(params, emit) {
     };
 
     try {
+        // Sin cupo o con la prueba vencida no se llama al modelo: deriva a WhatsApp.
+        const sinCupo = await reservarRespuesta();
+        if (sinCupo) {
+            tracked({ type: 'delta', text: sinCupo });
+            tracked({ type: 'done' });
+            return;
+        }
         await runAgent(params, tracked);
     } finally {
         await logChatTurn({ ...params, reply: reply.trim() });

@@ -23,21 +23,23 @@ export const SERVICIOS = [
         id: 'agente',
         title: 'Agente IA 24/7',
         kicker: 'Nuevo',
-        desc: 'Configuramos un asistente con la información de tu negocio: atiende en tu web a cualquier hora, cotiza y te envía los datos de cada interesado.',
+        desc: 'Configuramos un asistente con la información de tu negocio: atiende en tu web a cualquier hora, responde dudas, deriva a tu WhatsApp y te envía los datos de cada interesado. 3 meses gratis con tu página.',
         includes: [
             'Chat en tu sitio web, disponible las 24 horas',
-            'Entrenado con tus productos, precios y preguntas frecuentes',
-            'Te avisa por correo con los datos de cada interesado',
-            'Opcional: WhatsApp Business y conexión con tu sistema',
+            'Entrenado con tus productos, precios, horarios y zonas de despacho',
+            'Deriva a tu WhatsApp y te avisa por correo de cada interesado',
+            '3 meses gratis con el Plan Pyme Digital o Empresa Digital',
         ],
         ask: 'Hola, me interesa un agente IA para mi negocio. ¿Cómo funciona?',
         home: {
-            desc: 'Configuramos un asistente con la información de tu negocio: atiende en tu web a cualquier hora, cotiza y te envía los datos de cada interesado. Puedes sumarle WhatsApp.',
+            desc: 'Configuramos un asistente con la información de tu negocio: atiende en tu web a cualquier hora, responde dudas, deriva a tu WhatsApp y te envía los datos de cada interesado. Viene 3 meses gratis con tu página.',
             ask: '¿Qué hace un agente IA y cómo funcionaría en mi negocio?',
         },
         agente: [
-            'Producto aparte, NO viene dentro de ningún plan web. Se cobra un setup por única vez más una mensualidad.',
-            '- Nivel 1, básico: chat IA en el sitio web del cliente, atención 24/7 configurada con la información del negocio. Hasta 1.000 mensajes al mes. NO incluye WhatsApp (es un add-on aparte).',
+            'Viene 3 meses GRATIS con el Plan Pyme Digital y con Empresa Digital, instalado y configurado. Al terminar los 3 meses se apaga solo: sigue funcionando solo si el cliente decide contratarlo, nunca se cobra sin que lo acepte. Si no lo contrata, su sitio sigue con el botón de WhatsApp, que traen todos los planes.',
+            'El agente funciona con la conexión de Interfaz360: por eso tiene una mensualidad. Cada plan tiene un tope de respuestas al mes; si se llega al tope, el chat deriva a los visitantes al WhatsApp del negocio hasta el mes siguiente, sin cobros extra ni sorpresas.',
+            'Qué puede hacer: responder preguntas frecuentes, horarios, productos y precios del negocio; decir si atienden o despachan en una comuna o zona; derivar al WhatsApp del negocio; y enviar por correo los datos de cada interesado.',
+            '- Nivel 1, agente web: chat IA en el sitio web del cliente, atención 24/7 configurada con la información del negocio. Dos planes según el uso: hasta 1.500 respuestas al mes, o hasta 5.000 respuestas al mes para negocios con más visitas. Derivar al WhatsApp del negocio (botón o enlace) SÍ está incluido; que el agente responda DENTRO de WhatsApp es el add-on WhatsApp Business, aparte.',
             '- Nivel 2, integrado en software: todo lo del Nivel 1 más integración dentro de una aplicación, consulta a base de datos, registro de información y reportes. NO incluye WhatsApp (es un add-on aparte).',
             '- Add-on WhatsApp Business: el mismo agente respondiendo en el WhatsApp del negocio. Se suma al Nivel 1 o al Nivel 2, no se vende solo. Requiere que el cliente tenga su cuenta de Meta Business verificada y un número dedicado solo para el agente. Meta cobra aparte, directo al cliente, los mensajes que inicia la empresa (plantillas); responder los mensajes que escriben los clientes no tiene ese cobro.',
             '- Add-on Integración Google: el agente puede leer y responder correos, agendar en Google Calendar y consultar catálogos en Drive.',
@@ -62,7 +64,7 @@ export const SERVICIOS = [
         home: {
             desc: 'Diseñamos y programamos tu página: secciones, textos, fotos, formulario de contacto y botón de WhatsApp, lista para aparecer en Google. Incluye dominio, hosting y correos el primer año.',
         },
-        agente: ['Se vende como Plan Pyme Digital o Suite Digital 360 (ver los planes).'],
+        agente: ['Se vende como Plan Pyme Digital (landing page) o Empresa Digital (ver los planes).'],
     },
     {
         id: 'tienda',
@@ -136,23 +138,29 @@ export const PLANES = [
     {
         id: 'pyme',
         name: 'Plan Pyme Digital',
-        sub: 'Para aparecer en Google con una imagen profesional.',
+        sub: 'Tu landing page: una sola página con la identidad de tu negocio, para aparecer en Google.',
         items: [
-            'Página web de una sección (landing)',
-            `${CORREOS_HOSTING} correos con el nombre de tu empresa`,
-            'Dominio y hosting el primer año',
+            'Landing page: una página a medida, rápida en el celular',
+            'Dominio .cl y 1 correo con el nombre de tu empresa el primer año',
             'Perfil en Google y Maps + SEO local',
+            'Botón de WhatsApp',
+            'Asistente IA 3 meses gratis',
+            'Políticas de privacidad y aviso de IA (Ley 21.719)',
             'Portal de clientes para tu cuenta',
             'Certificado de seguridad',
         ],
-        ask: 'Hola, me interesa el Plan Pyme Digital. ¿Qué incluye y cuánto cuesta?',
-        agente: ['Es una sola página, hecha en React. Ideal para emprendedores que parten.'],
-        noIncluye: ['agente IA', 'tienda online', 'Analytics, Tag Manager ni Search Console', 'Google Workspace'],
+        ask: 'Hola, me interesa el Plan Pyme Digital (landing page). ¿Qué incluye y cuánto cuesta?',
+        agente: [
+            'Es una landing page: una sola página, hecha en React, que muestra la identidad del negocio de un vistazo (servicios, fotos, ubicación y contacto). Ideal para emprendedores y negocios que parten.',
+            'El correo llega a la casilla de Gmail del cliente y responde desde ahí con la dirección de su empresa. Si necesita más correos para su equipo, se suma el hosting con correos (ver Dominios, Correos y Hosting).',
+            'Si después quiere crecer a Empresa Digital, hay un descuento por subir de plan que aplica un asesor en la cotización.',
+        ],
+        noIncluye: ['más de 1 correo', 'tienda online', 'Analytics, Tag Manager ni Search Console', 'campañas de Google Ads', 'Google Workspace'],
     },
     {
         id: 'suite',
-        name: 'Suite Digital 360',
-        sub: 'Para crecer con web completa, Google y medición de visitas.',
+        name: 'Empresa Digital',
+        sub: 'Web completa para empresas que quieren mostrar toda su identidad, medir sus visitas y quedar listas para Google Ads.',
         badge: 'Más completo',
         hot: true,
         items: [
@@ -160,19 +168,25 @@ export const PLANES = [
             `${CORREOS_HOSTING} correos con el nombre de tu empresa`,
             'Dominio y hosting el primer año',
             'Perfil en Google y Maps + SEO local',
-            'Analytics, Tag Manager y Search Console',
+            'Analytics, Tag Manager y Search Console, listo para Google Ads',
+            'Botón de WhatsApp',
+            'Asistente IA 3 meses gratis',
+            'Políticas de privacidad y aviso de IA (Ley 21.719)',
             'Portal de clientes para tu cuenta',
             'Certificado de seguridad',
         ],
-        ask: 'Hola, me interesa la Suite Digital 360. ¿Qué incluye y cuánto cuesta?',
-        agente: ['Sitio completo con varias secciones, hecho en React. Para empresas que quieren más potencia. Diferencia con el Plan Pyme: más secciones y medición de visitas (Analytics, Tag Manager, Search Console); el portal de clientes viene en ambos.'],
-        noIncluye: ['agente IA (es un producto aparte)', 'tienda online', 'Google Workspace'],
+        ask: 'Hola, me interesa el plan Empresa Digital. ¿Qué incluye y cuánto cuesta?',
+        agente: [
+            'Sitio completo con varias secciones, hecho en React. Para empresas que quieren mostrar toda su identidad. Diferencia con el Plan Pyme Digital: varias secciones en vez de una sola página, 5 correos en vez de 1, y medición de visitas (Analytics, Tag Manager, Search Console) con la base técnica lista para Google Ads.',
+            'Google Ads: dejamos todo listo para que el cliente pueda anunciar; la pauta la maneja y la paga el cliente. Crear o administrar campañas es un servicio aparte que cotiza un asesor.',
+        ],
+        noIncluye: ['tienda online', 'creación ni administración de campañas de Google Ads (servicio aparte)', 'Google Workspace'],
     },
 ];
 
 // Nota bajo los planes en la página Servicios. No va al agente: "acompañamiento"
 // se confunde con mantención, que el agente deriva a un asesor.
-export const EN_TODOS_LOS_PLANES = 'el portal de clientes y acompañamiento después de la entrega';
+export const EN_TODOS_LOS_PLANES = 'el portal de clientes, botón de WhatsApp, políticas de privacidad (Ley 21.719) y acompañamiento después de la entrega';
 
 // Precios al cliente que el sitio ya muestra (pedidos de dominio y portal).
 // Son netos: se cobran + IVA. El total a pagar sale de conIva().

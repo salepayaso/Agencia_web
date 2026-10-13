@@ -255,7 +255,7 @@ const BriefPage = () => {
                                                     </Question>
                                                     <label className="brief-check">
                                                         <input type="checkbox" checked={b.asistente_ia} onChange={(e) => set('asistente_ia')(e.target.checked)} />
-                                                        <span>Me interesa un <b>asistente IA</b> que atienda a mis clientes en el sitio a cualquier hora. Se cotiza aparte.</span>
+                                                        <span>Me interesa un <b>asistente IA</b> que atienda a mis clientes en el sitio a cualquier hora. Con la landing page o el plan Empresa Digital viene 3 meses gratis.</span>
                                                     </label>
                                                 </>
                                             )}

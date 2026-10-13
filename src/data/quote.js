@@ -86,7 +86,7 @@ export function draftQuote(row, b, templates) {
         items.push({ ...itemFrom(byId.dominio_propio), sub: `Ya tienes ${b.dominio_nombre || 'tu dominio'}, así que no incluimos su registro` });
     }
     const negocio = b.negocio || row.client_name;
-    const tipo = { landing: 'Una página de presentación', multi: 'Un sitio con varias secciones', tienda: 'Una tienda online', sistema: 'Un sistema a medida' }[b.tipo];
+    const tipo = { landing: 'Una landing page', multi: 'Un sitio con varias secciones', tienda: 'Una tienda online', sistema: 'Un sistema a medida' }[b.tipo];
     const dominio = b.dominio === 'si' && b.dominio_nombre ? ` Lo publicamos con tu dominio ${b.dominio_nombre}, que ya tienes.` : '';
     return {
         client: {

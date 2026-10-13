@@ -29,7 +29,7 @@ const STEPS = [
 
 const ACCOUNT = [
     { dt: 'Dominio', b: 'tunegocio.cl', small: 'Vence el 14 mar 2027 · quedan 172 días', st: 'Vigente' },
-    { dt: 'Plan', b: 'Suite 360 · anual', small: 'Próximo pago 05 oct 2026 · Tarjeta •••• 4821', st: 'Al día' },
+    { dt: 'Plan', b: 'Empresa Digital · anual', small: 'Próximo pago 05 oct 2026 · Tarjeta •••• 4821', st: 'Al día' },
     { dt: 'Correos', b: '3 de 5 activos', small: 'contacto@ · ventas@ · pedidos@', st: '+ 2 libres', kind: 'ghost' },
     { dt: 'Sitio web', b: 'En línea', small: 'Certificado de seguridad vigente', st: 'OK' },
     { dt: 'Documentos', b: 'Contrato · Factura septiembre', small: '2 archivos nuevos', st: 'Descargar', kind: 'ghost' },

@@ -23,8 +23,8 @@ export const SITIO_ACTUAL = {
 };
 
 export const TIPOS = {
-    landing: { label: 'Página de presentación', sub: 'Una página con servicios, fotos, ubicación y contacto', resumen: 'Página de presentación (Plan Pyme)' },
-    multi: { label: 'Sitio con varias secciones', sub: 'Inicio, servicios, nosotros, contacto y más, con medición de visitas', resumen: 'Sitio con varias secciones (Suite 360)' },
+    landing: { label: 'Landing page', sub: 'Una sola página con servicios, fotos, ubicación y contacto', resumen: 'Landing page (Plan Pyme Digital)' },
+    multi: { label: 'Sitio con varias secciones', sub: 'Inicio, servicios, nosotros, contacto y más, con medición de visitas', resumen: 'Sitio con varias secciones (Empresa Digital)' },
     tienda: { label: 'Tienda online', sub: 'Catálogo, carro y pago en línea', resumen: 'Tienda online' },
     sistema: { label: 'Sistema a medida', sub: 'Inventario, reservas o gestión interna', resumen: 'Sistema a medida' },
 };

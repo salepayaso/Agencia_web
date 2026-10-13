@@ -12,7 +12,7 @@ const WELCOME =
 const SUGGESTIONS = [
     '¿Cuánto cuesta una página web?',
     'Quiero un agente IA para mi negocio',
-    '¿Qué incluye la Suite Digital 360?',
+    '¿Qué incluye el plan Empresa Digital?',
 ];
 
 // Mensajes del globo de invitación. Rotan para no repetir siempre lo mismo.
