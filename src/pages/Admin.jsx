@@ -203,8 +203,8 @@ const copyText = async (value) => {
 };
 
 const CLOSED = ['publicado', 'cancelada'];
-// Estados que hoy se pueden elegir a mano. Los demás llegan con la etapa 2
-// (enviar la cotización) y la 3 (aceptación y pago).
+// Estados que se eligen a mano antes de que el cliente acepte. Los demás los pone
+// el sistema: enviar la cotización, aceptarla, los pagos y la publicación.
 const MANUAL_STATUS = ['brief_pendiente', 'brief_recibido', 'en_preparacion', 'cancelada'];
 
 const Quotes = ({ quotes, templates, onChanged }) => {
@@ -300,7 +300,13 @@ const LinkBox = ({ quote: q, onClose }) => {
 
 const QuoteRow = ({ quote: q, templates, onChanged }) => {
     const [editing, setEditing] = useState(false);
-    const [status, setStatus] = useState(q.status);
+    // Lo que eligió en la lista; sin elegir, el estado actual de la base. Así, después de
+    // cada acción (enviar, pagar, publicar), "Guardar" no devuelve el estado anterior.
+    const [picked, setPicked] = useState(null);
+    const status = picked ?? q.status;
+    const setStatus = setPicked;
+    // Aceptada en adelante, el estado lo mueven los pagos: aquí solo se guarda la nota.
+    const locked = !!q.accepted_at;
     const [note, setNote] = useState(q.admin_note || '');
     const [open, setOpen] = useState(false);
     const [showLink, setShowLink] = useState(false);
@@ -317,9 +323,10 @@ const QuoteRow = ({ quote: q, templates, onChanged }) => {
     const save = async () => {
         setBusy(true);
         setError('');
-        const { error: err } = await supabase.rpc('admin_update_quote', { p_id: q.id, p_status: status, p_note: note });
+        const { error: err } = await supabase.rpc('admin_update_quote', { p_id: q.id, p_status: locked ? q.status : status, p_note: note });
         setBusy(false);
         if (err) return setError(errText(err));
+        setPicked(null);
         onChanged();
     };
 
@@ -341,14 +348,16 @@ const QuoteRow = ({ quote: q, templates, onChanged }) => {
                 </dl>
             )}
             <div className="admin-actions">
-                <select className="admin-input" style={{ maxWidth: 240 }} value={status} onChange={(e) => setStatus(e.target.value)} aria-label="Estado">
-                    {Object.entries(QUOTE_STATUS).map(([id, s]) => {
-                        const soon = !MANUAL_STATUS.includes(id) && id !== q.status;
-                        return <option key={id} value={id} disabled={soon}>{s.label}{soon ? ' (próximamente)' : ''}</option>;
-                    })}
-                </select>
+                {!locked && (
+                    <select className="admin-input" style={{ maxWidth: 240 }} value={status} onChange={(e) => setStatus(e.target.value)} aria-label="Estado">
+                        {Object.entries(QUOTE_STATUS).map(([id, s]) => {
+                            const auto = !MANUAL_STATUS.includes(id) && id !== q.status;
+                            return <option key={id} value={id} disabled={auto}>{s.label}{auto ? ' (automático)' : ''}</option>;
+                        })}
+                    </select>
+                )}
                 <input className="admin-input" value={note} onChange={(e) => setNote(e.target.value)} maxLength={1000} placeholder="Nota interna (no la ve el cliente)" aria-label="Nota interna" />
-                <button type="button" className="btn signal" disabled={busy} onClick={save}>{busy ? 'Guardando…' : 'Guardar →'}</button>
+                <button type="button" className="btn signal" disabled={busy} onClick={save}>{busy ? 'Guardando…' : locked ? 'Guardar nota →' : 'Guardar →'}</button>
             </div>
             <div className="admin-actions">
                 {q.status !== 'cancelada' && (
@@ -435,7 +444,7 @@ const ProjectPayments = ({ quote: q, onChanged }) => {
                 </div>
             )}
 
-            {q.status === 'en_desarrollo' && q.deposit_paid_at && !q.balance_requested_at && (
+            {['aceptada', 'en_desarrollo'].includes(q.status) && q.deposit_paid_at && !q.balance_requested_at && (
                 <div className="admin-actions">
                     <span>¿El cliente aprobó el sitio?</span>
                     <button type="button" className="btn" disabled={!!busy} onClick={() => run('saldo', {
@@ -448,7 +457,7 @@ const ProjectPayments = ({ quote: q, onChanged }) => {
                 </div>
             )}
 
-            {q.status === 'en_desarrollo' && q.balance_paid_at && (
+            {['aceptada', 'en_desarrollo'].includes(q.status) && q.balance_paid_at && !q.published_at && (
                 <div className="admin-actions">
                     <input className="admin-input" value={site} onChange={(e) => setSite(e.target.value)} placeholder="www.sudominio.cl (va en el correo)" aria-label="Dirección del sitio publicado" autoCapitalize="none" />
                     <button type="button" className="btn signal" disabled={!!busy} onClick={() => run('publicar', {

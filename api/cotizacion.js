@@ -101,7 +101,8 @@ export default async function handler(req, res) {
         // Sitio listo: se le pide el saldo al cliente.
         if (action === 'request_balance') {
             if (!row.deposit_paid_at || row.balance_paid_at) return res.status(409).json({ error: 'Primero tiene que estar pagado el anticipo.' });
-            const updated = await patch(row.id, ['en_desarrollo'], { balance_requested_at: new Date().toISOString() });
+            // Con el anticipo pagado el proyecto está en desarrollo (también corrige uno que quedó en "Aceptada").
+            const updated = await patch(row.id, ['aceptada', 'en_desarrollo'], { balance_requested_at: new Date().toISOString(), status: 'en_desarrollo' });
             if (!updated) return res.status(409).json({ error: 'El proyecto no está en desarrollo.' });
             const mailed = await sendBalanceRequest(updated, { origin });
             return res.status(200).json({ ok: true, mailed });
@@ -111,7 +112,7 @@ export default async function handler(req, res) {
         if (action === 'publish') {
             if (!row.balance_paid_at) return res.status(409).json({ error: 'Falta el pago del saldo.' });
             const site = String(req.body.site || '').trim().slice(0, 200);
-            const updated = await patch(row.id, ['en_desarrollo'], { status: 'publicado', published_at: new Date().toISOString() });
+            const updated = await patch(row.id, ['aceptada', 'en_desarrollo'], { status: 'publicado', published_at: new Date().toISOString() });
             if (!updated) return res.status(409).json({ error: 'El proyecto no está en desarrollo.' });
             const mailed = await sendPublished(updated, { site, origin });
             return res.status(200).json({ ok: true, mailed });
