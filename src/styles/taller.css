@@ -591,6 +591,12 @@
   & .qe-totals { display: flex; flex-wrap: wrap; gap: 8px 20px; font-size: 15px; font-variant-numeric: tabular-nums; }
   & .qe-totals b { font-size: 17px; }
 
+  /* Confirmación (src/components/ConfirmDialog.jsx) */
+  & .confirm-backdrop { position: fixed; inset: 0; z-index: 100; background: rgba(15, 26, 46, .45); display: grid; place-items: center; padding: 16px; }
+  & .confirm-box { width: min(460px, 100%); background: var(--white); border: 1.5px solid var(--ink); box-shadow: 10px 10px 0 var(--signal); padding: 24px; display: grid; gap: 14px; }
+  & .confirm-box h2 { margin: 0; font: 800 24px/1.1 var(--display); font-stretch: 85%; text-transform: uppercase; text-wrap: balance; }
+  & .confirm-box p { margin: 0; color: var(--ink-2); font-size: 16px; white-space: pre-line; }
+
   &.loading { min-height: 100vh; display: grid; place-items: center; }
   &.loading .seal { display: inline-grid; place-items: center; width: 56px; height: 56px; background: var(--signal); color: #fff; font: 900 18px/1 var(--display); animation: tcBlink 1.4s infinite; }
 }

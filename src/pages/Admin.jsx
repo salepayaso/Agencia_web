@@ -12,6 +12,7 @@ import {
 import { QUOTE_STATUS, briefNumber, briefRows, cleanBrief } from '../data/brief';
 import { quoteNumber, quoteTotals, quoteError, cleanQuote, draftQuote, DOMAIN_OWNER, clp as money } from '../data/quote';
 import QuoteDocument from '../components/QuoteDocument';
+import { useConfirm } from '../lib/useConfirm';
 
 // Panel de administración (/admin): cotizaciones, pedidos, clientes y soporte sin entrar a Supabase.
 // Solo para cuentas en la tabla admins (supabase_scripts/admin_panel_2026_09_30.sql).
@@ -380,6 +381,7 @@ const QuoteEditor = ({ quote: q, templates, onChanged }) => {
     const [busy, setBusy] = useState('');
     const [msg, setMsg] = useState(null);
     const [sentNow, setSentNow] = useState(false);
+    const [confirm, dialog] = useConfirm();
     const t = quoteTotals(doc.items);
 
     const setClient = (k) => (e) => setDoc((d) => ({ ...d, client: { ...d.client, [k]: e.target.value } }));
@@ -422,7 +424,16 @@ const QuoteEditor = ({ quote: q, templates, onChanged }) => {
         const problem = quoteError(cleanQuote(doc));
         if (problem) return setMsg({ ok: false, text: problem });
         const again = q.status === 'cotizacion_enviada';
-        if (!window.confirm(`${again ? '¿Reenviar' : '¿Enviar'} la cotización a ${doc.client.email}? Total ${money(t.total)} IVA incluido.`)) return;
+        const ok = await confirm({
+            title: again ? '¿Reenviar la cotización?' : '¿Enviar la cotización?',
+            text: [
+                `Le llega a ${doc.client.email} con el enlace para verla y aceptarla.`,
+                `Total ${money(t.total)} IVA incluido · anticipo ${money(t.anticipo)}.`,
+                again ? 'Vuelve a tener 15 días de validez.' : '',
+            ].filter(Boolean).join('\n'),
+            ok: again ? 'Reenviar' : 'Enviar',
+        });
+        if (!ok) return;
         setBusy('enviar');
         setMsg(null);
         try {
@@ -447,6 +458,7 @@ const QuoteEditor = ({ quote: q, templates, onChanged }) => {
 
     return (
         <div className="client-editor">
+            {dialog}
             <div className="tabs" role="tablist" aria-label="Cotización">
                 {editable && <button type="button" role="tab" aria-selected={tab === 'detalle'} onClick={() => setTab('detalle')}>Detalle</button>}
                 {editable && <button type="button" role="tab" aria-selected={tab === 'cliente'} onClick={() => setTab('cliente')}>Cliente</button>}
@@ -561,6 +573,7 @@ const OrderRow = ({ order: o, client, onChanged }) => {
     const [note, setNote] = useState(o.admin_note || '');
     const [busy, setBusy] = useState(false);
     const [error, setError] = useState('');
+    const [confirm, dialog] = useConfirm();
     const plan = OFFERS[o.kind]?.years[o.years] || OFFERS[o.kind]?.years[1];
     const h = o.holder || {};
     const email = client?.contact_email || client?.email;
@@ -583,6 +596,7 @@ const OrderRow = ({ order: o, client, onChanged }) => {
 
     return (
         <article className="ticket">
+            {dialog}
             <div className="t-top">
                 <h3>{renewal ? 'Renovación · ' : ''}{OFFERS[o.kind]?.title || o.kind}{o.domain ? ` · ${o.domain}` : ''}</h3>
                 <span className={`pill ${orderStatus(o).cls}`}>{orderStatus(o).label}</span>
@@ -602,7 +616,7 @@ const OrderRow = ({ order: o, client, onChanged }) => {
                 {next && <button type="button" className="btn signal" disabled={busy} onClick={() => save(next.to)}>{next.label} →</button>}
                 <button type="button" className="btn" disabled={busy} onClick={() => save(o.status)}>Guardar nota</button>
                 {o.status !== 'cancelado' && o.status !== 'activo' && (
-                    <button type="button" className="textlink" disabled={busy} onClick={() => window.confirm('¿Cancelar este pedido?') && save('cancelado')}>Cancelar pedido</button>
+                    <button type="button" className="textlink" disabled={busy} onClick={async () => (await confirm({ title: '¿Cancelar este pedido?', text: 'El cliente lo verá como cancelado en su portal.', ok: 'Cancelar pedido', cancel: 'Volver', danger: true })) && save('cancelado')}>Cancelar pedido</button>
                 )}
                 {email && <a className="textlink" href={`mailto:${email}?subject=${mailSubject}`}>Correo</a>}
                 {wa && <a className="textlink" href={wa} target="_blank" rel="noreferrer">WhatsApp</a>}
@@ -824,6 +838,7 @@ const HostingTab = ({ profile: p, onSave }) => {
     const [newEmail, setNewEmail] = useState('');
     const [mailBusy, setMailBusy] = useState(false);
     const [error, setError] = useState('');
+    const [confirm, dialog] = useConfirm();
     const known = HOSTING_PLANS.some((h) => h.id === f.hosting_plan);
     const limit = parseInt(f.email_count, 10) || 0;
 
@@ -866,6 +881,7 @@ const HostingTab = ({ profile: p, onSave }) => {
 
     return (
         <form className="admin-form" onSubmit={submit} noValidate>
+            {dialog}
             <label className="field">Plan de hosting <em>(lo ve el cliente)</em>
                 <select value={f.hosting_plan} onChange={pickPlan}>
                     <option value="">Sin hosting</option>
@@ -883,7 +899,7 @@ const HostingTab = ({ profile: p, onSave }) => {
                         {emails.map((m) => (
                             <li key={m}>
                                 <code>{m}</code>
-                                <button type="button" disabled={mailBusy} onClick={() => window.confirm(`¿Quitar ${m} del portal del cliente?`) && saveEmails(emails.filter((y) => y !== m))}>Quitar</button>
+                                <button type="button" disabled={mailBusy} onClick={async () => (await confirm({ title: '¿Quitar este correo?', text: `${m} deja de aparecer en el portal del cliente. Si también hay que borrarlo, hazlo en cPanel.`, ok: 'Quitar', danger: true })) && saveEmails(emails.filter((y) => y !== m))}>Quitar</button>
                             </li>
                         ))}
                     </ul>
@@ -945,6 +961,7 @@ const DocumentsTab = ({ profile: p, documents, onChanged }) => {
     const [inputKey, setInputKey] = useState(0);
     const [busy, setBusy] = useState(null);
     const [msg, setMsg] = useState(null);
+    const [confirm, dialog] = useConfirm();
 
     const upload = async (e) => {
         e.preventDefault();
@@ -981,7 +998,7 @@ const DocumentsTab = ({ profile: p, documents, onChanged }) => {
     };
 
     const remove = async (d) => {
-        if (!window.confirm(`¿Quitar "${d.title}" del portal del cliente?`)) return;
+        if (!(await confirm({ title: '¿Quitar este documento?', text: `"${d.title}" deja de aparecer en el portal del cliente.`, ok: 'Quitar', danger: true }))) return;
         setBusy(d.id);
         setMsg(null);
         const { data: path, error } = await supabase.rpc('admin_delete_document', { p_id: d.id });
@@ -995,6 +1012,7 @@ const DocumentsTab = ({ profile: p, documents, onChanged }) => {
 
     return (
         <div className="admin-form">
+            {dialog}
             <div className="wide">
                 {documents.length ? (
                     <ul className="doc-list" style={{ border: '1px solid var(--rule)' }}>
