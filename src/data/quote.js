@@ -53,6 +53,14 @@ export const CONDITIONS = [
     'Los cambios fuera de lo cotizado se presupuestan aparte antes de hacerlos.',
 ];
 
+// Quién tiene el dominio cambia qué paga desde el segundo año.
+//   nuestro: lo registramos nosotros → renueva el dominio con nosotros (y los correos si quiere)
+//   propio:  ya tenía dominio → lo renueva él con su proveedor; con nosotros solo los correos
+export const DOMAIN_OWNER = {
+    nuestro: 'Lo registramos nosotros',
+    propio: 'El cliente ya tiene su dominio',
+};
+
 export const RENEWALS = {
     dominio: OFFERS.dominio.years[1].price,
     hosting: OFFERS.hosting.years[1].price,
@@ -72,6 +80,8 @@ export function draftQuote(row, b, templates) {
     const byId = Object.fromEntries(templates.map((t) => [t.id, t]));
     const main = byId[templateFor(b)];
     const items = main ? [itemFrom(main)] : [];
+    // Si ya tiene dominio, el plan no lo incluye: se quita de la lista y va el descuento.
+    if (b.dominio === 'si' && items[0]) items[0].includes = items[0].includes.filter((x) => !/^dominio/i.test(x));
     if (b.dominio === 'si' && byId.dominio_propio) {
         items.push({ ...itemFrom(byId.dominio_propio), sub: `Ya tienes ${b.dominio_nombre || 'tu dominio'}, así que no incluimos su registro` });
     }
@@ -88,6 +98,7 @@ export function draftQuote(row, b, templates) {
             phone: b.telefono || row.client_phone || '',
         },
         summary: `${tipo} para ${negocio}.${dominio}`,
+        domain: b.dominio === 'si' ? 'propio' : 'nuestro',
         items,
     };
 }
@@ -109,6 +120,7 @@ export function cleanQuote(raw = {}) {
             phone: text(c.phone, 30),
         },
         summary: text(q.summary, 1500),
+        domain: q.domain === 'propio' ? 'propio' : 'nuestro',
         items: (Array.isArray(q.items) ? q.items : []).slice(0, 20).map((i) => ({
             title: text(i?.title, 150),
             sub: text(i?.sub, 300),

@@ -128,15 +128,30 @@ const QuoteDocument = ({ q, doc, children }) => {
 
                 <div>
                     <h2>Desde el segundo año</h2>
-                    <div className="qd-renew">
-                        <div><b>Dominio .cl</b> · mantiene tu sitio publicado</div>
-                        <div><b>{clp(RENEWALS.dominio)} + IVA</b> al año</div>
-                    </div>
-                    <p className="qd-fine">
-                        Para que tu sitio siga publicado basta con renovar el dominio. Si además quieres mantener tus correos, se suma el hosting
-                        de correos ({clp(RENEWALS.hosting)} + IVA al año), o el pack dominio + correos por {clp(RENEWALS.pack)} + IVA al año.
-                        Tu dominio sigue a tu nombre y te avisamos antes de cada vencimiento.
-                    </p>
+                    {doc.domain === 'propio' ? (
+                        <>
+                            <div className="qd-renew">
+                                <div><b>Hosting de correos</b> · solo si quieres mantener tus correos con nosotros</div>
+                                <div><b>{clp(RENEWALS.hosting)} + IVA</b> al año</div>
+                            </div>
+                            <p className="qd-fine">
+                                Tu dominio es tuyo y lo renuevas directamente con tu proveedor: mientras siga activo, tu sitio sigue publicado sin costo
+                                adicional. Si no quieres los correos, desde el segundo año no nos pagas nada.
+                            </p>
+                        </>
+                    ) : (
+                        <>
+                            <div className="qd-renew">
+                                <div><b>Dominio .cl</b> · mantiene tu sitio publicado</div>
+                                <div><b>{clp(RENEWALS.dominio)} + IVA</b> al año</div>
+                            </div>
+                            <p className="qd-fine">
+                                Para que tu sitio siga publicado basta con renovar el dominio. Si además quieres mantener tus correos, se suma el hosting
+                                de correos ({clp(RENEWALS.hosting)} + IVA al año), o el pack dominio + correos por {clp(RENEWALS.pack)} + IVA al año.
+                                Tu dominio sigue a tu nombre y te avisamos antes de cada vencimiento.
+                            </p>
+                        </>
+                    )}
                 </div>
 
                 <div>

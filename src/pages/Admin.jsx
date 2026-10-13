@@ -10,7 +10,7 @@ import {
     HOSTING_PLANS, PAY_METHODS, DOC_TITLES, cleanDomain,
 } from '../lib/portal';
 import { QUOTE_STATUS, briefNumber, briefRows, cleanBrief } from '../data/brief';
-import { quoteNumber, quoteTotals, quoteError, cleanQuote, draftQuote, clp as money } from '../data/quote';
+import { quoteNumber, quoteTotals, quoteError, cleanQuote, draftQuote, DOMAIN_OWNER, clp as money } from '../data/quote';
 import QuoteDocument from '../components/QuoteDocument';
 
 // Panel de administración (/admin): cotizaciones, pedidos, clientes y soporte sin entrar a Supabase.
@@ -370,7 +370,12 @@ const quoteMessage = (q, doc) => {
 
 const QuoteEditor = ({ quote: q, templates, onChanged }) => {
     const editable = EDITABLE_QUOTE.includes(q.status);
-    const [doc, setDoc] = useState(() => (q.quote ? cleanQuote(q.quote) : draftQuote(q, cleanBrief(q.brief), templates)));
+    const [doc, setDoc] = useState(() => {
+        if (!q.quote) return draftQuote(q, cleanBrief(q.brief), templates);
+        // Borradores guardados antes de existir el campo: se deduce del brief.
+        const saved = cleanQuote(q.quote);
+        return q.quote.domain ? saved : { ...saved, domain: cleanBrief(q.brief).dominio === 'si' ? 'propio' : 'nuestro' };
+    });
     const [tab, setTab] = useState(editable ? 'detalle' : 'vista');
     const [busy, setBusy] = useState('');
     const [msg, setMsg] = useState(null);
@@ -450,6 +455,11 @@ const QuoteEditor = ({ quote: q, templates, onChanged }) => {
 
             {tab === 'detalle' && (
                 <div style={{ display: 'grid', gap: 14 }}>
+                    <label className="field">Dominio <em>(cambia el texto "Desde el segundo año")</em>
+                        <select value={doc.domain} onChange={(e) => setDoc((d) => ({ ...d, domain: e.target.value }))}>
+                            {Object.entries(DOMAIN_OWNER).map(([id, label]) => <option key={id} value={id}>{label}</option>)}
+                        </select>
+                    </label>
                     <label className="field">Qué vamos a hacer <em>(lo primero que lee el cliente)</em>
                         <textarea value={doc.summary} onChange={(e) => setDoc((d) => ({ ...d, summary: e.target.value }))} maxLength={1500} rows={3} />
                     </label>
