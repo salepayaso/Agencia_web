@@ -1,6 +1,7 @@
 import { defineConfig, loadEnv } from 'vite'
 import react from '@vitejs/plugin-react'
 import { ViteImageOptimizer } from 'vite-plugin-image-optimizer'
+import { copyFileSync } from 'node:fs'
 
 // Sirve /api/check-domain en desarrollo local (npm run dev).
 // En producción Vercel usa api/check-domain.js directamente.
@@ -217,6 +218,16 @@ const briefDevApi = () => ({
   },
 });
 
+// Copia index.html como 404.html: Vercel lo sirve con estado 404 en las
+// direcciones que no existen y la app muestra la página "no encontrada".
+const notFoundPage = () => ({
+  name: 'not-found-page',
+  apply: 'build',
+  closeBundle() {
+    copyFileSync('dist/index.html', 'dist/404.html');
+  },
+});
+
 // https://vite.dev/config/
 export default defineConfig(({ mode }) => {
   // Expone las claves del .env al middleware de desarrollo (contexto Node).
@@ -231,6 +242,7 @@ export default defineConfig(({ mode }) => {
     paymentDevApi('webpay'),
     paymentDevApi('mercadopago'),
     briefDevApi(),
+    notFoundPage(),
     ViteImageOptimizer({
       png: {
         quality: 80,

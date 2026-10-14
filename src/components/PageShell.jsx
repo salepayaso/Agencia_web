@@ -5,9 +5,9 @@ import SEO from './SEO';
 import { openChat } from '../lib/chat';
 
 // Estructura común de las páginas públicas: menú, asesor, contenido y footer.
-const PageShell = ({ title, description, children }) => (
+const PageShell = ({ title, description, noindex, children }) => (
     <div className="tc-page">
-        <SEO title={title} description={description} />
+        <SEO title={title} description={description} noindex={noindex} />
         <Navbar />
         <ChatAgent />
         <main className="tc">{children}</main>

@@ -1,6 +1,6 @@
 import { useState, useEffect, lazy, Suspense } from 'react';
 import { supabase } from './supabase';
-import { BrowserRouter as Router, Routes, Route, useNavigate, useLocation, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useNavigate, useLocation } from 'react-router-dom';
 import ScrollToTop from './components/ScrollToTop';
 import ProtectedRoute from './components/ProtectedRoute';
 import ScrollProgress from './components/ScrollProgress';
@@ -24,6 +24,7 @@ const PrivacyPage = lazy(() => import('./pages/PrivacyPage'));
 const TermsPage = lazy(() => import('./pages/TermsPage'));
 const BriefPage = lazy(() => import('./pages/BriefPage'));
 const QuotePage = lazy(() => import('./pages/QuotePage'));
+const NotFound = lazy(() => import('./pages/NotFound'));
 
 const AuthHandler = () => {
   const navigate = useNavigate();
@@ -56,10 +57,10 @@ function App() {
       <SpeedInsights />
       <Analytics />
       <Suspense fallback={<div className="tc-page" />}>
+        {/* Una ruta nueva también va en los rewrites de vercel.json; si no, Vercel responde 404. */}
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/servicios" element={<Services />} />
-          <Route path="/portafolio" element={<Navigate to="/servicios" replace />} />
           <Route path="/nosotros" element={<AboutPage />} />
           <Route path="/contacto" element={<ContactPage />} />
           <Route path="/login" element={<Login />} />
@@ -85,6 +86,7 @@ function App() {
               </ProtectedRoute>
             }
           />
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </Suspense>
     </Router>

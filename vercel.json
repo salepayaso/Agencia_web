@@ -5,9 +5,17 @@
             "schedule": "0 12 * * *"
         }
     ],
+    "trailingSlash": false,
+    "redirects": [
+        { "source": "/portafolio", "destination": "/servicios", "permanent": true }
+    ],
     "rewrites": [
         {
-            "source": "/((?!api/).*)",
+            "source": "/(servicios|nosotros|contacto|login|update-password|tarjeta|privacidad|terminos|dashboard|admin)",
+            "destination": "/index.html"
+        },
+        {
+            "source": "/(brief|cotizacion)/:token",
             "destination": "/index.html"
         }
     ],
