@@ -89,5 +89,14 @@ export function volverACotizacion(res, token, estado) {
     res.end();
 }
 
-/** Origen del sitio para los enlaces de los correos, cuando no hay header Origin (retornos, webhooks). */
-export const siteOrigin = (req) => req.headers.origin || `https://${req.headers['x-forwarded-host'] || req.headers.host}`;
+/**
+ * Origen del sitio para los enlaces de los correos. Nunca sale del header Origin:
+ * quien llama lo elige, y un correo nuestro con un enlace a otro sitio sería phishing.
+ * Producción usa el dominio fijo (igual que reminders.js); la vista previa, el host
+ * del despliegue, que Vercel enruta; en local, el servidor de Vite.
+ */
+export function siteOrigin(req) {
+    if (process.env.VERCEL_ENV === 'production') return 'https://interfaz360.cl';
+    const host = req.headers['x-forwarded-host'] || req.headers.host;
+    return process.env.VERCEL_ENV ? `https://${host}` : `http://${host}`;
+}

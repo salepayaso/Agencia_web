@@ -16,7 +16,7 @@
 import { checkBriefLimit, getClientIp, isAllowedOrigin } from './_lib/guardrails.js';
 import { rest, rows, userFromToken } from './_lib/orderStore.js';
 import { sendQuoteToClient, sendAcceptToTeam, sendAcceptReceipt, sendBalanceRequest, sendPublished } from './_lib/quoteMail.js';
-import { settleQuotePayment } from './_lib/quotePayments.js';
+import { settleQuotePayment, siteOrigin } from './_lib/quotePayments.js';
 import {
     cleanQuote, quoteError, quoteNumber, QUOTE_VISIBLE, VALID_DAYS, isExpired, pendingStage, stageAmount,
 } from '../src/data/quote.js';
@@ -72,7 +72,7 @@ export default async function handler(req, res) {
 
         if (!isAllowedOrigin(req)) return res.status(403).json({ error: 'Origen no permitido.' });
         const { action, t, id } = req.body || {};
-        const origin = req.headers.origin;
+        const origin = siteOrigin(req);
 
         // Acciones del admin -----------------------------------------------------------
         const ADMIN_ACTIONS = ['send', 'confirm_payment', 'request_balance', 'publish'];

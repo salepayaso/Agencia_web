@@ -9,6 +9,7 @@ import { checkBriefLimit, getClientIp, isAllowedOrigin } from './_lib/guardrails
 import { rest, rows } from './_lib/orderStore.js';
 import { sendBriefToTeam, sendBriefReceipt } from './_lib/briefMail.js';
 import { draftWithClaude } from './_lib/quoteDraft.js';
+import { siteOrigin } from './_lib/quotePayments.js';
 import { cleanBrief, briefError, emptyBrief, briefNumber, BRIEF_EDITABLE } from '../src/data/brief.js';
 
 const validToken = (t) => typeof t === 'string' && /^[a-f0-9]{64}$/.test(t);
@@ -75,7 +76,7 @@ export default async function handler(req, res) {
         if (!saved) return res.status(409).json({ error: 'El formulario ya no se puede cambiar. Escríbenos por WhatsApp al +56 9 5414 6176.' });
 
         if (send) {
-            const origin = req.headers.origin;
+            const origin = siteOrigin(req);
             await Promise.all([
                 sendBriefToTeam(saved, brief, { origin, again }),
                 sendBriefReceipt(saved, brief, { origin }),
