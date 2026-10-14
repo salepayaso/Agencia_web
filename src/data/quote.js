@@ -80,6 +80,9 @@ export function draftQuote(row, b, templates) {
     const byId = Object.fromEntries(templates.map((t) => [t.id, t]));
     const main = byId[templateFor(b)];
     const items = main ? [itemFrom(main)] : [];
+    // Ítems que sugirió Claude al leer el brief (api/_lib/quoteDraft.js); el precio viene de la base.
+    const ai = row.ai_draft;
+    for (const id of ai?.extras || []) if (byId[id]) items.push(itemFrom(byId[id]));
     // Si ya tiene dominio, el plan no lo incluye: se quita de la lista y va el descuento.
     if (b.dominio === 'si' && items[0]) items[0].includes = items[0].includes.filter((x) => !/^dominio/i.test(x));
     if (b.dominio === 'si' && byId.dominio_propio) {
@@ -97,7 +100,7 @@ export function draftQuote(row, b, templates) {
             email: b.correo || row.client_email || '',
             phone: b.telefono || row.client_phone || '',
         },
-        summary: `${tipo} para ${negocio}.${dominio}`,
+        summary: ai?.summary || `${tipo} para ${negocio}.${dominio}`,
         domain: b.dominio === 'si' ? 'propio' : 'nuestro',
         items,
     };

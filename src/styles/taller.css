@@ -597,6 +597,7 @@
   & .quote-pay { display: grid; gap: 12px; border-top: 1px solid var(--rule); padding-top: 14px; }
   & .qe-item { border: 1.5px solid var(--rule); background: var(--white); padding: 14px; display: grid; gap: 10px; }
   & .qe-item.discount { border-color: var(--signal); }
+  & .qe-item.ai-note { border-style: dashed; border-color: var(--ink-2); gap: 6px; }
   & .qe-totals { display: flex; flex-wrap: wrap; gap: 8px 20px; font-size: 15px; font-variant-numeric: tabular-nums; }
   & .qe-totals b { font-size: 17px; }
 

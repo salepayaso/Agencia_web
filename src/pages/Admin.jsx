@@ -573,6 +573,13 @@ const QuoteEditor = ({ quote: q, templates, onChanged }) => {
 
             {tab === 'detalle' && (
                 <div style={{ display: 'grid', gap: 14 }}>
+                    {q.ai_draft?.note && (
+                        <div className="qe-item ai-note">
+                            <strong>Nota de Claude <span className="muted" style={{ fontWeight: 400, fontSize: 13 }}>(solo la ves tú)</span></strong>
+                            <p style={{ margin: 0, whiteSpace: 'pre-line', fontSize: 14 }}>{q.ai_draft.note}</p>
+                            {!q.quote && <span className="muted" style={{ fontSize: 13 }}>El texto de "Qué vamos a hacer" y los ítems extra vienen de su borrador. Revísalos antes de enviar.</span>}
+                        </div>
+                    )}
                     <label className="field">Dominio <em>(cambia el texto "Desde el segundo año")</em>
                         <select value={doc.domain} onChange={(e) => setDoc((d) => ({ ...d, domain: e.target.value }))}>
                             {Object.entries(DOMAIN_OWNER).map(([id, label]) => <option key={id} value={id}>{label}</option>)}

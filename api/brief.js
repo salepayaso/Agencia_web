@@ -8,6 +8,7 @@
 import { checkBriefLimit, getClientIp, isAllowedOrigin } from './_lib/guardrails.js';
 import { rest, rows } from './_lib/orderStore.js';
 import { sendBriefToTeam, sendBriefReceipt } from './_lib/briefMail.js';
+import { draftWithClaude } from './_lib/quoteDraft.js';
 import { cleanBrief, briefError, emptyBrief, briefNumber, BRIEF_EDITABLE } from '../src/data/brief.js';
 
 const validToken = (t) => typeof t === 'string' && /^[a-f0-9]{64}$/.test(t);
@@ -78,6 +79,8 @@ export default async function handler(req, res) {
             await Promise.all([
                 sendBriefToTeam(saved, brief, { origin, again }),
                 sendBriefReceipt(saved, brief, { origin }),
+                // Solo si el equipo todavía no armó la cotización a mano.
+                ...(saved.quote ? [] : [draftWithClaude(saved, brief)]),
             ]);
         }
 
