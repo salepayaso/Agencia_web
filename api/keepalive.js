@@ -1,5 +1,8 @@
 // Cron diario de Vercel: consulta la base para que el proyecto gratis de
-// Supabase no se pause tras 7 días sin actividad.
+// Supabase no se pause tras 7 días sin actividad, y envía los recordatorios
+// de los proyectos (api/_lib/reminders.js). Con ?dry=1 solo dice cuáles saldrían.
+
+import { runReminders } from './_lib/reminders.js';
 
 export default async function handler(req, res) {
     const secret = process.env.CRON_SECRET;
@@ -30,7 +33,15 @@ export default async function handler(req, res) {
             return res.status(502).json({ error: 'Supabase no respondió bien' });
         }
 
-        return res.status(200).json({ ok: true, at: await response.json() });
+        const at = await response.json();
+        let reminders;
+        try {
+            reminders = await runReminders({ dryRun: req.query?.dry === '1' });
+        } catch (error) {
+            console.error('[recordatorios]', error);
+            reminders = 'error';
+        }
+        return res.status(200).json({ ok: true, at, reminders });
     } catch (error) {
         console.error('Keepalive error:', error);
         return res.status(500).json({ error: 'Error interno del servidor' });

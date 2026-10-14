@@ -168,3 +168,96 @@ export function sendPublished(row, { site, origin }) {
         `),
     }, 'publicado');
 }
+
+// Recordatorios del cron diario (api/_lib/reminders.js). Uno por etapa, sin montos.
+
+/** Al cliente: el brief lleva días sin enviarse. */
+export function sendBriefReminder(row, { origin }) {
+    const nombre = row.brief?.nombre || row.client_name;
+    return sendMail({
+        from: clientesFrom(),
+        to: [row.brief?.correo || row.client_email],
+        reply_to: 'contacto@interfaz360.cl',
+        subject: 'Tu formulario para la cotización sigue pendiente · Interfaz 360',
+        html: cuerpo(`
+            <p>Hola ${firstName(nombre)}:</p>
+            <p>Te escribimos porque el formulario de tu proyecto todavía no nos llega. Con él armamos tu cotización a la medida: son unas preguntas cortas y puedes dejarlo a medias y volver después.</p>
+            ${boton(`${origin}/brief/${row.token}`, 'Completar mi formulario')}
+            <p>Si prefieres contarnos por WhatsApp o ya no lo necesitas, responde este correo y lo vemos.</p>
+        `),
+    }, 'recordatorio de brief');
+}
+
+/** Al cliente: la cotización vence pronto. */
+export function sendExpiryReminder(row, { origin }) {
+    const doc = row.quote;
+    return sendMail({
+        from: clientesFrom(),
+        to: [doc.client.email],
+        reply_to: 'contacto@interfaz360.cl',
+        subject: `Tu cotización ${quoteNumber(row)} vence el ${fecha(doc.valid_until)}`,
+        html: cuerpo(`
+            <p>Hola ${firstName(doc.client.contact)}:</p>
+            <p>Te recordamos que la cotización para ${escapeHtml(doc.client.name)} es válida hasta el ${fecha(doc.valid_until)}. En el enlace puedes revisarla y aceptarla.</p>
+            ${boton(`${origin}/cotizacion/${row.token}`, 'Ver mi cotización')}
+            <p>Si quieres ajustar algo o tienes dudas, responde este correo o escríbenos por WhatsApp.</p>
+        `),
+    }, 'recordatorio de vencimiento');
+}
+
+/** Al equipo: venció sin respuesta. */
+export function sendExpiredToTeam(row, { origin }) {
+    const destino = process.env.AVISOS_EMAIL;
+    if (!destino) return false;
+    const doc = row.quote;
+    return sendMail({
+        from: avisosFrom(),
+        to: [destino],
+        reply_to: doc.client.email,
+        subject: `⏰ Venció la cotización ${quoteNumber(row)} · ${doc.client.name}`,
+        html: `
+            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; color:#0f1a2e;">
+                <h2 style="margin-bottom:4px;">${escapeHtml(doc.client.name)} no respondió la cotización</h2>
+                <p>Venció el ${fecha(doc.valid_until)} (${clp(quoteTotals(doc.items).total)}). Puedes llamarlo, reenviarla desde el panel (le da 15 días más) o cancelarla.</p>
+                <p>Contacto: ${escapeHtml(doc.client.contact)} · ${escapeHtml(doc.client.email)}${doc.client.phone ? ` · ${escapeHtml(doc.client.phone)}` : ''}</p>
+                <p><a href="${origin}/admin" style="display:inline-block;background:#0f1a2e;color:#fff;text-decoration:none;padding:10px 16px;font-weight:600;">Abrir el panel</a></p>
+            </div>
+        `,
+    }, 'vencida al equipo');
+}
+
+/** Al cliente (con copia al equipo): aceptó y el anticipo no llega. */
+export function sendDepositReminder(row, { origin }) {
+    const doc = row.quote;
+    const copia = process.env.AVISOS_EMAIL;
+    return sendMail({
+        from: clientesFrom(),
+        to: [doc.client.email],
+        ...(copia ? { bcc: [copia] } : {}),
+        reply_to: 'contacto@interfaz360.cl',
+        subject: `Para partir con tu proyecto falta el anticipo (${quoteNumber(row)})`,
+        html: cuerpo(`
+            <p>Hola ${firstName(doc.client.contact)}:</p>
+            <p>Gracias otra vez por aceptar la cotización. Para empezar a trabajar en tu proyecto solo falta el pago del anticipo (el 50 % que aparece en tu cotización).</p>
+            ${boton(`${origin}/cotizacion/${row.token}`, 'Ver cómo pagar')}
+            <p>Si ya lo pagaste o tienes alguna duda, responde este correo y lo revisamos.</p>
+        `),
+    }, 'recordatorio de anticipo');
+}
+
+/** Al cliente: el saldo lleva días pedido y sin pagar. */
+export function sendBalanceReminder(row, { origin }) {
+    const doc = row.quote;
+    return sendMail({
+        from: clientesFrom(),
+        to: [doc.client.email],
+        reply_to: 'contacto@interfaz360.cl',
+        subject: `Tu sitio sigue listo para publicar (${quoteNumber(row)})`,
+        html: cuerpo(`
+            <p>Hola ${firstName(doc.client.contact)}:</p>
+            <p>Tu sitio está terminado y esperando para salir al aire. Apenas recibamos el saldo (el 50 % restante de tu cotización), lo publicamos con tu dominio.</p>
+            ${boton(`${origin}/cotizacion/${row.token}`, 'Pagar el saldo')}
+            <p>Si ya lo pagaste o quieres revisar algo antes, responde este correo.</p>
+        `),
+    }, 'recordatorio de saldo');
+}

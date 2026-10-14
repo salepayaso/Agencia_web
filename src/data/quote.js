@@ -165,3 +165,12 @@ export const stageAmount = (doc, stage) => {
 /** ¿Venció? (solo importa mientras espera respuesta) */
 export const isExpired = (row) => row.status === 'cotizacion_enviada' && !!row.quote?.valid_until
     && new Date(row.quote.valid_until) < new Date();
+
+// Recordatorios automáticos (api/_lib/reminders.js): quotes.reminders guarda cuándo salió cada uno.
+export const REMINDER_LABEL = {
+    brief: 'brief sin enviar',
+    vence: 'cotización por vencer',
+    vencida: 'aviso de vencida',
+    anticipo: 'anticipo pendiente',
+    saldo: 'saldo pendiente',
+};

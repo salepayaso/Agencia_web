@@ -12,6 +12,7 @@ import {
 import { QUOTE_STATUS, briefNumber, briefRows, cleanBrief } from '../data/brief';
 import {
     quoteNumber, quoteTotals, quoteError, cleanQuote, draftQuote, DOMAIN_OWNER, STAGE_LABEL, pendingStage, stageAmount, clp as money,
+    REMINDER_LABEL,
 } from '../data/quote';
 import QuoteDocument from '../components/QuoteDocument';
 import { useConfirm } from '../lib/useConfirm';
@@ -339,6 +340,14 @@ const QuoteRow = ({ quote: q, templates, onChanged }) => {
             <span className="meta">
                 {briefNumber(q)} · creado el {new Date(q.created_at).toLocaleDateString('es-CL')} · {progress}{email ? ` · ${email}` : ''}
             </span>
+            {Object.keys(q.reminders || {}).length > 0 && (
+                <span className="meta">
+                    Recordatorio enviado: {Object.keys(q.reminders).filter((k) => REMINDER_LABEL[k]).map((k) => REMINDER_LABEL[k]).join(' · ')}
+                </span>
+            )}
+            {q.ai_draft && !q.quote && EDITABLE_QUOTE.includes(q.status) && (
+                <span className="meta">✦ Claude dejó un borrador de la cotización: ábrelo con "Preparar cotización".</span>
+            )}
             {sent && (
                 <button type="button" className="textlink" style={{ justifySelf: 'start' }} onClick={() => setOpen((v) => !v)}>{open ? 'Ocultar brief' : 'Ver brief'}</button>
             )}
