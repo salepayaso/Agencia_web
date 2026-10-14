@@ -1,8 +1,42 @@
 import { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 
-const SEO = ({ title, description, image = '/seo_imagen.jpg' }) => {
+const SITE = 'https://www.interfaz360.cl';
+
+// Agrega o actualiza una etiqueta del <head>; devuelve el elemento.
+function headTag(selector, create) {
+    let el = document.head.querySelector(selector);
+    if (!el) {
+        el = create();
+        document.head.appendChild(el);
+    }
+    return el;
+}
+
+const SEO = ({ title, description, image = '/seo_imagen.jpg', noindex = false }) => {
     const location = useLocation();
+
+    // Canonical propio de cada página (sin barra final, salvo la portada):
+    // si no, Google cree que todas son copias de la portada.
+    useEffect(() => {
+        const path = location.pathname.replace(/\/+$/, '') || '/';
+        const link = headTag('link[rel="canonical"]', () => {
+            const l = document.createElement('link');
+            l.rel = 'canonical';
+            return l;
+        });
+        link.href = `${SITE}${path}`;
+    }, [location.pathname]);
+
+    // Páginas privadas (portal, admin, enlaces personales): fuera de los buscadores.
+    useEffect(() => {
+        if (!noindex) return;
+        const meta = document.createElement('meta');
+        meta.name = 'robots';
+        meta.content = 'noindex, nofollow';
+        document.head.appendChild(meta);
+        return () => meta.remove();
+    }, [noindex]);
 
     useEffect(() => {
         // Título dinámico

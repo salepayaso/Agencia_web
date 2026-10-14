@@ -28,15 +28,6 @@ const BriefPage = () => {
     const [error, setError] = useState('');
     const [saved, setSaved] = useState('');
 
-    // Enlace personal: que no aparezca en buscadores.
-    useEffect(() => {
-        const meta = document.createElement('meta');
-        meta.name = 'robots';
-        meta.content = 'noindex, nofollow';
-        document.head.appendChild(meta);
-        return () => meta.remove();
-    }, []);
-
     useEffect(() => {
         let alive = true;
         fetch(`/api/brief?t=${encodeURIComponent(token)}`)
@@ -103,7 +94,7 @@ const BriefPage = () => {
 
     return (
         <div className="tc-page">
-            <SEO title="Tu proyecto" description="Cuéntanos de tu proyecto para preparar tu cotización." />
+            <SEO title="Tu proyecto" description="Cuéntanos de tu proyecto para preparar tu cotización." noindex />
             <div className="tc">
                 <header className="portal-bar gutter">
                     <div className="max">

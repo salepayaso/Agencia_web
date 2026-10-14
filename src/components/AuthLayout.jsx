@@ -6,7 +6,7 @@ import Wordmark from './Wordmark';
 // a la derecha el formulario.
 const AuthLayout = ({ title, description, children }) => (
     <div className="tc-page">
-        <SEO title={title} description={description} />
+        <SEO title={title} description={description} noindex />
         <div className="tc auth">
             <aside className="side">
                 <Link to="/" className="brand" aria-label="Interfaz 360, ir al inicio">

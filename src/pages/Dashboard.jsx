@@ -138,7 +138,7 @@ const Dashboard = () => {
 
     return (
         <div className="tc-page">
-            <SEO title="Mi cuenta" description="Portal de clientes de Interfaz 360." />
+            <SEO title="Mi cuenta" description="Portal de clientes de Interfaz 360." noindex />
             <div className="tc">
                 <header className="portal-bar gutter">
                     <div className="max">

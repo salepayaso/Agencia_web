@@ -116,7 +116,7 @@ const Admin = () => {
 
     return (
         <div className="tc-page">
-            <SEO title="Administración" description="Panel de administración de Interfaz 360." />
+            <SEO title="Administración" description="Panel de administración de Interfaz 360." noindex />
             <div className="tc">
                 <header className="portal-bar gutter">
                     <div className="max">
