@@ -1,0 +1,48 @@
+/* Robot del asesor (src/components/RobotAsesor.jsx): gestos y animaciones. */
+
+.robot { overflow: visible; display: block; }
+.robot .r-body { transform-box: fill-box; transform-origin: 50% 100%; }
+.robot .r-move { transform-box: view-box; transform-origin: 100px 110px; transition: transform .6s ease-in-out; }
+.robot.is-following .r-move { transition-duration: .15s; transition-timing-function: ease-out; }
+
+/* Ojos y extras: solo se ve el juego que corresponde al gesto. */
+.robot .r-eyes, .robot .r-extra { display: none; }
+.robot.g-esperando .e-normal,
+.robot.g-saludo .e-normal,
+.robot.g-pensando .e-pensando,
+.robot.g-contento .e-feliz,
+.robot.g-confundido .e-confundido,
+.robot.g-saludo .x-mano,
+.robot.g-pensando .x-puntos,
+.robot.g-contento .x-brillo,
+.robot.g-confundido .x-duda { display: inline; }
+
+.robot .r-blink { transform-box: fill-box; transform-origin: center; animation: robot-blink 4s infinite; }
+@keyframes robot-blink { 0%, 92%, 100% { transform: scaleY(1); } 95% { transform: scaleY(.1); } }
+
+.robot.g-esperando .r-body { animation: robot-float 3s ease-in-out infinite; }
+@keyframes robot-float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+
+.robot.g-saludo .r-body { animation: robot-hop 1s ease-in-out infinite; }
+@keyframes robot-hop { 0%, 100% { transform: translateY(0) rotate(0); } 30% { transform: translateY(-8px) rotate(-4deg); } 60% { transform: translateY(0) rotate(3deg); } }
+.robot .x-mano { transform-box: fill-box; transform-origin: 50% 100%; animation: robot-wave .45s ease-in-out infinite alternate; }
+@keyframes robot-wave { from { transform: rotate(-20deg); } to { transform: rotate(20deg); } }
+
+.robot.g-pensando .r-body { animation: robot-tilt 2.4s ease-in-out infinite; }
+@keyframes robot-tilt { 0%, 100% { transform: rotate(0); } 50% { transform: rotate(-4deg); } }
+.robot .x-puntos > * { animation: robot-dot 1.2s infinite; }
+.robot .x-puntos > *:nth-child(2) { animation-delay: .2s; }
+.robot .x-puntos > *:nth-child(3) { animation-delay: .4s; }
+@keyframes robot-dot { 0%, 100% { opacity: .15; } 50% { opacity: 1; } }
+
+.robot.g-contento .r-body { animation: robot-bounce .55s ease-in-out infinite; }
+@keyframes robot-bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+.robot .x-brillo path { transform-box: fill-box; transform-origin: center; animation: robot-spark 1.1s ease-in-out infinite; }
+@keyframes robot-spark { 0%, 100% { transform: scale(.4); opacity: .3; } 50% { transform: scale(1); opacity: 1; } }
+
+.robot.g-confundido .r-body { animation: robot-shake 1.8s ease-in-out infinite; }
+@keyframes robot-shake { 0%, 100% { transform: rotate(0); } 20% { transform: rotate(7deg); } 40% { transform: rotate(-5deg); } 60% { transform: rotate(6deg); } 80% { transform: rotate(0); } }
+
+@media (prefers-reduced-motion: reduce) {
+    .robot *, .robot .r-move { animation: none !important; transition: none !important; }
+}

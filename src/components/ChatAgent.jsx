@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { OPEN_CHAT_EVENT } from '../lib/chat';
+import RobotAsesor from './RobotAsesor';
 
 const WHATSAPP_URL =
     'https://wa.me/56954146176?text=' +
@@ -144,13 +145,8 @@ const Markdown = ({ text }) => {
     });
 };
 
-// Ícono del asesor: globo de conversación naranja con el 360 del logo.
-const SealIcon = ({ className }) => (
-    <svg viewBox="0 0 32 32" className={className} aria-hidden="true">
-        <path d="M3 4h26v18H13l-7 6v-6H3z" fill="#e8471c" />
-        <text x="16" y="17.2" textAnchor="middle" fontFamily="Archivo, Arial, sans-serif" fontWeight="900" fontSize="10" fill="#fff">360</text>
-    </svg>
-);
+// Cuánto dura un gesto puntual del robot antes de volver a esperar o pensar.
+const GESTURE_MS = { saludo: 2600, contento: 3500, confundido: 3000 };
 
 
 const ChatAgent = () => {
@@ -187,6 +183,18 @@ const ChatAgent = () => {
     // Bloqueo por insistir en manipular al agente.
     const [blockedUntil, setBlockedUntil] = useState(readBlock);
     const isBlocked = blockedUntil > Date.now();
+
+    // ---- Gestos del robot -------------------------------------------------
+    // Puntuales (saludo, contento, confundido) duran unos segundos; el resto
+    // sale del estado: pensando mientras carga la respuesta, si no, esperando.
+    const [flash, setFlash] = useState(null);
+    const flashTimer = useRef(null);
+    const gesture = useCallback((name) => {
+        clearTimeout(flashTimer.current);
+        setFlash(name);
+        flashTimer.current = setTimeout(() => setFlash(null), GESTURE_MS[name]);
+    }, []);
+    useEffect(() => () => clearTimeout(flashTimer.current), []);
 
     // ---- Globo de invitación --------------------------------------------
     // Aparece en cada página: el widget se monta de nuevo en cada ruta, así que
@@ -255,9 +263,10 @@ const ChatAgent = () => {
     useEffect(() => {
         if (isOpen) {
             dismissTeaser();
+            gesture('saludo');
             inputRef.current?.focus();
         }
-    }, [isOpen, dismissTeaser]);
+    }, [isOpen, dismissTeaser, gesture]);
 
     useEffect(() => {
         scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: 'smooth' });
@@ -329,6 +338,7 @@ const ChatAgent = () => {
             if (contentType.includes('application/json')) {
                 const data = await response.json();
                 setIsTyping(false);
+                if (!data.reply) gesture('confundido');
                 setMessages((prev) => [
                     ...prev,
                     { role: 'assistant', content: data.reply || data.error || 'No pude responder.' },
@@ -387,13 +397,19 @@ const ChatAgent = () => {
                         offerIdentity();
                     }
 
+                    if (event.type === 'lead' && event.ok) {
+                        gesture('contento');
+                    }
+
                     if (event.type === 'error') {
+                        gesture('confundido');
                         setIsTyping(false);
                         setMessages((prev) => [...prev, { role: 'assistant', content: event.message }]);
                     }
                 }
             }
         } catch {
+            gesture('confundido');
             setMessages((prev) => [
                 ...prev,
                 {
@@ -460,6 +476,7 @@ const ChatAgent = () => {
 
         showFormRef.current = false;
         setShowForm(false);
+        gesture('contento');
 
         // El lead se avisa al instante: si se va sin escribir más, igual quedó.
         // Va con la conversación, para que el equipo sepa de qué negocio se trata.
@@ -494,7 +511,12 @@ const ChatAgent = () => {
                     >
                         {/* Cabecera */}
                         <div className="flex items-center gap-3 px-4 py-3 bg-ink text-paper shrink-0">
-                            <SealIcon className="w-8 h-8 shrink-0" />
+                            <span className="w-10 h-10 rounded-full bg-paper text-ink flex items-center justify-center shrink-0">
+                                <RobotAsesor
+                                    size={34}
+                                    gesture={isBlocked ? 'confundido' : flash || (isTyping ? 'pensando' : 'esperando')}
+                                />
+                            </span>
                             <div className="flex-1 min-w-0">
                                 <p className="font-bold text-[15px] leading-tight">
                                     Asesor Interfaz 360
@@ -730,11 +752,18 @@ const ChatAgent = () => {
                 transition={{ type: 'spring', stiffness: 260, damping: 20 }}
             >
                 {isOpen ? (
-                    <svg viewBox="0 0 24 24" className="w-7 h-7" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" className="w-8 h-8" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" aria-hidden="true">
                         <path d="M6 6l12 12M18 6L6 18" />
                     </svg>
                 ) : (
-                    <SealIcon className="w-7 h-7" />
+                    // Saluda cuando aparece el globo de invitación.
+                    <span className="w-8 h-8 rounded-full bg-paper text-ink flex items-center justify-center">
+                        <RobotAsesor
+                            variant="boton"
+                            size={28}
+                            gesture={isBlocked ? 'confundido' : teaser ? 'saludo' : 'esperando'}
+                        />
+                    </span>
                 )}
                 <span className="hidden sm:inline">{isOpen ? 'Cerrar' : 'Asesor'}</span>
                 {!isOpen && !isBlocked && (
