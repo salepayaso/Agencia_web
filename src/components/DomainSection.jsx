@@ -6,7 +6,7 @@ import { OFFERS, conIva, PAYS, ACTIVE_PAYS, DEFAULT_PAY, payMethodsText, clp, ru
 // forma de pago → listo.
 // - En la portada y en Servicios va como sección completa.
 // - En el portal va "embedded" (sin la columna de texto), para comprar un
-//   dominio solo o el pack hosting + dominio (kind="pack").
+//   dominio solo o el pack dominio + 5 correos (kind="pack").
 // Si la persona entró a su cuenta, los datos del titular vienen de su ficha
 // y el pedido queda guardado en su portal (src/lib/orders.js).
 
@@ -136,7 +136,7 @@ const DomainSection = ({ embedded = false, kind = 'dominio', onOrdered, onCancel
 
     const stepClass = (n) => (n === step ? 'on' : n < step ? 'past' : undefined);
     const holderName = data.name.trim();
-    const what = kind === 'pack' ? `el pack hosting + ${domain}` : domain;
+    const what = kind === 'pack' ? `el pack ${domain} + 5 correos` : domain;
 
     const buyer = (
         <div>
@@ -168,7 +168,7 @@ const DomainSection = ({ embedded = false, kind = 'dominio', onOrdered, onCancel
                         <div>
                             <span className="ok">✓ {domain} está disponible</span>
                             <small>
-                                {kind === 'pack' ? `Pack hosting + dominio ${clp(fromPrice)} + IVA al año` : `Desde ${clp(fromPrice)} + IVA al año`}
+                                {kind === 'pack' ? `Pack dominio + 5 correos ${clp(fromPrice)} + IVA al año` : `Desde ${clp(fromPrice)} + IVA al año, con 1 correo incluido`}
                                 {' · '}buscar no lo reserva: se asegura al pagar
                             </small>
                         </div>
@@ -266,7 +266,7 @@ const DomainSection = ({ embedded = false, kind = 'dominio', onOrdered, onCancel
                                 ))}
                             </fieldset>
                             <div className="sum">
-                                <span><b>{kind === 'pack' ? `Hosting + ${domain}` : domain}</b> · {plan.label}</span>
+                                <span><b>{kind === 'pack' ? `${domain} + 5 correos` : domain}</b> · {plan.label}</span>
                                 <span>Total <b>{clp(conIva(plan.price))}</b> IVA incluido</span>
                             </div>
                             <fieldset className="pay">
@@ -310,7 +310,7 @@ const DomainSection = ({ embedded = false, kind = 'dominio', onOrdered, onCancel
                             <p className="note2">
                                 Te escribimos a {data.email.trim()} con {pay === 'tr' ? 'los datos para la transferencia' : 'el enlace de pago'}.
                                 {kind === 'pack'
-                                    ? ' Apenas se confirme, registramos el dominio a tu nombre y te enviamos los accesos de tu hosting (cPanel) por correo.'
+                                    ? ' Apenas se confirme, registramos el dominio a tu nombre y te enviamos los accesos de tus correos (cPanel) por correo.'
                                     : ' Apenas se confirme, registramos el dominio a tu nombre.'}
                                 {loggedIn
                                     ? ' Puedes seguir el pedido en tu portal.'
@@ -339,7 +339,7 @@ const DomainSection = ({ embedded = false, kind = 'dominio', onOrdered, onCancel
             <div className="domain embedded">
                 <div className="emb-head">
                     <div>
-                        <b>{kind === 'pack' ? 'Pack hosting + dominio' : 'Comprar un dominio .cl'}</b>
+                        <b>{kind === 'pack' ? 'Pack dominio + 5 correos' : 'Comprar un dominio .cl'}</b>
                         <span>{kind === 'pack' ? 'Busca el nombre para tu sitio y tus correos.' : 'Busca el nombre y lo registramos a tu nombre.'}</span>
                     </div>
                     {onCancel && <button type="button" className="link" onClick={onCancel}>Cerrar</button>}

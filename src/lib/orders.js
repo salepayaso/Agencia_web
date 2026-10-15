@@ -1,7 +1,7 @@
 import { supabase } from '../supabase';
-import { OFFERS, conIva } from '../data/catalogo';
+import { OFFERS, CORREO_PLANES, conIva } from '../data/catalogo';
 
-// Pedidos de dominio, hosting y pack desde el sitio y el portal.
+// Pedidos de dominio, planes de correos y pack desde el sitio y el portal.
 // - En línea (Webpay o Mercado Pago): el pedido lo crea el servidor
 //   (api/webpay/crear.js, api/mercadopago/crear.js) y queda "Pago recibido"
 //   solo cuando la pasarela confirma el cobro. Requiere cuenta.
@@ -10,7 +10,7 @@ import { OFFERS, conIva } from '../data/catalogo';
 // Regla vigente: nunca registrar ni activar nada sin el pago recibido.
 
 // Precios al cliente: viven en src/data/catalogo.js junto con lo que incluye cada servicio.
-export { OFFERS, conIva };
+export { OFFERS, CORREO_PLANES, conIva };
 
 // Webpay se enciende por ambiente con VITE_PAGO_WEBPAY=si (Vercel), así el sitio
 // en línea no lo muestra hasta tener el código de comercio de Transbank.

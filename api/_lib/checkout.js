@@ -4,7 +4,7 @@
 // El monto NUNCA viene del navegador: sale de OFFERS (src/data/catalogo.js), el
 // mismo catálogo que muestra la página. Editar el navegador solo cambia QUÉ compra.
 
-import { OFFERS, conIva } from '../../src/data/catalogo.js';
+import { OFFERS, CORREO_PLANES, conIva } from '../../src/data/catalogo.js';
 import { userFromToken } from './orderStore.js';
 
 const texto = (v, max) => (typeof v === 'string' ? v.trim().slice(0, max) : '');
@@ -29,7 +29,8 @@ export async function leerPedido(req) {
     if (!plan) return { status: 400, error: 'El plan no es válido.' };
 
     const domain = cleanDomain(rawDomain);
-    const domainOk = kind === 'hosting'
+    // Los correos van sobre un dominio que ya existe (puede no ser .cl).
+    const domainOk = CORREO_PLANES.includes(kind)
         ? /^[a-z0-9-]+(\.[a-z0-9-]+)+$/.test(domain)
         : /^[a-z0-9]([a-z0-9-]*[a-z0-9])?\.cl$/.test(domain);
     if (!domainOk) return { status: 400, error: 'El dominio no es válido.' };

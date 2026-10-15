@@ -19,8 +19,10 @@ export const isOpen = (t) => t.status !== 'solved';
 // Opciones fijas de la ficha (las elige el admin; el cliente ve el nombre del plan).
 // Un plan que no está en la lista es de un contrato anterior y se respeta tal cual.
 export const HOSTING_PLANS = [
-    { id: 'Hosting con correos', storage: '5 GB', emails: '5' },
-    { id: 'Pack hosting + dominio', storage: '5 GB', emails: '5' },
+    { id: 'Correos 5', storage: '5 GB', emails: '5' },
+    { id: 'Correos 10', storage: '10 GB', emails: '10' },
+    { id: 'Correos 20', storage: '20 GB', emails: '20' },
+    { id: 'Pack dominio + 5 correos', storage: '5 GB', emails: '5' },
 ];
 export const PAY_METHODS = ['Transferencia', 'Tarjeta (Webpay)', 'Mercado Pago'];
 export const DOC_TITLES = ['Contrato', 'Factura', 'Boleta', 'Cotización', 'Informe de entrega', 'Guía de configuración de correo', 'Certificado de dominio'];

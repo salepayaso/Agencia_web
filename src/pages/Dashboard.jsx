@@ -5,7 +5,7 @@ import SEO from '../components/SEO';
 import Wordmark from '../components/Wordmark';
 import { PortalLoading } from '../components/ProtectedRoute';
 import DomainSection from '../components/DomainSection';
-import { OFFERS, conIva, PAYS, ACTIVE_PAYS, DEFAULT_PAY, clp, submitOrder, rutOk, isOpenOrder, isUnpaidCard, isOnlineOrder, orderStatus } from '../lib/orders';
+import { OFFERS, CORREO_PLANES, conIva, PAYS, ACTIVE_PAYS, DEFAULT_PAY, clp, submitOrder, rutOk, isOpenOrder, isUnpaidCard, isOnlineOrder, orderStatus } from '../lib/orders';
 import { CATEGORIES, catLabel, TICKET_STATUS as STATUS, isOpen, parseDate, fmt, daysFrom, dayWord, hasServices, firstName } from '../lib/portal';
 
 // Portal del cliente ("Tu cuenta, en orden"): dominio, plan y pagos, correos,
@@ -230,14 +230,15 @@ const OFFER_CARDS = [
     },
     {
         id: 'hosting',
-        price: `${clp(OFFERS.hosting.years[1].price)} + IVA`,
-        desc: 'Espacio para tu sitio y correos con el nombre de tu empresa. Al activarlo te enviamos los accesos de cPanel por correo.',
-        cta: 'Contratar hosting →',
+        title: 'Correos para tu equipo',
+        price: `Desde ${clp(OFFERS.hosting.years[1].price)} + IVA`,
+        desc: 'Planes de 5, 10 o 20 correos con el nombre de tu empresa. Al activarlo te enviamos los accesos de cPanel por correo.',
+        cta: 'Contratar correos →',
     },
     {
         id: 'pack',
         price: `${clp(OFFERS.pack.years[1].price)} + IVA`,
-        desc: `Hosting con correos + dominio .cl, todo listo para partir. Ahorras ${clp(OFFERS.dominio.years[1].price + OFFERS.hosting.years[1].price - OFFERS.pack.years[1].price)} al año.`,
+        desc: `Dominio .cl + 5 correos, todo listo para partir. Ahorras ${clp(OFFERS.dominio.years[1].price + OFFERS.hosting.years[1].price - OFFERS.pack.years[1].price)} al año.`,
         cta: 'Contratar pack →',
         hot: true,
     },
@@ -271,7 +272,7 @@ const Hire = ({ user, profile, orders, renewing, setRenewing, onOrdered }) => {
                         <article key={o.id} className={`plan-card${o.hot ? ' hot' : ''}`}>
                             <header>
                                 <div>
-                                    <h3>{OFFERS[o.id].title}</h3>
+                                    <h3>{o.title || OFFERS[o.id].title}</h3>
                                     <small><b style={{ color: 'var(--ink)', fontSize: 20 }}>{o.price}</b> al año</small>
                                 </div>
                                 {o.hot && <span className="badge">Conviene</span>}
@@ -445,11 +446,12 @@ const RenewDomain = ({ user, profile, onDone, onCancel }) => {
 
 const HostingOrder = ({ user, onDone, onCancel }) => {
     const [domain, setDomain] = useState('');
+    const [tier, setTier] = useState(CORREO_PLANES[0]);
     const [pay, setPay] = useState(DEFAULT_PAY);
     const [sending, setSending] = useState(false);
     const [error, setError] = useState('');
     const [done, setDone] = useState(false);
-    const neto = OFFERS.hosting.years[1].price;
+    const neto = OFFERS[tier].years[1].price;
     const price = conIva(neto);
 
     const submit = async (e) => {
@@ -459,7 +461,7 @@ const HostingOrder = ({ user, onDone, onCancel }) => {
         setSending(true);
         setError('');
         try {
-            await submitOrder({ user, kind: 'hosting', domain: d, years: 1, pay, holder: null });
+            await submitOrder({ user, kind: tier, domain: d, years: 1, pay, holder: null });
             setDone(true);
             onDone?.();
         } catch (err) {
@@ -476,14 +478,14 @@ const HostingOrder = ({ user, onDone, onCancel }) => {
     return (
         <section className="panel">
             <div className="box-title">
-                <b>Hosting con correos · {clp(neto)} + IVA al año</b>
+                <b>{OFFERS[tier].title} · {clp(neto)} + IVA al año</b>
                 <button type="button" className="textlink" onClick={onCancel}>Cerrar</button>
             </div>
             {done ? (
                 <div className="box-body">
                     <p className="alert ok" role="status">
                         Recibimos tu pedido. Te escribimos a {user.email} con {pay === 'tr' ? 'los datos para transferir' : 'el enlace de pago'}.
-                        Apenas se confirme, activamos tu hosting y te enviamos los accesos de cPanel por correo.
+                        Apenas se confirme, activamos tus correos y te enviamos los accesos de cPanel por correo.
                     </p>
                     <div><button type="button" className="textlink" onClick={onCancel}>Volver a Contratar</button></div>
                 </div>
@@ -492,7 +494,20 @@ const HostingOrder = ({ user, onDone, onCancel }) => {
                     <label className="field">¿Para qué dominio?
                         <input value={domain} onChange={(e) => setDomain(e.target.value)} placeholder="minegocio.cl" maxLength={80} autoCapitalize="none" spellCheck={false} />
                     </label>
-                    <p className="muted" style={{ margin: 0, fontSize: 14 }}>¿Todavía no tienes dominio? El pack hosting + dominio te sale más barato.</p>
+                    <div style={{ display: 'grid', gap: 8 }}>
+                        <span className="field">¿Cuántos correos necesitas?</span>
+                        <div className="toggles" role="radiogroup" aria-label="Plan de correos">
+                            {CORREO_PLANES.map((id) => (
+                                <button key={id} type="button" role="radio" aria-checked={tier === id} aria-pressed={tier === id} onClick={() => setTier(id)}>
+                                    {OFFERS[id].emails} correos · {OFFERS[id].storage}
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+                    <p className="muted" style={{ margin: 0, fontSize: 14 }}>
+                        ¿Necesitas solo 1 correo? Viene incluido con tu dominio .cl. ¿Más de 20 correos o más espacio? Escríbenos en Soporte y lo cotizamos.
+                        {tier === 'hosting' && ' ¿Todavía no tienes dominio? El pack dominio + 5 correos te sale más barato.'}
+                    </p>
                     <div style={{ display: 'grid', gap: 8 }}>
                         <span className="field">¿Cómo quieres pagar?</span>
                         <div className="toggles" role="radiogroup" aria-label="Forma de pago">

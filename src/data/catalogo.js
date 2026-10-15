@@ -18,6 +18,48 @@
 
 export const CORREOS_HOSTING = 5;
 
+// Precios al cliente que el sitio ya muestra (pedidos de dominio y portal).
+// Son netos: se cobran + IVA. El total a pagar sale de conIva().
+//
+// Correos: 1 correo va con el dominio, sin servidor (Cloudflare reenvía a su
+// Gmail y responde por Brevo). Desde 2 correos se necesita un plan de correos
+// en cPanel. La clave 'hosting' es Correos 5: así se llamaba en los pedidos
+// antiguos. Más de 20 correos o más espacio se cotiza con un asesor.
+export const OFFERS = {
+    dominio: {
+        title: 'Dominio .cl',
+        years: { 1: { label: '1 año', price: 25000, note: 'Incluye 1 correo · Renovación anual $25.000 + IVA' }, 2: { label: '2 años', price: 45000, note: 'Incluye 1 correo · Ahorras $5.000 + IVA' } },
+    },
+    hosting: {
+        title: 'Correos 5',
+        emails: 5,
+        storage: '5 GB',
+        years: { 1: { label: '1 año', price: 35000, note: 'Renovación anual $35.000 + IVA' } },
+    },
+    correos10: {
+        title: 'Correos 10',
+        emails: 10,
+        storage: '10 GB',
+        years: { 1: { label: '1 año', price: 50000, note: 'Renovación anual $50.000 + IVA' } },
+    },
+    correos20: {
+        title: 'Correos 20',
+        emails: 20,
+        storage: '20 GB',
+        years: { 1: { label: '1 año', price: 75000, note: 'Renovación anual $75.000 + IVA' } },
+    },
+    pack: {
+        title: 'Pack dominio + 5 correos',
+        years: { 1: { label: '1 año', price: 55000, note: 'Renovación anual $55.000 + IVA' } },
+    },
+};
+
+// Planes de correos con servidor, de menor a mayor.
+export const CORREO_PLANES = ['hosting', 'correos10', 'correos20'];
+
+const pesos = (n) => `$${n.toLocaleString('es-CL')}`;
+const anual = (kind) => `${pesos(OFFERS[kind].years[1].price)} + IVA al año`;
+
 export const SERVICIOS = [
     {
         id: 'agente',
@@ -113,16 +155,17 @@ export const SERVICIOS = [
         id: 'dominio',
         title: 'Dominio y correos',
         kicker: 'Tu identidad digital',
-        desc: 'Registramos tu dominio .cl a tu nombre, creamos tus correos con el nombre de tu empresa y nos encargamos de renovarlos a tiempo.',
+        desc: 'Registramos tu dominio .cl a tu nombre con 1 correo de tu empresa incluido. Si tu equipo necesita más, sumas un plan de 5, 10 o 20 correos. Nos encargamos de renovarlos a tiempo.',
         includes: [
             'Dominio .cl registrado a tu nombre',
-            `${CORREOS_HOSTING} correos con el nombre de tu empresa`,
-            'Hosting con certificado de seguridad',
+            '1 correo con el nombre de tu empresa, incluido con el dominio',
+            'Planes de 5, 10 o 20 correos para tu equipo',
             'Aviso antes de cada vencimiento',
         ],
         anchor: '#dominio',
         agente: [
-            'Hosting, dominio .cl, o el pack con ambos. Contratable por 1 o 2 años, con renovación anual. El sitio tiene un buscador de dominios .cl. Buscar un dominio NO lo reserva, así que si está libre conviene cerrarlo rápido. El dominio queda legalmente a nombre del cliente.',
+            'El dominio .cl se contrata por 1 o 2 años, con renovación anual, y queda legalmente a nombre del cliente. El sitio tiene un buscador de dominios .cl. Buscar un dominio NO lo reserva, así que si está libre conviene cerrarlo rápido.',
+            'Correos: 1 correo viene incluido con el dominio y sigue funcionando mientras el dominio esté al día. Llega a la casilla de Gmail del cliente y responde desde ahí con la dirección de su empresa, sin servidor. Desde 2 correos se necesita un servidor de correos: planes de 5 correos (5 GB), 10 correos (10 GB) o 20 correos (20 GB). Más de 20 correos o más espacio se cotiza con un asesor.',
         ],
     },
     {
@@ -152,7 +195,8 @@ export const PLANES = [
         ask: 'Hola, me interesa el Plan Pyme Digital (landing page). ¿Qué incluye y cuánto cuesta?',
         agente: [
             'Es una landing page: una sola página, hecha en React, que muestra la identidad del negocio de un vistazo (servicios, fotos, ubicación y contacto). Ideal para emprendedores y negocios que parten.',
-            'El correo llega a la casilla de Gmail del cliente y responde desde ahí con la dirección de su empresa. Si necesita más correos para su equipo, se suma el hosting con correos (ver Dominios, Correos y Hosting).',
+            'El correo llega a la casilla de Gmail del cliente y responde desde ahí con la dirección de su empresa. Si necesita 2 correos o más, se suma un plan de correos (ver Dominios y Correos).',
+            `Desde el segundo año paga solo la renovación del dominio (${anual('dominio')}): su página sigue publicada y su correo sigue funcionando.`,
             'Si después quiere crecer a Empresa Digital, hay un descuento por subir de plan que aplica un asesor en la cotización.',
         ],
         noIncluye: ['más de 1 correo', 'tienda online', 'Analytics, Tag Manager ni Search Console', 'campañas de Google Ads', 'Google Workspace'],
@@ -179,6 +223,7 @@ export const PLANES = [
         agente: [
             'Sitio completo con varias secciones, hecho en React. Para empresas que quieren mostrar toda su identidad. Diferencia con el Plan Pyme Digital: varias secciones en vez de una sola página, 5 correos en vez de 1, y medición de visitas (Analytics, Tag Manager, Search Console) con la base técnica lista para Google Ads.',
             'Google Ads: dejamos todo listo para que el cliente pueda anunciar; la pauta la maneja y la paga el cliente. Crear o administrar campañas es un servicio aparte que cotiza un asesor.',
+            `Desde el segundo año: el pack dominio + 5 correos (${anual('pack')}). Si ya no necesita los 5 correos, renueva solo el dominio (${anual('dominio')}) y se queda con 1 correo.`,
         ],
         noIncluye: ['tienda online', 'creación ni administración de campañas de Google Ads (servicio aparte)', 'Google Workspace'],
     },
@@ -188,27 +233,8 @@ export const PLANES = [
 // se confunde con mantención, que el agente deriva a un asesor.
 export const EN_TODOS_LOS_PLANES = 'el portal de clientes, botón de WhatsApp, políticas de privacidad (Ley 21.719) y acompañamiento después de la entrega';
 
-// Precios al cliente que el sitio ya muestra (pedidos de dominio y portal).
-// Son netos: se cobran + IVA. El total a pagar sale de conIva().
-export const OFFERS = {
-    dominio: {
-        title: 'Dominio .cl',
-        years: { 1: { label: '1 año', price: 25000, note: 'Renovación anual $25.000 + IVA' }, 2: { label: '2 años', price: 45000, note: 'Ahorras $5.000 + IVA' } },
-    },
-    hosting: {
-        title: 'Hosting con correos',
-        years: { 1: { label: '1 año', price: 60000, note: 'Renovación anual $60.000 + IVA' } },
-    },
-    pack: {
-        title: 'Pack hosting + dominio',
-        years: { 1: { label: '1 año', price: 75000, note: 'Renovación anual $75.000 + IVA' } },
-    },
-};
-
 export const IVA = 0.19;
 export const conIva = (neto) => Math.round(neto * (1 + IVA));
-
-const pesos = (n) => `$${n.toLocaleString('es-CL')}`;
 
 const lista = (items) => items.join('; ');
 
@@ -235,11 +261,14 @@ export function catalogoParaAgente() {
 
 // Precios públicos para el agente: reemplaza {{PRECIOS_PUBLICOS}} en el bloque de precios.
 export function preciosPublicosParaAgente() {
-    const { dominio, hosting, pack } = OFFERS;
+    const { dominio } = OFFERS;
+    const correos = CORREO_PLANES.map((k) => `${OFFERS[k].emails} correos (${OFFERS[k].storage}) ${pesos(OFFERS[k].years[1].price)}`);
     return [
-        '## Dominios, Correos y Hosting (anual)',
-        `- Hosting con ${CORREOS_HOSTING} correos: ${pesos(hosting.years[1].price)} + IVA al año`,
-        `- Dominio .cl: 1 año ${pesos(dominio.years[1].price)}, 2 años ${pesos(dominio.years[2].price)}, renovación anual ${pesos(dominio.years[1].price)}, todo + IVA`,
-        `- Pack hosting + dominio: ${pesos(pack.years[1].price)} + IVA al año`,
+        '## Dominios y Correos (anual)',
+        `- Dominio .cl con 1 correo incluido: 1 año ${pesos(dominio.years[1].price)}, 2 años ${pesos(dominio.years[2].price)}, renovación anual ${pesos(dominio.years[1].price)}, todo + IVA. El correo no necesita servidor y sigue funcionando mientras el dominio esté al día.`,
+        `- Desde 2 correos se necesita un plan de correos con servidor: ${correos.join(', ')}, todo + IVA al año.`,
+        `- Pack dominio + 5 correos: ${anual('pack')}.`,
+        '- Más de 20 correos o más espacio: a cotizar con un asesor. No des precio ni rango.',
+        '- La página del cliente sigue publicada sin costo mientras su dominio esté al día. Si su negocio crece mucho en visitas, un asesor puede recomendarle un servidor mensual: eso se evalúa caso a caso, no des precio.',
     ].join('\n');
 }
