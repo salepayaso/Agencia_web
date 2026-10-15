@@ -22,9 +22,10 @@ const REFUSAL_REPLY =
 const LEAD_TOOL = {
     name: 'registrar_lead',
     description:
-        'Registra los datos de un visitante interesado para que el equipo comercial lo contacte. ' +
-        'Úsala solo cuando el visitante ya te dio su nombre y al menos un dato de contacto ' +
-        '(correo o teléfono). Nunca inventes datos que el visitante no te haya dado.',
+        'Registra a un visitante interesado y lo que necesita, para que un asesor lo contacte ' +
+        'y prepare su demo o propuesta. Úsala cuando ya tengas su nombre y un dato de contacto ' +
+        '(WhatsApp o correo), ya sea del formulario o porque lo escribió en el chat. ' +
+        'Nunca inventes datos que el visitante no te haya dado.',
     input_schema: {
         type: 'object',
         properties: {
@@ -39,19 +40,40 @@ const LEAD_TOOL = {
     strict: true,
 };
 
+// Para quien ya dejó nombre y WhatsApp en el formulario. El modelo no ve esos
+// datos, así que con la herramienta completa se los volvía a pedir: acá solo
+// informa qué necesita y el servidor completa el resto con el formulario.
+const LEAD_TOOL_IDENTIFICADO = {
+    name: 'registrar_lead',
+    description:
+        'Registra algo nuevo que pide un visitante que ya dejó su nombre y WhatsApp en el ' +
+        'formulario (otra cotización, otro servicio, contratar), para que un asesor lo vea. ' +
+        'El sistema ya tiene sus datos de contacto: no se los pidas.',
+    input_schema: {
+        type: 'object',
+        properties: {
+            interes: { type: 'string', description: 'Qué servicio o plan le interesa, en pocas palabras.' },
+            resumen: { type: 'string', description: 'Resumen breve de su negocio y lo que necesita, para contexto del asesor que lo atienda.' },
+        },
+        required: ['interes'],
+        additionalProperties: false,
+    },
+    strict: true,
+};
 
 const IDENTIFY_TOOL = {
     name: 'solicitar_datos',
     description:
-        'Abre en pantalla un formulario para que el visitante deje su nombre, correo y ' +
-        'WhatsApp opcional. Úsala apenas muestre interés concreto en los servicios, ' +
-        'productos o precios de Interfaz360. No pidas los datos por chat: para eso está esta herramienta.',
+        'Abre en pantalla un formulario para que el visitante deje su nombre y WhatsApp, ' +
+        'con el correo opcional. Úsala cuando acepte la demo sin costo, pida que lo contacten ' +
+        'o quiera contratar. No la uses para dar precios: los precios se dan sin pedir datos. ' +
+        'No pidas los datos por chat: para eso está esta herramienta.',
     input_schema: {
         type: 'object',
         properties: {
             motivo: {
                 type: 'string',
-                description: 'Qué le interesa al visitante, en pocas palabras. Ej: "precio de una landing".',
+                description: 'Qué pidió el visitante, en pocas palabras. Ej: "demo de landing para su pastelería".',
             },
         },
         required: ['motivo'],
@@ -97,8 +119,11 @@ async function runAgent({ message, history, visitor }, emit) {
     const client = buildClient();
 
     const system = buildSystemPrompt(visitor);
-    // El formulario solo tiene sentido mientras no sepamos quién es.
-    const tools = visitor ? [LEAD_TOOL] : [LEAD_TOOL, IDENTIFY_TOOL];
+    // El formulario solo tiene sentido mientras no sepamos quién es. Quien entró
+    // con el formulario antiguo (solo correo) todavía puede dar su WhatsApp por chat.
+    const tools = !visitor
+        ? [LEAD_TOOL, IDENTIFY_TOOL]
+        : [visitor.telefono ? LEAD_TOOL_IDENTIFICADO : LEAD_TOOL];
 
     const messages = [
         ...history.map((turn) => ({ role: turn.role, content: turn.content })),
@@ -153,7 +178,7 @@ async function runAgent({ message, history, visitor }, emit) {
                 if (!streamedText) {
                     emit({
                         type: 'delta',
-                        text: 'Déjame tus datos acá abajo y te muestro precios y detalles 👇',
+                        text: 'Déjame tu nombre y WhatsApp acá abajo y te escribimos 👇',
                     });
                 }
                 emit({ type: 'done' });
@@ -170,6 +195,8 @@ async function runAgent({ message, history, visitor }, emit) {
                 const sent = await registerLead(
                     {
                         ...call.input,
+                        nombre: call.input?.nombre || visitor?.nombre,
+                        contacto: call.input?.contacto || visitor?.email || `+${visitor?.telefono}`,
                         email: visitor?.email,
                         telefono: visitor?.telefono || cleanPhone(call.input?.contacto),
                     },
@@ -181,7 +208,7 @@ async function runAgent({ message, history, visitor }, emit) {
                     type: 'tool_result',
                     tool_use_id: call.id,
                     content: sent
-                        ? 'Lead registrado. Confírmale al visitante que el equipo de Interfaz360 lo va a contactar a la brevedad por correo o WhatsApp, y ofrécele el WhatsApp +56 9 5414 6176 si prefiere escribir de inmediato.'
+                        ? 'Lead registrado. Confírmale al visitante que un asesor de Interfaz360 le va a escribir por WhatsApp (o por correo si no dejó WhatsApp), y ofrécele el WhatsApp +56 9 5414 6176 si prefiere escribir de inmediato.'
                         : 'No se pudo registrar. Pídele disculpas breves al visitante y dale el WhatsApp +56 9 5414 6176 para que escriba directo.',
                 });
                 continue;

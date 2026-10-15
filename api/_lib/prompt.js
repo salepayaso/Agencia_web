@@ -65,26 +65,26 @@ function cargarBloques() {
 }
 
 /**
- * Arma el system prompt según si el visitante se identificó o no.
- * Devuelve bloques separados para que el bloque base (el más grande y estable)
- * se cachee entre requests.
- * @param {{nombre?: string, email?: string, telefono?: string} | null} visitor
+ * Arma el system prompt según si el visitante dejó sus datos o no.
+ * Los precios van siempre: el agente los da abiertos y pide el contacto a
+ * cambio de la demo. Base y precios van primero y fijos, para que se cacheen
+ * entre requests; solo el último bloque cambia según el visitante.
+ * @param {{nombre: string, email?: string, telefono?: string} | null} visitor ya validado con cleanVisitor
  */
 export function buildSystemPrompt(visitor) {
     const bloques = cargarBloques();
-    const base = { type: 'text', text: bloques.base, cache_control: { type: 'ephemeral' } };
+    const fijos = [
+        { type: 'text', text: bloques.base },
+        { type: 'text', text: bloques.pricing, cache_control: { type: 'ephemeral' } },
+    ];
 
-    if (!visitor?.nombre || !visitor?.email) {
-        return [base, { type: 'text', text: bloques.gateAnonimo }];
+    if (!visitor) {
+        return [...fijos, { type: 'text', text: bloques.gateAnonimo }];
     }
 
     const gate = (visitor.telefono ? bloques.gateIdConTelefono : bloques.gateIdSinTelefono)
         .split(TOKEN_NOMBRE)
         .join(visitor.nombre);
 
-    return [
-        base,
-        { type: 'text', text: bloques.pricing, cache_control: { type: 'ephemeral' } },
-        { type: 'text', text: gate },
-    ];
+    return [...fijos, { type: 'text', text: gate }];
 }

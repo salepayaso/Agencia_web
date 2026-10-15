@@ -1,11 +1,11 @@
 // Registro de cada turno del chat en Supabase, se identifique o no el visitante.
 // Si falla, solo se anota en el log: el chat nunca se corta por esto.
 
-import { supabaseConfig } from './leadStore.js';
+import { supabaseConfig, leadKey } from './leadStore.js';
 
 /**
  * Agrega el mensaje del visitante y la respuesta del agente a su conversación.
- * @param {{sessionId: string|null, ip?: string, visitor?: {nombre: string, email: string}|null, message: string, reply: string}} turn
+ * @param {{sessionId: string|null, ip?: string, visitor?: {nombre: string, email?: string, telefono?: string}|null, message: string, reply: string}} turn
  */
 export async function logChatTurn({ sessionId, ip, visitor, message, reply }) {
     const config = supabaseConfig();
@@ -26,7 +26,7 @@ export async function logChatTurn({ sessionId, ip, visitor, message, reply }) {
             body: JSON.stringify({
                 p_session_id: sessionId,
                 p_ip: ip && ip !== 'unknown' ? ip : null,
-                p_lead_key: visitor?.email || null,
+                p_lead_key: visitor ? leadKey(visitor) : null,
                 p_nombre: visitor?.nombre || null,
                 p_turnos: turnos,
             }),

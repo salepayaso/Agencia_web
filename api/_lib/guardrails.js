@@ -94,6 +94,16 @@ export function validateRequest(body) {
         return { ok: false, status: 200, reply: REFUSAL_REPLY, blocked: true, strike: true };
     }
 
+    return { ok: true, message, history: cleanHistory(history), visitor, sessionId: cleanSessionId(body?.sessionId) };
+}
+
+/**
+ * Deja solo turnos válidos del historial que manda el navegador, recortados al
+ * tope total, para que no se pueda inflar el costo de cada request.
+ */
+export function cleanHistory(history) {
+    if (!Array.isArray(history)) return [];
+
     // Solo aceptamos roles válidos y recortamos por si acaso.
     const recentTurns = history
         .filter((turn) => turn && (turn.role === 'user' || turn.role === 'assistant'))
@@ -110,17 +120,17 @@ export function validateRequest(body) {
 
     // El historial lo arma el cliente: se conservan los turnos más recientes
     // hasta el tope total, para que no se pueda inflar el costo de cada request.
-    const cleanHistory = [];
+    const kept = [];
     let budget = LIMITS.MAX_HISTORY_CHARS;
     for (let i = recentTurns.length - 1; i >= 0; i -= 1) {
         budget -= recentTurns[i].content.length;
         if (budget < 0) break;
-        cleanHistory.unshift(recentTurns[i]);
+        kept.unshift(recentTurns[i]);
     }
     // La API exige que la conversación empiece con un turno del usuario.
-    while (cleanHistory.length && cleanHistory[0].role !== 'user') cleanHistory.shift();
+    while (kept.length && kept[0].role !== 'user') kept.shift();
 
-    return { ok: true, message, history: cleanHistory, visitor, sessionId: cleanSessionId(body?.sessionId) };
+    return kept;
 }
 
 // Validación simple y permisiva: filtra basura evidente sin rechazar correos
@@ -132,12 +142,16 @@ export function cleanSessionId(value) {
     return typeof value === 'string' && /^[a-z0-9-]{8,64}$/i.test(value) ? value : null;
 }
 
+// El formulario pide nombre y WhatsApp, con el correo opcional. Un visitante con
+// correo y sin WhatsApp se sigue aceptando: así quedaba con el formulario antiguo.
 export function cleanVisitor(visitor) {
     const nombre = typeof visitor?.nombre === 'string' ? visitor.nombre.trim().slice(0, 80) : '';
-    const email = typeof visitor?.email === 'string' ? visitor.email.trim().toLowerCase().slice(0, 120) : '';
+    const rawEmail = typeof visitor?.email === 'string' ? visitor.email.trim().toLowerCase().slice(0, 120) : '';
+    const email = EMAIL_RE.test(rawEmail) ? rawEmail : '';
+    const telefono = cleanPhone(visitor?.telefono);
 
-    if (nombre.length < 2 || !EMAIL_RE.test(email)) return null;
-    return { nombre, email, telefono: cleanPhone(visitor?.telefono) };
+    if (nombre.length < 2 || (!telefono && !email)) return null;
+    return { nombre, email, telefono };
 }
 
 /**

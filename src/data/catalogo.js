@@ -5,9 +5,9 @@
 // página y en lo que responde el agente a la vez: nunca se contradicen.
 //
 // Precios: solo van los que el sitio ya muestra (dominio y hosting). Los de
-// planes, tiendas, Google y agentes se entregan solo a quien deja sus datos en
-// el chat: viven en AGENT_PROMPT (Vercel), nunca aquí, porque el repositorio es
-// público y este archivo termina en el JavaScript del navegador.
+// planes, tiendas, Google y agentes los da solo el agente del chat: viven en
+// AGENT_PROMPT (Vercel), nunca aquí, porque el repositorio es público y este
+// archivo termina en el JavaScript del navegador.
 //
 // Campos:
 //   desc, includes, ask ... lo que muestra la página Servicios

@@ -16,10 +16,8 @@ const SUGGESTIONS = [
 ];
 
 // Mensajes del globo de invitación. Rotan para no repetir siempre lo mismo.
-// Sin precios: el agente no los entrega hasta que el visitante deja sus datos,
-// así que anunciarlos acá se contradice con el resto del flujo.
 const TEASERS = [
-    '¿Buscas página web para tu negocio? Conversemos 👋',
+    '¿Cuánto cuesta una página web? Te lo digo al tiro 👋',
     '¿Un agente IA que atienda a tus clientes 24/7? Te cuento cómo 💬',
     '¿Tienes un proyecto en mente? Cuéntame y te oriento',
     '¿Dudas sobre qué plan te conviene? Te ayudo en 1 minuto',
@@ -44,8 +42,11 @@ const MAX_IDENTITY_OFFERS = 2;
 const CLOSE_DELAY_MS = 6000;
 
 const DECLINE_REPLY =
-    'Sin problema 👍 Igual te puedo contar qué incluye cada plan y cómo trabajamos. ' +
-    'Y si prefieres los precios directo, escríbenos por WhatsApp al +56 9 5414 6176.';
+    'Sin problema 👍 Sigamos conversando: pregúntame lo que quieras de los planes y sus precios. ' +
+    'Y si prefieres hablar con un asesor, escríbenos por WhatsApp al +56 9 5414 6176.';
+
+// Mismo criterio que cleanPhone en el backend: celular chileno, con o sin +56.
+const isChileanMobile = (value) => /^(?:56|0)?9\d{8}$/.test(value.replace(/\D/g, ''));
 
 // Id aleatorio de la conversación: con él se guarda en Supabase aunque el
 // visitante no deje sus datos. Dura lo que dura la pestaña.
@@ -163,7 +164,7 @@ const ChatAgent = () => {
     const [input, setInput] = useState('');
     const [isTyping, setIsTyping] = useState(false);
 
-    // Identificación: el backend retiene los precios hasta tener nombre y correo.
+    // Identificación: nombre y WhatsApp, a cambio de la demo o de que lo contacten.
     const [visitor, setVisitor] = useState(readVisitor);
     const [form, setForm] = useState({ nombre: '', email: '', telefono: '' });
     const [formError, setFormError] = useState('');
@@ -180,6 +181,8 @@ const ChatAgent = () => {
     // stream, donde el valor del render ya puede estar viejo.
     const showFormRef = useRef(restored?.showForm ?? false);
     const offersRef = useRef(restored?.offers ?? 0);
+    // Lo que pidió el visitante cuando el agente abrió el formulario: va en el aviso al equipo.
+    const motivoRef = useRef('');
 
     // Bloqueo por insistir en manipular al agente.
     const [blockedUntil, setBlockedUntil] = useState(readBlock);
@@ -380,6 +383,7 @@ const ChatAgent = () => {
                     }
 
                     if (event.type === 'identify') {
+                        motivoRef.current = typeof event.motivo === 'string' ? event.motivo : '';
                         offerIdentity();
                     }
 
@@ -430,17 +434,22 @@ const ChatAgent = () => {
 
         const nombre = form.nombre.trim();
         const email = form.email.trim().toLowerCase();
+        const telefono = form.telefono.trim();
 
         if (nombre.length < 2) {
             setFormError('Escribe tu nombre.');
             return;
         }
-        if (!/^[^\s@]+@[^\s@]+\.[a-z]{2,}$/i.test(email)) {
-            setFormError('Revisa el correo, parece incompleto.');
+        if (!isChileanMobile(telefono)) {
+            setFormError('Revisa el WhatsApp: un celular chileno, como +56 9 1234 5678.');
+            return;
+        }
+        if (email && !/^[^\s@]+@[^\s@]+\.[a-z]{2,}$/i.test(email)) {
+            setFormError('Revisa el correo, parece incompleto. Si prefieres, déjalo en blanco.');
             return;
         }
 
-        const identity = { nombre, email, telefono: form.telefono.trim() };
+        const identity = { nombre, email, telefono };
         setVisitor(identity);
         setFormError('');
         try {
@@ -453,15 +462,21 @@ const ChatAgent = () => {
         setShowForm(false);
 
         // El lead se avisa al instante: si se va sin escribir más, igual quedó.
+        // Va con la conversación, para que el equipo sepa de qué negocio se trata.
         fetch('/api/chat', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ action: 'identify', visitor: identity }),
+            body: JSON.stringify({
+                action: 'identify',
+                visitor: identity,
+                motivo: motivoRef.current,
+                history: messages.filter((m) => m.content !== WELCOME),
+            }),
         }).catch(() => {
             // Si falla, el lead igual se registra cuando el agente use su herramienta.
         });
 
-        // Retoma la conversación donde quedó, ya con los precios disponibles.
+        // Retoma la conversación: el agente confirma lo que pidió y lo registra.
         send('Listo, ya te dejé mis datos ✅', identity);
     };
 
@@ -554,10 +569,10 @@ const ChatAgent = () => {
                                         </svg>
                                     </button>
                                     <p className="text-sm text-ink font-bold leading-snug pr-7">
-                                        Déjame tus datos y te muestro precios y detalles 👇
+                                        Déjanos tu nombre y WhatsApp 👇
                                     </p>
                                     <p className="text-xs text-ink-2 leading-snug -mt-1">
-                                        Con tus datos seguimos la conversación acá mismo y te muestro los planes con sus precios.
+                                        Un asesor te escribe por WhatsApp con tu demo o tu cotización, sin costo ni compromiso.
                                     </p>
                                     <input
                                         value={form.nombre}
@@ -568,21 +583,21 @@ const ChatAgent = () => {
                                         className="w-full bg-white border-[1.5px] border-rule px-3 py-2 text-sm text-ink placeholder:text-ink-2/70 outline-none focus:border-ink transition-colors"
                                     />
                                     <input
-                                        value={form.email}
-                                        onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))}
-                                        placeholder="tu@correo.cl"
-                                        type="email"
-                                        maxLength={120}
-                                        autoComplete="email"
-                                        className="w-full bg-white border-[1.5px] border-rule px-3 py-2 text-sm text-ink placeholder:text-ink-2/70 outline-none focus:border-ink transition-colors"
-                                    />
-                                    <input
                                         value={form.telefono}
                                         onChange={(e) => setForm((f) => ({ ...f, telefono: e.target.value }))}
-                                        placeholder="WhatsApp (opcional) — +56 9 1234 5678"
+                                        placeholder="WhatsApp — +56 9 1234 5678"
                                         type="tel"
                                         maxLength={20}
                                         autoComplete="tel"
+                                        className="w-full bg-white border-[1.5px] border-rule px-3 py-2 text-sm text-ink placeholder:text-ink-2/70 outline-none focus:border-ink transition-colors"
+                                    />
+                                    <input
+                                        value={form.email}
+                                        onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))}
+                                        placeholder="Correo (opcional)"
+                                        type="email"
+                                        maxLength={120}
+                                        autoComplete="email"
                                         className="w-full bg-white border-[1.5px] border-rule px-3 py-2 text-sm text-ink placeholder:text-ink-2/70 outline-none focus:border-ink transition-colors"
                                     />
                                     {formError && <p className="text-xs text-signal font-semibold">{formError}</p>}
@@ -590,7 +605,7 @@ const ChatAgent = () => {
                                         type="submit"
                                         className="w-full bg-signal hover:bg-ink text-white text-sm font-bold py-2.5 transition-colors"
                                     >
-                                        Empezar a conversar
+                                        Enviar mis datos
                                     </button>
                                     <button
                                         type="button"
