@@ -17,13 +17,13 @@ import {
 import QuoteDocument from '../components/QuoteDocument';
 import { useConfirm } from '../lib/useConfirm';
 
-// Panel de administración (/admin): cotizaciones, pedidos, clientes y soporte sin entrar a Supabase.
+// Panel de administración (/admin): leads, cotizaciones, pedidos, clientes y soporte sin entrar a Supabase.
 // Solo para cuentas en la tabla admins (supabase_scripts/admin_panel_2026_09_30.sql).
 // Lee con las políticas "Admin can view all ..." y cambia datos SOLO con las
 // funciones admin_update_order / admin_update_ticket,
 // admin_create_brief / admin_update_quote (cotizaciones_2026_10_12.sql) y
 // admin_update_profile / admin_set_client_note / admin_add_document /
-// admin_delete_document (fichas_admin_2026_10_12.sql),
+// admin_delete_document (fichas_admin_2026_10_12.sql), admin_update_lead (leads_admin_2026_10_15.sql),
 // que vuelven a revisar is_admin() en la base. Ocultar esta página no es la
 // seguridad: la seguridad está en la base.
 
@@ -56,9 +56,11 @@ const Admin = () => {
     const [notes, setNotes] = useState({});
     const [templates, setTemplates] = useState([]);
     const [ticketMessages, setTicketMessages] = useState([]);
+    const [leads, setLeads] = useState([]);
+    const [chats, setChats] = useState([]);
 
     const load = useCallback(async () => {
-        const [p, o, t, q, d, n, tp, tm] = await Promise.all([
+        const [p, o, t, q, d, n, tp, tm, l, c] = await Promise.all([
             supabase.from('profiles').select('*').order('created_at', { ascending: false }),
             supabase.from('orders').select('*').order('created_at', { ascending: false }),
             supabase.from('tickets').select('*').order('created_at', { ascending: false }),
@@ -67,6 +69,8 @@ const Admin = () => {
             supabase.from('client_notes').select('*'),
             supabase.from('quote_templates').select('*').eq('active', true).order('sort'),
             supabase.from('ticket_messages').select('*').order('created_at'),
+            supabase.from('leads').select('*').order('created_at', { ascending: false }),
+            supabase.from('chat_conversaciones').select('lead_key, mensajes, created_at').not('lead_key', 'is', null).order('created_at'),
         ]);
         setProfiles(p.data || []);
         setOrders(o.data || []);
@@ -76,6 +80,8 @@ const Admin = () => {
         setNotes(Object.fromEntries((n.data || []).map((x) => [x.user_id, x.note])));
         setTemplates(tp.data || []);
         setTicketMessages(tm.data || []);
+        setLeads(l.data || []);
+        setChats(c.data || []);
     }, []);
 
     useEffect(() => {
@@ -96,6 +102,7 @@ const Admin = () => {
     const waiting = orders.filter((o) => o.status === 'pendiente' && isOpenOrder(o));
     const paid = orders.filter((o) => o.status === 'pagado');
     const openTickets = tickets.filter(isOpen);
+    const newLeads = leads.filter((x) => x.estado === 'nuevo');
     const newBriefs = quotes.filter((x) => x.status === 'brief_recibido');
     const projectPayments = quotes.filter((x) => pendingStage(x));
     const expiring = profiles.filter((p) => {
@@ -140,6 +147,7 @@ const Admin = () => {
                             </div>
                             <div className="tabs" role="tablist" aria-label="Secciones del panel">
                                 {tabBtn('hoy', 'Hoy')}
+                                {tabBtn('leads', 'Leads', newLeads.length)}
                                 {tabBtn('cotizaciones', 'Cotizaciones', newBriefs.length + projectPayments.length)}
                                 {tabBtn('pedidos', 'Pedidos', waiting.length + paid.length)}
                                 {tabBtn('clientes', 'Clientes')}
@@ -149,8 +157,9 @@ const Admin = () => {
 
                         <div style={{ paddingBottom: 80 }}>
                             {tab === 'hoy' && (
-                                <Today newBriefs={newBriefs} projectPayments={projectPayments} waiting={waiting} paid={paid} openTickets={openTickets} expiring={expiring} goTo={setTab} />
+                                <Today newLeads={newLeads} newBriefs={newBriefs} projectPayments={projectPayments} waiting={waiting} paid={paid} openTickets={openTickets} expiring={expiring} goTo={setTab} />
                             )}
+                            {tab === 'leads' && <Leads leads={leads} chats={chats} onChanged={load} goTo={setTab} />}
                             {tab === 'cotizaciones' && <Quotes quotes={quotes} templates={templates} onChanged={load} />}
                             {tab === 'pedidos' && <Orders orders={orders} byId={byId} onChanged={load} />}
                             {tab === 'clientes' && <Clients profiles={profiles} orders={orders} documents={documents} notes={notes} onChanged={load} />}
@@ -164,8 +173,9 @@ const Admin = () => {
 };
 
 // Hoy: lo que requiere acción ----------------------------------------------------------
-const Today = ({ newBriefs, projectPayments, waiting, paid, openTickets, expiring, goTo }) => {
+const Today = ({ newLeads, newBriefs, projectPayments, waiting, paid, openTickets, expiring, goTo }) => {
     const tiles = [
+        { n: newLeads.length, t: 'Leads nuevos', d: 'Dejaron su WhatsApp en el chat: escríbeles y conversa sobre su negocio.', go: 'leads' },
         { n: newBriefs.length, t: 'Briefs por cotizar', d: 'Clientes que ya enviaron su brief: prepara la cotización.', go: 'cotizaciones' },
         { n: projectPayments.length, t: 'Pagos de proyectos', d: 'Anticipos o saldos por cobrar. Si pagan en línea se confirman solos.', go: 'cotizaciones' },
         { n: waiting.length, t: 'Esperando pago', d: 'Envía los datos de transferencia. Los pagos con Webpay o Mercado Pago llegan solos a "Pagados".', go: 'pedidos' },
@@ -183,6 +193,127 @@ const Today = ({ newBriefs, projectPayments, waiting, paid, openTickets, expirin
                 </button>
             ))}
         </div>
+    );
+};
+
+// Leads del chat: quién dejó sus datos, qué conversó con el agente y en qué va -------------
+const LEAD_STATUS = {
+    nuevo: { label: 'Nuevo', cls: 'hot' },
+    contactado: { label: 'Contactado', cls: 'hot' },
+    en_brief: { label: 'En brief', cls: 'ok' },
+    descartado: { label: 'Descartado', cls: '' },
+};
+const LEAD_OPEN = ['nuevo', 'contactado'];
+
+// Mismo saludo que el botón del correo (api/_lib/leads.js).
+const leadGreeting = (lead) => `Hola ${lead.nombre}, te escribo de Interfaz360 por tu consulta en nuestro sitio web.`;
+
+const Leads = ({ leads, chats, onChanged, goTo }) => {
+    const [all, setAll] = useState(false);
+    const list = all ? leads : leads.filter((x) => LEAD_OPEN.includes(x.estado));
+    return (
+        <section className="panel">
+            <div className="box-title">
+                <b>{all ? 'Todos los leads' : 'Leads por atender'}</b>
+                <button type="button" className="textlink" onClick={() => setAll((v) => !v)}>{all ? 'Ver solo por atender' : `Ver todos (${leads.length})`}</button>
+            </div>
+            {list.length ? list.map((x) => (
+                <LeadRow key={x.id} lead={x} chats={chats.filter((c) => c.lead_key === x.lead_key)} onChanged={onChanged} goTo={goTo} />
+            )) : (
+                <p className="empty">No hay leads {all ? '' : 'por atender'}. Llegan cuando alguien deja sus datos en el chat del sitio.</p>
+            )}
+        </section>
+    );
+};
+
+const LeadRow = ({ lead: x, chats, onChanged, goTo }) => {
+    const [estado, setEstado] = useState(LEAD_STATUS[x.estado] ? x.estado : 'nuevo');
+    const [nota, setNota] = useState(x.nota || '');
+    const [open, setOpen] = useState(false);
+    const [busy, setBusy] = useState(false);
+    const [error, setError] = useState('');
+    const st = LEAD_STATUS[x.estado] || { label: x.estado, cls: '' };
+    const wa = waLink(x.telefono);
+    // La conversación completa está en chat_conversaciones (una por sesión del navegador);
+    // si no está, queda la copia que se guardó con el lead al dejar sus datos.
+    const mensajes = chats.length ? chats.flatMap((c) => c.mensajes || []) : (x.transcript || []);
+
+    const update = async (nuevoEstado) => {
+        const { error: err } = await supabase.rpc('admin_update_lead', { p_id: x.id, p_estado: nuevoEstado, p_nota: nota });
+        if (err) throw err;
+    };
+
+    const save = async () => {
+        setBusy(true);
+        setError('');
+        try {
+            await update(estado);
+            onChanged();
+        } catch (err) {
+            setError(errText(err));
+        }
+        setBusy(false);
+    };
+
+    // Después de conversar por WhatsApp: crea el brief con sus datos y lo deja en Cotizaciones.
+    const toBrief = async () => {
+        setBusy(true);
+        setError('');
+        const { error: err } = await supabase.rpc('admin_create_brief', {
+            p_name: x.nombre,
+            p_email: x.email || '',
+            p_phone: x.telefono ? `+${x.telefono}` : '',
+            p_note: [`Lead del chat: ${x.interes || 'sin detalle'}`, nota].filter(Boolean).join(' · '),
+        });
+        if (err) {
+            setBusy(false);
+            return setError(errText(err));
+        }
+        try {
+            await update('en_brief');
+        } catch {
+            // El brief ya quedó creado: el estado del lead se corrige a mano si falla.
+        }
+        setBusy(false);
+        onChanged();
+        goTo('cotizaciones');
+    };
+
+    return (
+        <article className="ticket">
+            <div className="t-top">
+                <h3>{x.nombre}</h3>
+                <span className={`pill ${st.cls}`}>{st.label}</span>
+            </div>
+            <span className="meta">
+                {new Date(x.created_at).toLocaleString('es-CL', { dateStyle: 'short', timeStyle: 'short' })}
+                {x.telefono ? ` · +${x.telefono}` : ''}{x.email ? ` · ${x.email}` : ''}
+            </span>
+            {x.interes && <p className="desc">{x.interes}</p>}
+            {mensajes.length > 0 && (
+                <button type="button" className="textlink" style={{ justifySelf: 'start' }} onClick={() => setOpen((v) => !v)}>
+                    {open ? 'Ocultar conversación' : `Ver conversación (${mensajes.length} mensajes)`}
+                </button>
+            )}
+            {open && mensajes.map((m, i) => (
+                <div key={i} className={m.role === 'assistant' ? 'reply' : 'reply mine'}>
+                    <b>{m.role === 'assistant' ? 'Agente' : x.nombre}{m.at ? ` · ${new Date(m.at).toLocaleString('es-CL', { dateStyle: 'short', timeStyle: 'short' })}` : ''}</b>{m.content}
+                </div>
+            ))}
+            <div className="admin-actions">
+                <select className="admin-input" style={{ maxWidth: 180 }} value={estado} onChange={(e) => setEstado(e.target.value)} aria-label="Estado">
+                    {Object.entries(LEAD_STATUS).map(([id, s]) => <option key={id} value={id}>{s.label}</option>)}
+                </select>
+                <input className="admin-input" value={nota} onChange={(e) => setNota(e.target.value)} maxLength={1000} placeholder="Nota interna: qué vende, si tiene logo, Google Maps…" aria-label="Nota interna" />
+                <button type="button" className="btn signal" disabled={busy} onClick={save}>{busy ? 'Guardando…' : 'Guardar →'}</button>
+            </div>
+            <div className="admin-actions">
+                {wa && <a className="textlink" href={`${wa}?text=${encodeURIComponent(leadGreeting(x))}`} target="_blank" rel="noreferrer">Escribir por WhatsApp</a>}
+                {x.email && <a className="textlink" href={`mailto:${x.email}`}>Correo</a>}
+                {x.estado !== 'en_brief' && <button type="button" className="btn" disabled={busy} onClick={toBrief}>Crear brief con sus datos</button>}
+            </div>
+            {error && <p className="alert" role="alert">{error}</p>}
+        </article>
     );
 };
 
