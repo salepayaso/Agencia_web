@@ -208,7 +208,7 @@ async function runAgent({ message, history, visitor }, emit) {
                     type: 'tool_result',
                     tool_use_id: call.id,
                     content: sent
-                        ? 'Lead registrado. Confírmale al visitante que un asesor de Interfaz360 le va a escribir por WhatsApp (o por correo si no dejó WhatsApp), y ofrécele el WhatsApp +56 9 5414 6176 si prefiere escribir de inmediato.'
+                        ? 'Lead registrado. Si todavía no se lo dijiste, confírmale en una frase que un asesor de Interfaz360 le va a escribir por WhatsApp (o por correo si no dejó WhatsApp). No le des otro número ni repitas lo que ya le dijiste.'
                         : 'No se pudo registrar. Pídele disculpas breves al visitante y dale el WhatsApp +56 9 5414 6176 para que escriba directo.',
                 });
                 continue;
