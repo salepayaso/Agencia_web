@@ -317,6 +317,10 @@ const ChatAgent = () => {
         // El saludo inicial no viaja a la API. Se filtra por contenido y no por
         // posición: al restaurar una conversación larga puede no ir primero.
         const history = messages.filter((m) => m.content !== WELCOME);
+        // Conversión para Analytics: la primera vez que el visitante escribe.
+        if (!history.some((m) => m.role === 'user')) {
+            window.dataLayer?.push({ event: 'chat_first_message', page_path: window.location.pathname });
+        }
         setMessages((prev) => [...prev, { role: 'user', content }]);
         setInput('');
         setIsTyping(true);
@@ -477,6 +481,9 @@ const ChatAgent = () => {
         showFormRef.current = false;
         setShowForm(false);
         gesture('contento');
+
+        // Conversión principal del chat. Sin nombre ni teléfono: a Analytics no van datos personales.
+        window.dataLayer?.push({ event: 'chat_lead', with_email: Boolean(email), page_path: window.location.pathname });
 
         // El lead se avisa al instante: si se va sin escribir más, igual quedó.
         // Va con la conversación, para que el equipo sepa de qué negocio se trata.
