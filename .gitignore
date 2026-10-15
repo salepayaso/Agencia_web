@@ -48,3 +48,4 @@ guia_entrega_looker.md
 supabase_scripts/
 card-preview.html
 
+.env*
