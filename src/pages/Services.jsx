@@ -5,7 +5,7 @@ import { openChat } from '../lib/chat';
 import { SERVICIOS, PLANES as PLANS, EN_TODOS_LOS_PLANES } from '../data/catalogo';
 
 // Servicios y planes salen de src/data/catalogo.js (el mismo que usa el agente).
-// "Preguntar" abre el asesor con la pregunta ya escrita.
+// "Preguntar" abre el chat con Faz con la pregunta ya escrita.
 const SERVICES = SERVICIOS.filter((s) => !s.soloAgente);
 
 const track = (label) =>
@@ -17,7 +17,7 @@ const Services = () => (
         description="Página web, tienda online, agente IA, ecosistema Google, software a medida, dominio y correos para pymes en Chile."
     >
         <PageHead eyebrow="Servicios" title={<>Lo que hacemos<br />por tu <span>negocio</span></>}>
-            Desde tu primera página web hasta el sistema que ordena tu operación, con un solo equipo a cargo. ¿Dudas? El asesor te explica qué incluye y cuánto cuesta.
+            Desde tu primera página web hasta el sistema que ordena tu operación, con un solo equipo a cargo. ¿Dudas? Faz, nuestro agente IA, te explica qué incluye y cuánto cuesta.
         </PageHead>
 
         <section className="s gutter" style={{ paddingTop: 0 }}>
@@ -40,7 +40,7 @@ const Services = () => (
                                     <a className="btn" href={s.anchor}>Buscar dominio →</a>
                                 ) : (
                                     <button type="button" className="btn" onClick={() => { track(`Servicios: ${s.title}`); openChat(s.ask); }}>
-                                        Preguntar al asesor →
+                                        Preguntar a Faz →
                                     </button>
                                 )}
                             </div>
@@ -54,7 +54,7 @@ const Services = () => (
             <div className="max">
                 <div className="s-head">
                     <h2 className="display">Planes<br />para pymes</h2>
-                    <p>El precio depende de lo que necesites. Cuéntale al asesor de qué es tu negocio y te dice cuál te conviene y cuánto cuesta.</p>
+                    <p>El precio depende de lo que necesites. Cuéntale a Faz de qué es tu negocio y te dice cuál te conviene y cuánto cuesta.</p>
                 </div>
                 <div className="plans">
                     {PLANS.map((p) => (

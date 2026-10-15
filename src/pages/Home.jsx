@@ -9,7 +9,7 @@ import DomainSection from '../components/DomainSection';
 import { openChat } from '../lib/chat';
 import { SERVICIOS } from '../data/catalogo';
 
-// Cada servicio abre el asesor con una pregunta ya escrita,
+// Cada servicio abre el chat con Faz con una pregunta ya escrita,
 // así responde al tiro sobre lo que le interesó a la persona.
 // Textos en src/data/catalogo.js; la portada usa su versión corta si la hay.
 const SERVICES = SERVICIOS.filter((s) => !s.soloAgente).map((s) => ({
@@ -60,13 +60,13 @@ const Home = () => (
                         </p>
                         <div className="ctas">
                             <button type="button" className="btn signal" onClick={() => { track('Hero: Preguntale al asesor'); openChat(); }}>
-                                Pregúntale al asesor →
+                                Pregúntale a Faz →
                             </button>
                             <a className="btn" href="#servicios">Ver servicios</a>
                         </div>
                         <div className="proof">
                             <span><b>Dominio, hosting y correos</b> incluidos</span>
-                            <span><b>Asesor IA</b> 24/7</span>
+                            <span><b>Agente IA</b> 24/7</span>
                             <span><b>Portal</b> para tu cuenta</span>
                         </div>
                     </div>
@@ -82,7 +82,7 @@ const Home = () => (
                     <div className="s-head">
                         <h2 className="display">Lo que<br />hacemos</h2>
                         <p>
-                            Soluciones para vender más y administrar mejor tu negocio, con un solo equipo a cargo. ¿Tienes dudas sobre algún servicio? Consulta a nuestro asesor: te explica qué incluye y cuánto cuesta.
+                            Soluciones para vender más y administrar mejor tu negocio, con un solo equipo a cargo. ¿Tienes dudas sobre algún servicio? Pregúntale a Faz, nuestro agente IA: te explica qué incluye y cuánto cuesta.
                         </p>
                     </div>
                     <ul className="svc">
@@ -162,7 +162,7 @@ const Home = () => (
                 <div className="max">
                     <h2 className="display">¿Conversamos sobre tu negocio?</h2>
                     <button type="button" className="btn" onClick={() => { track('CTA final: Hablar con el asesor'); openChat(); }}>
-                        Hablar con el asesor →
+                        Hablar con Faz →
                     </button>
                 </div>
             </section>

@@ -40,7 +40,7 @@ const COMPROMISOS = [
     {
         icon: Clock,
         title: 'Respuesta en 24 horas',
-        desc: 'Si nos escribes, te contestamos dentro de un día hábil. Y el asesor del chat responde al instante.',
+        desc: 'Si nos escribes, te contestamos dentro de un día hábil. Y Faz, nuestro agente IA, responde al instante.',
     },
 ];
 
@@ -104,14 +104,14 @@ const About = () => {
                 <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6 border-t border-white/10 pt-12">
                     <div>
                         <h2 className="text-3xl font-bold mb-2">¿Conversamos sobre tu negocio?</h2>
-                        <p className="text-gray-400">Cuéntale a nuestro asesor qué necesitas. Te responde al instante.</p>
+                        <p className="text-gray-400">Cuéntale a Faz, nuestro agente IA, qué necesitas. Te responde al instante.</p>
                     </div>
                     <button
                         type="button"
                         onClick={() => openChat('Hola, quiero conversar sobre un proyecto para mi negocio.')}
                         className="inline-flex items-center justify-center gap-2 px-7 py-4 rounded-full bg-white text-dark-bg font-semibold hover:bg-primary-400 transition-colors shrink-0"
                     >
-                        <MessageCircle className="w-5 h-5" /> Hablar con el asesor
+                        <MessageCircle className="w-5 h-5" /> Hablar con Faz
                     </button>
                 </div>
             </Section>

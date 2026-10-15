@@ -23,7 +23,7 @@ const COMPROMISOS = [
     { title: 'Tu sitio es tuyo', desc: 'Sin arriendos eternos ni plataformas que te amarran. Lo que construimos te pertenece.' },
     { title: 'Rápido y siempre en línea', desc: 'Carga en segundos desde el celular y lo vigilamos las 24 horas para que no se caiga.' },
     { title: 'Hablas con quien lo construye', desc: 'Sin ejecutivos de por medio ni tickets que se pierden. Trato directo, de principio a fin.' },
-    { title: 'Respuesta en 24 horas', desc: 'Si nos escribes, te contestamos dentro de un día hábil. Y el asesor del chat responde al instante.' },
+    { title: 'Respuesta en 24 horas', desc: 'Si nos escribes, te contestamos dentro de un día hábil. Y Faz, nuestro agente IA, responde al instante.' },
 ];
 
 const AboutPage = () => (

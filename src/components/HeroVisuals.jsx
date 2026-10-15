@@ -11,11 +11,11 @@ const TABS = [
 ];
 const EVERY = 7000;
 
-// Todo el visual abre el asesor, también con teclado.
+// Todo el visual abre el chat con Faz, también con teclado.
 const opener = {
     role: 'button',
     tabIndex: 0,
-    'aria-label': 'Abrir el asesor',
+    'aria-label': 'Abrir el chat con Faz',
     onClick: () => openChat(),
     onKeyDown: (e) => {
         if (e.key === 'Enter' || e.key === ' ') {
@@ -28,7 +28,7 @@ const opener = {
 const Night = () => (
     <>
         <div className="feed" {...opener}>
-            <span className="top"><b>Consultas atendidas anoche</b><span>● Asesor activo</span></span>
+            <span className="top"><b>Consultas atendidas anoche</b><span>● Agente IA activo</span></span>
             <ol>
                 <li><time>23:14</time><span className="who">Marcela · pastelería</span><span className="what">Quiere vender tortas por encargo con pago online.</span><span className="st hot">Pidió precio</span></li>
                 <li><time>01:52</time><span className="who">Jorge · taller mecánico</span><span className="what">Preguntó cómo aparecer en Google Maps.</span><span className="st">Dejó correo</span></li>
@@ -36,7 +36,7 @@ const Night = () => (
             </ol>
             <span className="foot"><span>Ejemplo · así te llegan a tu panel</span><b>3 clientes mientras dormías</b></span>
         </div>
-        <p className="vis-note">Así atiende el asesor mientras duermes. <button type="button" onClick={() => openChat()}>Pruébalo tú →</button></p>
+        <p className="vis-note">Así atiende un agente IA mientras duermes. <button type="button" onClick={() => openChat()}>Pruébalo tú →</button></p>
     </>
 );
 
@@ -49,7 +49,7 @@ const Phone = () => (
                 <span className="shero"><b>Tu producto<br />estrella</b></span>
                 <span className="slines"><i style={{ width: '80%' }} /><i style={{ width: '64%' }} /><i style={{ width: '72%' }} /></span>
                 <span className="bubble">
-                    <span className="bh">Asesor <small>● en línea</small></span>
+                    <span className="bh">Agente IA <small>● en línea</small></span>
                     <span className="l">
                         <span className="m bot">¡Hola! ¿Quieres hacer un pedido para mañana?</span>
                         <span className="m me">Sí, una torta para 20 personas</span>
@@ -58,7 +58,7 @@ const Phone = () => (
                 </span>
             </span></span>
         </div>
-        <p className="vis-note">Tu web en el celular, con el asesor tomando pedidos. <button type="button" onClick={() => openChat()}>Pruébalo tú →</button></p>
+        <p className="vis-note">Tu web en el celular, con el agente IA tomando pedidos. <button type="button" onClick={() => openChat()}>Pruébalo tú →</button></p>
     </>
 );
 
@@ -82,12 +82,12 @@ const Google = () => (
                 <span className="lbl"><b>Cómo llegar</b><span>A 600 m</span></span>
             </span>
             <span className="card gchat">
-                <small>Asesor · 23:14</small>
+                <small>Agente IA · 23:14</small>
                 <span className="q">¿Hacen despacho a Ñuñoa?</span>
                 <span>Sí, de lunes a sábado. ¿Te tomo el pedido?</span>
             </span>
         </div>
-        <p className="vis-note">Te encuentran en Google y Maps, y el asesor responde. <button type="button" onClick={() => openChat()}>Pruébalo tú →</button></p>
+        <p className="vis-note">Te encuentran en Google y Maps, y el agente IA responde. <button type="button" onClick={() => openChat()}>Pruébalo tú →</button></p>
     </>
 );
 

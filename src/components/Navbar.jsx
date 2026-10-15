@@ -74,7 +74,7 @@ const Navbar = () => {
                             <Link to="/login" className="client">Clientes</Link>
                         )}
                         <button type="button" className="btn solid" onClick={talk}>
-                            Hablar con el asesor
+                            Hablar con Faz
                         </button>
                         <button
                             type="button"
@@ -103,7 +103,7 @@ const Navbar = () => {
                         <Link to="/login" aria-current={current('/login')}>Portal de clientes</Link>
                     )}
                     <button type="button" className="btn signal" onClick={talk}>
-                        Hablar con el asesor →
+                        Hablar con Faz →
                     </button>
                 </nav>
             )}

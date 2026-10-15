@@ -8,7 +8,7 @@ const WHATSAPP_URL =
     encodeURIComponent('Hola Interfaz 360, me gustaría cotizar un proyecto para mi negocio.');
 
 const WELCOME =
-    '¡Hola! 👋 Soy el asesor virtual de Interfaz360. Te puedo contar sobre nuestros servicios, planes y precios, o coordinar que un asesor te contacte. ¿Qué andas buscando para tu negocio?';
+    '¡Hola! 👋 Soy Faz, el agente IA de Interfaz 360. Te puedo contar sobre nuestros servicios, planes y precios, o coordinar que un asesor del equipo te contacte. ¿Qué andas buscando para tu negocio?';
 
 const SUGGESTIONS = [
     '¿Cuánto cuesta una página web?',
@@ -519,7 +519,7 @@ const ChatAgent = () => {
                             </span>
                             <div className="flex-1 min-w-0">
                                 <p className="font-bold text-[15px] leading-tight">
-                                    Asesor Interfaz 360
+                                    Faz <span className="font-normal text-paper/70">· Agente IA de Interfaz 360</span>
                                 </p>
                                 <p className="text-[#8fe0a8] text-xs font-semibold leading-tight">
                                     ● En línea · responde al instante
@@ -637,7 +637,7 @@ const ChatAgent = () => {
                                         Ahora no, gracias
                                     </button>
                                     <p className="text-[11px] text-ink-2 text-center leading-snug">
-                                        Te responde un asistente de IA y guardamos la conversación para darte seguimiento.{' '}
+                                        Te responde Faz, un agente IA, y guardamos la conversación para darte seguimiento.{' '}
                                         <a href="/privacidad" target="_blank" rel="noopener noreferrer" className="underline hover:text-ink">Privacidad</a>
                                     </p>
                                 </motion.form>
@@ -696,7 +696,7 @@ const ChatAgent = () => {
                                 ¿Prefieres WhatsApp? Escríbenos al +56 9 5414 6176
                             </a>
                             <p className="text-center text-[10px] text-ink-2/80 mt-1">
-                                Asistente de IA · la conversación se guarda ·{' '}
+                                Faz es un agente IA · la conversación se guarda ·{' '}
                                 <a href="/privacidad" target="_blank" rel="noopener noreferrer" className="underline hover:text-ink">Privacidad</a>
                             </p>
                         </div>
@@ -742,7 +742,7 @@ const ChatAgent = () => {
                         ? 'Chat cerrado por ahora'
                         : isOpen
                           ? 'Cerrar chat'
-                          : 'Abrir el asesor'
+                          : 'Abrir el chat con Faz'
                 }
                 className="flex items-center gap-2.5 bg-ink text-white border-[1.5px] border-ink shadow-[5px_5px_0_#e8471c] hover:shadow-[5px_5px_0_#0f1a2e] hover:bg-[#1d2b45] p-3 sm:py-2.5 sm:pl-3 sm:pr-4 font-bold text-[15px] transition-shadow disabled:cursor-not-allowed"
                 initial={{ opacity: 0, y: 12 }}
@@ -765,7 +765,7 @@ const ChatAgent = () => {
                         />
                     </span>
                 )}
-                <span className="hidden sm:inline">{isOpen ? 'Cerrar' : 'Asesor'}</span>
+                <span className="hidden sm:inline">{isOpen ? 'Cerrar' : 'Faz'}</span>
                 {!isOpen && !isBlocked && (
                     <span className="hidden sm:block w-2 h-2 rounded-full bg-[#8fe0a8] shadow-[0_0_0_3px_rgba(143,224,168,.25)]" />
                 )}

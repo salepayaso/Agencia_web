@@ -84,9 +84,9 @@ const ContactPage = () => {
                         </ul>
                         <div className="feed" role="button" tabIndex={0} onClick={() => openChat()}
                             onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openChat(); } }}
-                            aria-label="Abrir el asesor">
-                            <span className="top"><b>¿Prefieres una respuesta ya?</b><span>● Asesor activo</span></span>
-                            <span className="foot"><span>Nuestro asesor IA te atiende ahora mismo.</span><b>Abrir chat →</b></span>
+                            aria-label="Abrir el chat con Faz">
+                            <span className="top"><b>¿Prefieres una respuesta ya?</b><span>● Faz en línea</span></span>
+                            <span className="foot"><span>Faz, nuestro agente IA, te atiende ahora mismo.</span><b>Abrir chat →</b></span>
                         </div>
                     </div>
 

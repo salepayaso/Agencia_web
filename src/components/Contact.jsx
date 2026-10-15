@@ -123,7 +123,7 @@ const Contact = () => {
                         </span>
                         <span className="flex-1">
                             <span className="block font-semibold text-white">¿Prefieres una respuesta ya?</span>
-                            <span className="block text-sm text-gray-400">Nuestro asesor IA te atiende ahora mismo</span>
+                            <span className="block text-sm text-gray-400">Faz, nuestro agente IA, te atiende ahora mismo</span>
                         </span>
                         <ArrowRight className="w-5 h-5 text-gray-500 group-hover:text-primary-400 group-hover:translate-x-1 transition-all" />
                     </button>

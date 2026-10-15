@@ -4,7 +4,7 @@ import ChatAgent from './ChatAgent';
 import SEO from './SEO';
 import { openChat } from '../lib/chat';
 
-// Estructura común de las páginas públicas: menú, asesor, contenido y footer.
+// Estructura común de las páginas públicas: menú, chat con Faz, contenido y footer.
 const PageShell = ({ title, description, noindex, children }) => (
     <div className="tc-page">
         <SEO title={title} description={description} noindex={noindex} />
@@ -28,8 +28,8 @@ export const PageHead = ({ eyebrow, title, children }) => (
     </section>
 );
 
-// Franja naranja de cierre que abre el asesor.
-export const CtaBand = ({ title = '¿Conversamos sobre tu negocio?', label = 'Hablar con el asesor →', message }) => (
+// Franja naranja de cierre que abre el chat con Faz.
+export const CtaBand = ({ title = '¿Conversamos sobre tu negocio?', label = 'Hablar con Faz →', message }) => (
     <section className="cta gutter">
         <div className="max">
             <h2 className="display">{title}</h2>
