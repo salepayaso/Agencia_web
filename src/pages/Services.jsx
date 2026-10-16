@@ -20,7 +20,7 @@ const Services = () => (
             Dos planes para tener tu página web con agente IA y aparecer en Google, con un solo equipo a cargo. Y si necesitas más, también hacemos tiendas online y software a medida.
         </PageHead>
 
-        <section className="s gutter" id="planes" style={{ paddingTop: 0 }}>
+        <section className="s gutter" id="planes">
             <div className="max">
                 <div className="s-head">
                     <h2 className="display">Elige tu<br />plan</h2>
