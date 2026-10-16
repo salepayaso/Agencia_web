@@ -151,7 +151,8 @@ export function sendBalanceRequest(row, { origin }) {
 }
 
 /** Al cliente: el sitio está publicado. */
-export function sendPublished(row, { site, origin }) {
+/** Al cliente: sitio publicado. Con `invite` (cuenta nueva) va el enlace para crear su contraseña del portal. */
+export function sendPublished(row, { site, origin, invite }) {
     const doc = row.quote;
     const url = site ? (/^https?:\/\//.test(site) ? site : `https://${site}`) : '';
     return sendMail({
@@ -162,9 +163,16 @@ export function sendPublished(row, { site, origin }) {
         html: cuerpo(`
             <p>Hola ${firstName(doc.client.contact)}:</p>
             <p>¡Listo! Tu sitio ya está en línea${url ? `: <a href="${escapeHtml(url)}" style="color:#e8471c;font-weight:700;">${escapeHtml(site)}</a>` : ''}.</p>
-            <p>Tienes 30 días de garantía: si encuentras algún error, escríbenos y lo corregimos sin costo. Para pedir cambios o ver tus servicios, entra a tu portal de cliente en interfaz360.cl.</p>
-            <p>Gracias por trabajar con nosotros.</p>
+            <p>Tienes 30 días de garantía: si encuentras algún error, escríbenos y lo corregimos sin costo.</p>
+            ${invite ? `
+            <p>Además, ya tienes tu <b>portal de cliente</b>: ahí pides cambios, ves tus servicios y tus documentos. Para entrar, crea tu contraseña con este botón:</p>
+            ${boton(invite, 'Crear mi contraseña')}
+            <p style="font-size:13px;color:#6b6b6b;">El enlace es personal y vence pronto. Si ya venció, entra a ${escapeHtml(origin)}/login, elige "¿Olvidaste tu contraseña?" y escribe ${escapeHtml(doc.client.email)}.</p>
+            ` : `
+            <p>Para pedir cambios o ver tus servicios, entra a tu portal de cliente en ${escapeHtml(origin)}/login.</p>
             ${boton(`${origin}/cotizacion/${row.token}`, 'Ver mi proyecto')}
+            `}
+            <p>Gracias por trabajar con nosotros.</p>
         `),
     }, 'publicado');
 }

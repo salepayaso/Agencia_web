@@ -162,7 +162,7 @@ const Admin = () => {
                             {tab === 'leads' && <Leads leads={leads} chats={chats} onChanged={load} goTo={setTab} />}
                             {tab === 'cotizaciones' && <Quotes quotes={quotes} templates={templates} onChanged={load} />}
                             {tab === 'pedidos' && <Orders orders={orders} byId={byId} onChanged={load} />}
-                            {tab === 'clientes' && <Clients profiles={profiles} orders={orders} documents={documents} notes={notes} onChanged={load} />}
+                            {tab === 'clientes' && <Clients profiles={profiles} orders={orders} quotes={quotes} documents={documents} notes={notes} onChanged={load} />}
                             {tab === 'soporte' && <Tickets tickets={tickets} messages={ticketMessages} byId={byId} onChanged={load} />}
                         </div>
                     </div>
@@ -549,7 +549,8 @@ const ProjectPayments = ({ quote: q, onChanged }) => {
         setMsg(null);
         try {
             const json = await adminQuoteApi({ id: q.id, ...body });
-            setMsg({ ok: true, text: json.mailed === false ? `${okText} Ojo: el correo al cliente falló, avísale por WhatsApp.` : okText });
+            const text = typeof okText === 'function' ? okText(json) : okText;
+            setMsg({ ok: true, text: json.mailed === false ? `${text} Ojo: el correo al cliente falló, avísale por WhatsApp.` : text });
             onChanged();
         } catch (err) {
             setMsg({ ok: false, text: err.message });
@@ -602,9 +603,13 @@ const ProjectPayments = ({ quote: q, onChanged }) => {
                     <input className="admin-input" value={site} onChange={(e) => setSite(e.target.value)} placeholder="www.sudominio.cl (va en el correo)" aria-label="Dirección del sitio publicado" autoCapitalize="none" />
                     <button type="button" className="btn signal" disabled={!!busy} onClick={() => run('publicar', {
                         title: '¿Marcar como publicado?',
-                        text: `A ${doc.client.email} le llega el aviso de que su sitio está en línea${site ? ` (${site})` : ''}, con la garantía de 30 días.`,
+                        text: `A ${doc.client.email} le llega el aviso de que su sitio está en línea${site ? ` (${site})` : ''}, con la garantía de 30 días.
+Si no tiene cuenta en el portal se la creamos con los datos del brief, y en el mismo correo le llega el enlace para crear su contraseña.`,
                         ok: 'Marcar publicado',
-                    }, { action: 'publish', site }, 'Proyecto publicado.')}>
+                    }, { action: 'publish', site }, (json) => ({
+                        nueva: 'Proyecto publicado. Creamos su cuenta del portal: ya aparece en Clientes.',
+                        existente: 'Proyecto publicado. Ya tenía cuenta: completamos su ficha en Clientes.',
+                    })[json.account] || 'Proyecto publicado. No se pudo crear su cuenta del portal: créala a mano.')}>
                         {busy === 'publicar' ? 'Guardando…' : 'Marcar publicado →'}
                     </button>
                 </div>
@@ -897,7 +902,7 @@ const clientWarnings = (p) => {
     return out;
 };
 
-const Clients = ({ profiles, orders, documents, notes, onChanged }) => {
+const Clients = ({ profiles, orders, quotes, documents, notes, onChanged }) => {
     const [q, setQ] = useState('');
     const [editing, setEditing] = useState(null);
     const term = q.trim().toLowerCase();
@@ -913,7 +918,10 @@ const Clients = ({ profiles, orders, documents, notes, onChanged }) => {
             {list.map((p) => {
                 const mine = orders.filter((o) => o.user_id === p.id);
                 const docs = documents.filter((d) => d.user_id === p.id);
-                const active = hasServices(p, mine);
+                // Proyectos de cotización: se unen por correo (el brief no pide cuenta)
+                const mails = [p.email, p.contact_email].filter(Boolean).map((m) => m.toLowerCase());
+                const projects = quotes.filter((x) => mails.includes(String(x.quote?.client?.email || x.client_email || '').toLowerCase()));
+                const active = hasServices(p, mine) || projects.some((x) => x.status === 'publicado');
                 const exp = parseDate(p.domain_expires);
                 const left = daysFrom(exp);
                 const warnings = clientWarnings(p);
@@ -924,7 +932,7 @@ const Clients = ({ profiles, orders, documents, notes, onChanged }) => {
                             <span className={`pill ${active ? 'ok' : ''}`}>{active ? 'Cliente' : 'Sin servicios'}</span>
                         </div>
                         <span className="meta">
-                            {p.contact_email || p.email}{p.phone ? ` · ${p.phone}` : ''} · {mine.length} {mine.length === 1 ? 'pedido' : 'pedidos'} · {docs.length} {docs.length === 1 ? 'documento' : 'documentos'}
+                            {p.contact_email || p.email}{p.phone ? ` · ${p.phone}` : ''} · {mine.length} {mine.length === 1 ? 'pedido' : 'pedidos'}{projects.length ? ` · ${projects.length} ${projects.length === 1 ? 'proyecto' : 'proyectos'} (${projects.map(quoteNumber).join(', ')})` : ''} · {docs.length} {docs.length === 1 ? 'documento' : 'documentos'}
                         </span>
                         <p className="desc">
                             {p.domain_name || p.active_web || 'Sin dominio ni sitio'}

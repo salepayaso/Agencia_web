@@ -6,7 +6,7 @@
 // POST /api/cotizacion { id, action: 'send' }                       → la envía al cliente
 // POST /api/cotizacion { id, action: 'confirm_payment', stage }     → confirma una transferencia
 // POST /api/cotizacion { id, action: 'request_balance' }            → pide el saldo (sitio listo)
-// POST /api/cotizacion { id, action: 'publish', site }              → marca publicado y avisa
+// POST /api/cotizacion { id, action: 'publish', site }              → marca publicado, crea su cuenta del portal y avisa
 //
 // Los pagos en línea del anticipo y el saldo van por /api/webpay y /api/mercadopago.
 //
@@ -17,6 +17,7 @@ import { checkBriefLimit, getClientIp, isAllowedOrigin } from './_lib/guardrails
 import { rest, rows, userFromToken } from './_lib/orderStore.js';
 import { sendQuoteToClient, sendAcceptToTeam, sendAcceptReceipt, sendBalanceRequest, sendPublished } from './_lib/quoteMail.js';
 import { settleQuotePayment, siteOrigin } from './_lib/quotePayments.js';
+import { ensureClientAccount } from './_lib/clientAccount.js';
 import {
     cleanQuote, quoteError, quoteNumber, QUOTE_VISIBLE, VALID_DAYS, isExpired, pendingStage, stageAmount,
 } from '../src/data/quote.js';
@@ -108,14 +109,15 @@ export default async function handler(req, res) {
             return res.status(200).json({ ok: true, mailed });
         }
 
-        // Publicado: cierra el proyecto y avisa al cliente.
+        // Publicado: cierra el proyecto, deja al cliente con cuenta y ficha en el portal y le avisa.
         if (action === 'publish') {
             if (!row.balance_paid_at) return res.status(409).json({ error: 'Falta el pago del saldo.' });
             const site = String(req.body.site || '').trim().slice(0, 200);
             const updated = await patch(row.id, ['aceptada', 'en_desarrollo'], { status: 'publicado', published_at: new Date().toISOString() });
             if (!updated) return res.status(409).json({ error: 'El proyecto no está en desarrollo.' });
-            const mailed = await sendPublished(updated, { site, origin });
-            return res.status(200).json({ ok: true, mailed });
+            const client = await ensureClientAccount(updated, { site, origin });
+            const mailed = await sendPublished(updated, { site, origin, invite: client?.link });
+            return res.status(200).json({ ok: true, mailed, account: client?.account || null });
         }
 
         // El admin envía la cotización ----------------------------------------------
