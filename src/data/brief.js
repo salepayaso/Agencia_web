@@ -138,7 +138,7 @@ export function briefRows(b, { team = false } = {}) {
         ['Tipo', TIPOS[b.tipo].resumen + (b.tipo === 'tienda' ? ` (${PRODUCTOS[b.productos].toLowerCase()} productos)` : '')],
         ...(b.tipo === 'sistema' && b.sistema_desc ? [['Qué debe hacer', b.sistema_desc]] : []),
         ['Dominio', b.dominio === 'si' ? `Tiene: ${b.dominio_nombre || 'sin indicar cuál'}${team ? ' (aplica descuento de $10.000)' : ''}` : b.dominio === 'no' ? 'No tiene' : 'No sabe'],
-        ['Asistente IA', b.asistente_ia ? 'Le interesa' : 'No'],
+        ['Agente IA', b.asistente_ia ? 'Le interesa' : 'No'],
         ['Material', b.material.join(', ') || 'Nada aún'],
         ...(b.referencias ? [['Referencias', b.referencias]] : []),
         ['Plazo', b.plazo],

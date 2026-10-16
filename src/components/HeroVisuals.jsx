@@ -222,7 +222,7 @@ const WebPanel = ({ active, still }) => {
                     <div className="hv-sbub">
                         <span className="hv-sbh">Agente IA de {shown}<em>● en línea</em></span>
                         <span className="hv-sbt">
-                            <Typed key={k} text={`Hola, soy el asistente de ${shown}. ${r.say}`} speed={24} still={still} />
+                            <Typed key={k} text={`Hola, soy el agente IA de ${shown}. ${r.say}`} speed={24} still={still} />
                         </span>
                     </div>
                 </div>
