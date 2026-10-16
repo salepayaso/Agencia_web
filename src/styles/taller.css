@@ -378,6 +378,12 @@
   & .toggles button:not([aria-pressed="true"]):hover { background: var(--paper-2); }
   & .alert { margin: 0; padding: 12px 14px; font-size: 14px; font-weight: 600; border: 1.5px solid var(--signal); color: #9c2f10; background: #fdeee8; }
   & .alert.ok { border-color: var(--ok); color: var(--ok); background: #e8f5ec; }
+  & .receipt { display: grid; gap: 10px; padding: 16px; border: 1.5px solid var(--ink); background: var(--white); }
+  & .receipt dl { display: grid; gap: 6px; margin: 0; font-size: 14px; }
+  & .receipt dl > div { display: grid; grid-template-columns: minmax(0, 11em) minmax(0, 1fr); gap: 12px; border-bottom: 1px dashed var(--rule); padding-bottom: 6px; }
+  & .receipt dt { color: var(--ink-2); }
+  & .receipt dd { margin: 0; font-weight: 600; overflow-wrap: anywhere; }
+  & .receipt p { margin: 0; font-size: 13px; }
   & .muted { color: var(--ink-2); }
   & .panel { background: var(--white); border: 1.5px solid var(--ink); box-shadow: 10px 10px 0 var(--ink); }
   & .textlink { background: none; border: 0; padding: 0; font-weight: 700; font-size: 14px; color: var(--ink); border-bottom: 1.5px solid var(--signal); text-decoration: none; }

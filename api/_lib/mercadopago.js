@@ -84,13 +84,18 @@ export function crearPreferencia({ order, title, email, returnUrl, notificationU
 export const leerPago = (id) => llamar('GET', `/v1/payments/${encodeURIComponent(id)}`);
 
 /**
- * Valida la firma x-signature de un aviso. Si no hay clave configurada, el aviso
- * igual es seguro de procesar: procesarPago() consulta el pago a Mercado Pago.
+ * Valida la firma x-signature de un aviso. En pruebas, sin clave configurada el
+ * aviso se acepta (procesarPago() igual consulta el pago a Mercado Pago); en
+ * producción la clave es obligatoria y sin ella se rechaza todo aviso.
  * https://www.mercadopago.cl/developers/es/docs/your-integrations/notifications/webhooks
  */
 export function firmaValida(req, dataId) {
     const secreto = process.env.MP_WEBHOOK_SECRET;
-    if (!secreto) return true;
+    if (!secreto) {
+        if (process.env.VERCEL_ENV !== 'production') return true;
+        console.error('[mercadopago] Falta MP_WEBHOOK_SECRET en producción: aviso rechazado.');
+        return false;
+    }
     const partes = Object.fromEntries(String(req.headers['x-signature'] || '')
         .split(',').map((p) => p.trim().split('=')));
     if (!partes.ts || !partes.v1) return false;
@@ -126,6 +131,7 @@ export async function procesarPago(paymentId, origin) {
         status: pago.status,
         status_detail: pago.status_detail || null,
         payment_type_code: pago.payment_method_id || null,
+        card_type: pago.payment_type_id || null,
         installments_number: pago.installments ?? null,
         card_last4: pago.card?.last_four_digits || null,
         authorization_code: pago.authorization_code || null,
@@ -184,6 +190,8 @@ async function procesarPagoCotizacion(pago, id, origin) {
         status: pago.status,
         status_detail: pago.status_detail || null,
         payment_type_code: pago.payment_method_id || null,
+        card_type: pago.payment_type_id || null,
+        installments_number: pago.installments ?? null,
         card_last4: pago.card?.last_four_digits || null,
         authorization_code: pago.authorization_code || null,
         transaction_date: pago.date_approved || pago.date_created || null,

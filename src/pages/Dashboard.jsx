@@ -5,6 +5,8 @@ import SEO from '../components/SEO';
 import Wordmark from '../components/Wordmark';
 import { PortalLoading } from '../components/ProtectedRoute';
 import DomainSection from '../components/DomainSection';
+import { PaymentReceipt, TransferData } from '../components/PaymentReceipt';
+import { transferenciaLista } from '../data/transferencia';
 import { OFFERS, CORREO_PLANES, conIva, PAYS, ACTIVE_PAYS, DEFAULT_PAY, clp, submitOrder, rutOk, isOpenOrder, isUnpaidCard, isOnlineOrder, orderStatus } from '../lib/orders';
 import { CATEGORIES, catLabel, TICKET_STATUS as STATUS, isOpen, cleanDomain, parseDate, fmt, daysFrom, dayWord, hasServices, firstName } from '../lib/portal';
 
@@ -28,7 +30,7 @@ const parseEmails = (raw) => {
 // Vuelta desde Webpay o Mercado Pago: api/webpay/retorno.js y api/mercadopago/retorno.js mandan a /dashboard?pago=<estado>&pedido=<id>
 const PAGO_MSG = {
     ok: { cls: 'ok', t: (n) => `Pago recibido${n ? ` (pedido N.º ${n})` : ''}. Lo activamos dentro de un día hábil y te avisamos aquí.` },
-    rechazado: { cls: '', t: () => 'El pago fue rechazado y no se hizo ningún cobro. Puedes intentarlo de nuevo o elegir transferencia.' },
+    rechazado: { cls: '', t: (n) => `El pago${n ? ` del pedido N.º ${n}` : ''} fue rechazado y no se hizo ningún cobro. Puedes intentarlo de nuevo o elegir transferencia.` },
     anulado: { cls: '', t: () => 'Saliste del pago sin completarlo. No se hizo ningún cobro.' },
     proceso: { cls: '', t: (n) => `Tu pago${n ? ` del pedido N.º ${n}` : ''} está en revisión en Mercado Pago. Te avisamos aquí apenas se apruebe.` },
     error: { cls: '', t: (n) => `No pudimos confirmar el pago${n ? ` del pedido N.º ${n}` : ''}. Si ves un cargo en tu tarjeta, escríbenos en Soporte y lo revisamos.` },
@@ -37,7 +39,7 @@ const PAGO_MSG = {
 const readPago = () => {
     const q = new URLSearchParams(window.location.search);
     const msg = PAGO_MSG[q.get('pago')];
-    return msg ? { ...msg, text: msg.t(q.get('pedido')) } : null;
+    return msg ? { ...msg, text: msg.t(q.get('pedido')), ok: q.get('pago') === 'ok', pedido: Number(q.get('pedido')) || null } : null;
 };
 
 const Lock = () => (
@@ -184,6 +186,16 @@ const Dashboard = () => {
                         {pago && (
                             <p className={`alert ${pago.cls}`} role="status" style={{ marginBottom: 24 }}>{pago.text}</p>
                         )}
+                        {pago?.ok && (() => {
+                            const o = orders.find((x) => x.id === pago.pedido && x.status !== 'pendiente' && isOnlineOrder(x));
+                            return o && (
+                                <div style={{ marginBottom: 24 }}>
+                                    <PaymentReceipt method={o.payment_method} buyOrder={o.buy_order || `I360-${o.id}`}
+                                        detail={`${OFFERS[o.kind]?.title || o.kind}${o.domain ? ` · ${o.domain}` : ''}`}
+                                        amount={o.amount} paidAt={o.paid_at} info={o.payment_info || {}} />
+                                </div>
+                            );
+                        })()}
 
                         {tab === 'contratar' && (
                             <Hire
@@ -315,7 +327,10 @@ const Hire = ({ user, profile, orders, renewing, setRenewing, onOrdered }) => {
                             {isUnpaidCard(o) && (
                                 <p className="desc">El pago en línea no se completó y no se hizo ningún cobro. Si aún lo quieres, haz el pedido de nuevo.</p>
                             )}
-                            {o.status === 'pendiente' && !isUnpaidCard(o) && !o.admin_note && (
+                            {o.status === 'pendiente' && o.payment_method === 'tr' && transferenciaLista() && (
+                                <TransferData amount={o.amount ?? (plan ? conIva(plan.price) : null)} reference={`Pedido N.º ${o.id}`} />
+                            )}
+                            {o.status === 'pendiente' && !isUnpaidCard(o) && !o.admin_note && !(o.payment_method === 'tr' && transferenciaLista()) && (
                                 <p className="desc">Te escribimos al correo con {o.payment_method === 'tr' ? 'los datos para transferir' : 'el enlace de pago'}.</p>
                             )}
                             {o.status === 'pagado' && isOnlineOrder(o) && !o.admin_note && (

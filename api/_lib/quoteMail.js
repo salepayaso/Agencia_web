@@ -6,6 +6,7 @@
 import { escapeHtml, avisosFrom } from './leads.js';
 import { sendMail, clientesFrom } from './briefMail.js';
 import { quoteNumber, quoteTotals, clp, STAGE_LABEL } from '../../src/data/quote.js';
+import { transferenciaLista, filasTransferencia } from '../../src/data/transferencia.js';
 
 const fecha = (v) => new Date(v).toLocaleDateString('es-CL', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'America/Santiago' });
 const firstName = (s) => escapeHtml(String(s || '').trim().split(' ')[0]);
@@ -13,6 +14,11 @@ const firstName = (s) => escapeHtml(String(s || '').trim().split(' ')[0]);
 const marca = '<p style="font-size:20px;font-weight:800;letter-spacing:.02em;margin:0 0 20px;">INTERFAZ <span style="background:#e8471c;color:#fff;padding:0 4px;">360</span></p>';
 const firma = '<p>Saludos,<br><strong>Equipo Interfaz 360</strong><br><a href="https://interfaz360.cl" style="color:#0f1a2e;">interfaz360.cl</a> · WhatsApp +56 9 5414 6176</p>';
 const boton = (href, texto) => `<p><a href="${href}" style="display:inline-block;background:#e8471c;color:#fff;text-decoration:none;padding:11px 18px;font-weight:700;">${texto}</a></p>`;
+// Datos de la cuenta (sin montos: esos están en la cotización), o null si aún no hay cuenta.
+const datosTransferencia = () => (transferenciaLista()
+    ? `<table style="border-collapse:collapse;font-size:14px;margin:4px 0 16px;">${filasTransferencia()
+        .map(([k, v]) => `<tr><td style="padding:3px 16px 3px 0;color:#51607a;">${k}</td><td style="padding:3px 0;font-weight:700;">${escapeHtml(v)}</td></tr>`).join('')}</table>`
+    : null);
 const cuerpo = (html) => `<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; color:#0f1a2e; font-size:15px; line-height:1.55;">${marca}${html}${firma}</div>`;
 
 /** La cotización al cliente, con el enlace para verla, descargarla y aceptarla. */
@@ -67,7 +73,9 @@ export function sendAcceptReceipt(row, { origin }) {
         html: cuerpo(`
             <p>Hola ${firstName(doc.client.contact)}:</p>
             <p>¡Gracias por confiar en nosotros! Recibimos tu aceptación de la cotización ${quoteNumber(row)}.</p>
-            <p>Para partir falta el pago del anticipo (el 50 % que aparece en tu cotización). Te enviaremos los datos de pago a este correo dentro de un día hábil.</p>
+            ${datosTransferencia()
+                ? `<p>Para partir falta el pago del anticipo (el 50 % que aparece en tu cotización). Puedes pagarlo en línea desde tu cotización o por transferencia a esta cuenta, indicando ${quoteNumber(row)} en el comentario:</p>${datosTransferencia()}`
+                : '<p>Para partir falta el pago del anticipo (el 50 % que aparece en tu cotización). Te enviaremos los datos de pago a este correo dentro de un día hábil.</p>'}
             <p>Mientras tanto, puedes ir juntando tu logo, fotos y textos y mandárnoslos por WhatsApp o en una carpeta de Google Drive.</p>
             ${boton(`${origin}/cotizacion/${row.token}`, 'Ver mi cotización')}
         `),

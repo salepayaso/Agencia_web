@@ -5,6 +5,8 @@ import QuoteDocument from '../components/QuoteDocument';
 import { PortalLoading } from '../components/ProtectedRoute';
 import { quoteTotals, stageAmount, clp } from '../data/quote';
 import { PAYS } from '../lib/orders';
+import { PaymentReceipt, TransferData } from '../components/PaymentReceipt';
+import { transferenciaLista } from '../data/transferencia';
 
 // Cotización por enlace personal (/cotizacion/:token): el cliente la ve, la
 // descarga en PDF (imprimir → Guardar como PDF), la acepta y paga el anticipo y
@@ -152,6 +154,13 @@ const QuotePage = () => {
                                 <section className="panel quote-bar no-print">
                                     <div className="box-body">
                                         {pagoMsg && <p className={pagoMsg.ok ? 'alert ok' : 'alert'} role="status" style={{ margin: 0 }}>{pagoMsg.text}</p>}
+                                        {params.get('pago') === 'ok' && data.receipts?.[0] && (() => {
+                                            const r = data.receipts[0];
+                                            return (
+                                                <PaymentReceipt method={r.method} buyOrder={r.buyOrder} amount={r.amount} paidAt={r.paidAt} info={r.info}
+                                                    detail={`Cotización ${data.number} · ${r.stage === 'anticipo' ? 'Anticipo' : 'Saldo'} 50 %`} />
+                                            );
+                                        })()}
 
                                         {!data.accepted && data.expired && (
                                             <p className="alert" style={{ margin: 0 }}>Esta cotización venció. Escríbenos por WhatsApp al {WHATSAPP} y te enviamos una actualizada.</p>
@@ -210,10 +219,19 @@ const QuotePage = () => {
                                                                 ))}
                                                             </div>
                                                         )}
-                                                        <p className="muted" style={{ margin: 0, fontSize: 14 }}>
-                                                            {ONLINE.length ? 'Si prefieres transferencia, ' : 'Pagas por transferencia: '}
-                                                            te enviaremos los datos por correo y confirmamos tu pago apenas llegue.
-                                                        </p>
+                                                        {transferenciaLista() ? (
+                                                            <>
+                                                                <p className="muted" style={{ margin: 0, fontSize: 14 }}>
+                                                                    {ONLINE.length ? 'Si prefieres transferencia, usa estos datos:' : 'Pagas por transferencia con estos datos:'}
+                                                                </p>
+                                                                <TransferData amount={stageAmount(data.quote, data.due)} reference={`Cotización ${data.number}`} />
+                                                            </>
+                                                        ) : (
+                                                            <p className="muted" style={{ margin: 0, fontSize: 14 }}>
+                                                                {ONLINE.length ? 'Si prefieres transferencia, ' : 'Pagas por transferencia: '}
+                                                                te enviaremos los datos por correo y confirmamos tu pago apenas llegue.
+                                                            </p>
+                                                        )}
                                                     </div>
                                                 )}
 

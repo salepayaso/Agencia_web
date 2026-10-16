@@ -41,6 +41,24 @@ async function patch(id, onlyIf, body) {
     return row || null;
 }
 
+// Comprobantes de los pagos en línea ya hechos: solo los datos que muestra
+// PaymentReceipt, nunca los ids internos de la pasarela.
+const RECEIPT_INFO = ['authorization_code', 'payment_type_code', 'card_type', 'installments_number', 'card_last4', 'transaction_date'];
+
+async function paidOnline(quoteId) {
+    const list = await rows(await rest(
+        `quote_payments?quote_id=eq.${Number(quoteId)}&status=eq.pagado&method=in.(webpay,mp)&select=stage,method,amount,buy_order,paid_at,payment_info&order=paid_at.desc`,
+    ), 'leer pagos de cotización');
+    return list.map((p) => ({
+        stage: p.stage,
+        method: p.method,
+        amount: p.amount,
+        buyOrder: p.buy_order,
+        paidAt: p.paid_at,
+        info: Object.fromEntries(RECEIPT_INFO.map((k) => [k, p.payment_info?.[k] ?? null])),
+    }));
+}
+
 // Lo que ve el cliente: nunca la nota interna ni el brief.
 const forClient = (row) => ({
     id: row.id,
@@ -68,7 +86,9 @@ export default async function handler(req, res) {
             const token = String(req.query?.t || '');
             const row = validToken(token) ? await findBy(`token=eq.${token}`) : null;
             if (!row || !row.quote || !QUOTE_VISIBLE.includes(row.status)) return res.status(404).json({ error: 'no_existe' });
-            return res.status(200).json(forClient(row));
+            // Si falla la tabla de pagos, la cotización se ve igual (sin comprobantes).
+            const receipts = await paidOnline(row.id).catch(() => []);
+            return res.status(200).json({ ...forClient(row), receipts });
         }
 
         if (!isAllowedOrigin(req)) return res.status(403).json({ error: 'Origen no permitido.' });
