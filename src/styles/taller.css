@@ -358,7 +358,7 @@
   /* ---------- servicios: detalle ---------- */
   & .svc-detail { list-style: none; margin: 0; padding: 0; border-top: 1.5px solid var(--ink); }
   & .svc-detail > li { display: grid; grid-template-columns: minmax(0, 4fr) minmax(0, 5fr) minmax(0, 3fr); gap: 20px 40px; padding: 36px 0; border-bottom: 1px solid var(--rule); }
-  & .svc-detail h2 { margin: 0; font-family: var(--display); font-stretch: 88%; font-weight: 800; font-size: clamp(26px, 2.8vw, 36px); line-height: 1.05; }
+  & .svc-detail h3 { margin: 0; font-family: var(--display); font-stretch: 88%; font-weight: 800; font-size: clamp(26px, 2.8vw, 36px); line-height: 1.05; }
   & .svc-detail .kicker { display: block; margin-top: 10px; font-size: 13px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--signal); }
   & .svc-detail p { margin: 0 0 16px; color: var(--ink-2); }
   & .svc-detail .go { display: flex; flex-direction: column; align-items: flex-start; gap: 10px; }
@@ -374,6 +374,9 @@
   & .plan-card h3 { margin: 0; font-family: var(--display); font-stretch: 85%; font-weight: 800; font-size: 32px; line-height: 1; text-transform: uppercase; }
   & .plan-card header small { display: block; margin-top: 8px; color: var(--ink-2); font-size: 15px; }
   & .plan-card .badge { font-size: 11px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; background: var(--signal); color: #fff; padding: 5px 8px; white-space: nowrap; }
+  & .plan-card .price { padding: 18px 24px; border-bottom: 1.5px solid var(--ink); display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+  & .plan-card .price b { font-family: var(--display); font-stretch: 85%; font-weight: 800; font-size: 44px; line-height: 1; }
+  & .plan-card .price small { color: var(--ink-2); font-size: 14px; }
   & .plan-card .body { padding: 22px 24px; flex: 1; }
   & .plan-card footer { padding: 18px 24px 24px; }
   & .plan-card footer .btn { width: 100%; justify-content: center; }

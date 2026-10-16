@@ -13,7 +13,7 @@ function headTag(selector, create) {
     return el;
 }
 
-const SEO = ({ title, description, image = '/seo_imagen.jpg', noindex = false }) => {
+const SEO = ({ title, description, image = '/og-interfaz360.png', noindex = false }) => {
     const location = useLocation();
 
     // Canonical propio de cada página (sin barra final, salvo la portada):

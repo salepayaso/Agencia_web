@@ -67,8 +67,8 @@ const ContactPage = () => {
             title="Cotiza tu página web o agente IA"
             description="Cuéntanos de tu negocio por WhatsApp, chat o formulario. Te respondemos en un día hábil con una propuesta y un precio cerrado, sin compromiso."
         >
-            <PageHead eyebrow="Contacto" title={<>Cuéntanos qué<br />quieres <span>construir</span></>}>
-                Te respondemos con una propuesta concreta, no con un folleto. Sin compromiso.
+            <PageHead eyebrow="Contacto" title={<>Cotiza tu<br />página <span>web</span></>}>
+                Página web, agente IA, tienda o software: te respondemos con una propuesta concreta, no con un folleto. Sin compromiso.
             </PageHead>
 
             <section className="s gutter">

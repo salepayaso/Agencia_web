@@ -57,7 +57,7 @@ export const OFFERS = {
 // Planes de correos con servidor, de menor a mayor.
 export const CORREO_PLANES = ['hosting', 'correos10', 'correos20'];
 
-const pesos = (n) => `$${n.toLocaleString('es-CL')}`;
+export const pesos = (n) => `$${n.toLocaleString('es-CL')}`;
 const anual = (kind) => `${pesos(OFFERS[kind].years[1].price)} + IVA al año`;
 
 export const SERVICIOS = [
@@ -180,6 +180,7 @@ export const PLANES = [
     {
         id: 'pyme',
         name: 'Plan Pyme Digital',
+        precio: 200000, // neto, pago único; el agente lo toma de agent_prompt (pricing)
         sub: 'Tu landing page: una sola página con la identidad de tu negocio, para aparecer en Google.',
         items: [
             'Landing page: una página a medida, rápida en el celular',
@@ -203,6 +204,7 @@ export const PLANES = [
     {
         id: 'suite',
         name: 'Empresa Digital',
+        precio: 350000,
         sub: 'Web completa para empresas que quieren mostrar toda su identidad, medir sus visitas y quedar listas para Google Ads.',
         badge: 'Más completo',
         hot: true,
