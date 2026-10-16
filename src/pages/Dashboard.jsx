@@ -6,7 +6,7 @@ import Wordmark from '../components/Wordmark';
 import { PortalLoading } from '../components/ProtectedRoute';
 import DomainSection from '../components/DomainSection';
 import { OFFERS, CORREO_PLANES, conIva, PAYS, ACTIVE_PAYS, DEFAULT_PAY, clp, submitOrder, rutOk, isOpenOrder, isUnpaidCard, isOnlineOrder, orderStatus } from '../lib/orders';
-import { CATEGORIES, catLabel, TICKET_STATUS as STATUS, isOpen, parseDate, fmt, daysFrom, dayWord, hasServices, firstName } from '../lib/portal';
+import { CATEGORIES, catLabel, TICKET_STATUS as STATUS, isOpen, cleanDomain, parseDate, fmt, daysFrom, dayWord, hasServices, firstName } from '../lib/portal';
 
 // Portal del cliente ("Tu cuenta, en orden"): dominio, plan y pagos, correos,
 // estado del sitio, documentos y soporte. Sin estadísticas: esas son internas.
@@ -250,6 +250,13 @@ const SESSION_CLOSED = 'Tu sesión se cerró. Entra de nuevo a tu cuenta para ha
 const renewalInProgress = (profile, orders) =>
     orders.some((o) => o.kind === 'dominio' && o.domain === profile?.domain_name && isOpenOrder(o));
 
+// Dominios que el cliente tiene (o está comprando) con nosotros: para esos
+// configuramos el correo sin pedirle nada; para otros necesitamos acceso al DNS.
+const ownDomains = (profile, orders) => new Set([
+    profile?.domain_name,
+    ...orders.filter((o) => ['dominio', 'pack'].includes(o.kind) && (o.status === 'activo' || isOpenOrder(o))).map((o) => o.domain),
+].filter(Boolean).map(cleanDomain));
+
 const Hire = ({ user, profile, orders, renewing, setRenewing, onOrdered }) => {
     const [picked, setPicked] = useState(null); // dominio | hosting | pack
     const myDomain = profile?.domain_name || null;
@@ -263,7 +270,7 @@ const Hire = ({ user, profile, orders, renewing, setRenewing, onOrdered }) => {
             ))}
 
             {picked === 'hosting' ? (
-                <HostingOrder user={user} onDone={onOrdered} onCancel={() => setPicked(null)} />
+                <HostingOrder user={user} owned={ownDomains(profile, orders)} onDone={onOrdered} onCancel={() => setPicked(null)} />
             ) : picked ? (
                 <DomainSection embedded kind={picked} onOrdered={onOrdered} onCancel={() => setPicked(null)} />
             ) : (
@@ -444,8 +451,10 @@ const RenewDomain = ({ user, profile, onDone, onCancel }) => {
     );
 };
 
-const HostingOrder = ({ user, onDone, onCancel }) => {
-    const [domain, setDomain] = useState('');
+const DOMAIN_RE = /^[a-z0-9-]+(\.[a-z0-9-]+)+$/;
+
+const HostingOrder = ({ user, owned, onDone, onCancel }) => {
+    const [domain, setDomain] = useState(() => (owned.size === 1 ? [...owned][0] : ''));
     const [tier, setTier] = useState(CORREO_PLANES[0]);
     const [pay, setPay] = useState(DEFAULT_PAY);
     const [sending, setSending] = useState(false);
@@ -453,11 +462,13 @@ const HostingOrder = ({ user, onDone, onCancel }) => {
     const [done, setDone] = useState(false);
     const neto = OFFERS[tier].years[1].price;
     const price = conIva(neto);
+    const typed = cleanDomain(domain);
+    const external = DOMAIN_RE.test(typed) && !owned.has(typed);
 
     const submit = async (e) => {
         e.preventDefault();
-        const d = domain.toLowerCase().trim().replace(/^https?:\/\//, '').replace(/^www\./, '').replace(/\/.*$/, '');
-        if (!/^[a-z0-9-]+(\.[a-z0-9-]+)+$/.test(d)) return setError('Escribe el dominio completo, por ejemplo minegocio.cl.');
+        const d = cleanDomain(domain);
+        if (!DOMAIN_RE.test(d)) return setError('Escribe el dominio completo, por ejemplo minegocio.cl.');
         setSending(true);
         setError('');
         try {
@@ -494,6 +505,12 @@ const HostingOrder = ({ user, onDone, onCancel }) => {
                     <label className="field">¿Para qué dominio?
                         <input value={domain} onChange={(e) => setDomain(e.target.value)} placeholder="minegocio.cl" maxLength={80} autoCapitalize="none" spellCheck={false} />
                     </label>
+                    {external && (
+                        <p className="alert" role="status" style={{ margin: 0 }}>
+                            {typed} no está registrado con nosotros. Para activar los correos necesitamos que sea tuyo y acceso a su configuración (DNS),
+                            o te indicamos qué cambiar. ¿Todavía no tienes dominio? El pack dominio + 5 correos te sale más barato.
+                        </p>
+                    )}
                     <div style={{ display: 'grid', gap: 8 }}>
                         <span className="field">¿Cuántos correos necesitas?</span>
                         <div className="toggles" role="radiogroup" aria-label="Plan de correos">
