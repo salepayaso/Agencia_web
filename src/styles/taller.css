@@ -20,7 +20,6 @@
 }
 
 @keyframes tcTabFill { to { transform: scaleX(1); } }
-@keyframes tcVisIn { from { opacity: .4; transform: translateY(6px); } to { opacity: 1; transform: none; } }
 @keyframes tcPulse { 50% { box-shadow: 0 0 0 5px rgba(232, 71, 28, .25); } }
 @keyframes tcBlink { 0%, 60%, 100% { opacity: 1; } 30% { opacity: .25; } }
 
@@ -92,18 +91,14 @@
   & .vis-tabs button::before { content: ""; display: inline-block; width: 7px; height: 7px; margin-right: 8px; vertical-align: .1em; background: var(--signal); transform: scale(0); transition: transform .25s; }
   & .vis-tabs button[aria-selected="true"]::before { transform: scale(1); }
   & .vis-tabs button::after { content: ""; position: absolute; left: 0; bottom: 0; height: 3px; width: 100%; background: var(--signal); transform: scaleX(0); transform-origin: left; }
-  & .vis-tabs button[aria-selected="true"]::after { animation: tcTabFill 7s linear forwards; }
+  & .vis-tabs button[aria-selected="true"]::after { animation: tcTabFill var(--every, 7s) linear forwards; }
   & .vis-tabs.paused button[aria-selected="true"]::after, & .vis-tabs.static button[aria-selected="true"]::after { animation: none; transform: scaleX(1); }
   & .vis-tabs.hold button[aria-selected="true"]::after { animation-play-state: paused; }
   @media (max-width: 480px) {
     & .vis-tabs button { font-size: 11px; letter-spacing: .04em; padding: 9px 4px; white-space: normal; line-height: 1.25; }
     & .vis-tabs button::before { display: none; }
   }
-  & .vis { animation: tcVisIn .35s ease-out; }
-  & .vis-note { font-size: 13px; color: var(--ink-2); margin: 14px 0 0; }
-  & .vis-note button { background: none; border: 0; padding: 0; font-weight: 700; color: var(--ink); border-bottom: 1.5px solid var(--signal); }
-
-  /* Visual 1 · consultas de anoche */
+  /* Tarjeta de consultas (la usa la página de contacto) */
   & .feed { background: var(--white); border: 1.5px solid var(--ink); box-shadow: 10px 10px 0 var(--ink); cursor: pointer; display: block; width: 100%; text-align: left; padding: 0; transition: box-shadow .15s; }
   & .feed:hover { box-shadow: 10px 10px 0 var(--signal); }
   & .feed .top { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 14px 18px; border-bottom: 1.5px solid var(--ink); }
@@ -123,40 +118,7 @@
     & .feed .st { grid-row: auto; grid-column: 2; justify-self: start; }
   }
 
-  /* Visual 2 · tu web en el celular */
-  & .phone-wrap { display: flex; justify-content: center; cursor: pointer; background: none; border: 0; padding: 0; width: 100%; }
-  & .phone { width: min(300px, 100%); aspect-ratio: 300 / 590; max-width: 100%; border: 1.5px solid var(--ink); border-radius: 34px; background: var(--ink); padding: 10px; box-shadow: 10px 10px 0 var(--signal); }
-  & .screen { height: 100%; border-radius: 25px; overflow: hidden; background: #fbf6ee; display: flex; flex-direction: column; position: relative; text-align: left; }
-  & .screen .sbar { height: 26px; display: flex; justify-content: center; align-items: center; }
-  & .screen .sbar i { width: 70px; height: 6px; border-radius: 3px; background: #1d2433; }
-  & .screen .shead { display: flex; justify-content: space-between; align-items: center; padding: 8px 14px; font: 800 13px/1 var(--display); color: #5b3a1a; border-bottom: 1px solid #eadfcd; }
-  & .screen .shero { margin: 12px; height: 118px; background: repeating-linear-gradient(135deg, #efe3cf 0 10px, #e9dcc5 10px 20px); display: flex; align-items: flex-end; padding: 10px; }
-  & .screen .shero b { font: 800 19px/1 var(--display); font-stretch: 85%; color: #5b3a1a; text-transform: uppercase; }
-  & .screen .slines { padding: 0 14px; display: grid; gap: 6px; }
-  & .screen .slines i { height: 7px; background: #eadfcd; display: block; }
-  & .bubble { position: absolute; left: 10px; right: 10px; bottom: 10px; background: var(--white); border: 1.5px solid var(--ink); display: grid; }
-  & .bubble .bh { background: var(--ink); color: var(--paper); font-size: 11px; font-weight: 700; padding: 7px 10px; display: flex; justify-content: space-between; }
-  & .bubble .bh small { color: #8fe0a8; }
-  & .bubble .l { padding: 9px; display: grid; gap: 6px; font-size: 11.5px; line-height: 1.35; }
-  & .bubble .m { padding: 6px 8px; max-width: 88%; }
-  & .bubble .bot { background: var(--paper-2); }
-  & .bubble .me { background: var(--signal); color: #fff; justify-self: end; }
-
-  /* Visual 3 · tu negocio en Google */
-  & .collage { position: relative; display: grid; cursor: pointer; background: none; border: 0; padding: 0 0 10px; width: 100%; text-align: left; }
   & .card { display: block; background: var(--white); border: 1.5px solid var(--ink); padding: 16px 18px; }
-  & .gres { box-shadow: 8px 8px 0 var(--ink); }
-  & .gres .url { font-size: 12px; color: var(--ink-2); }
-  & .gres .h4 { display: block; margin: 4px 0 6px; font: 700 19px/1.2 var(--body); color: #1a3bb3; }
-  & .gres .meta { font-size: 13px; color: var(--ink-2); }
-  & .gres .meta b { color: #b07a00; }
-  & .gmap { width: 78%; margin: -6px 0 0 auto; position: relative; z-index: 1; padding: 0; overflow: hidden; box-shadow: 8px 8px 0 var(--signal); }
-  & .gmap svg { display: block; width: 100%; height: 150px; }
-  & .gmap .lbl { display: flex; justify-content: space-between; padding: 10px 14px; font-size: 13px; border-top: 1.5px solid var(--ink); }
-  & .gmap .lbl span { color: var(--ok); font-weight: 700; }
-  & .gchat { width: 74%; margin: -10px 0 0 4%; position: relative; z-index: 2; box-shadow: 8px 8px 0 var(--ink); font-size: 14px; display: grid; gap: 6px; }
-  & .gchat small { font-weight: 700; font-size: 12px; color: var(--ink-2); }
-  & .gchat .q { background: var(--paper-2); padding: 8px 10px; }
 
   /* ---------- franja de tecnologías ---------- */
   & .tech { position: relative; background: var(--ink); color: var(--mute); overflow: hidden; border-block: 1.5px solid var(--ink); }

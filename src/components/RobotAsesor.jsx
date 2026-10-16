@@ -92,9 +92,9 @@ const RobotAsesor = ({ gesture = 'esperando', variant = 'cabecera', size = 40, a
                         </>
                     ) : (
                         <>
-                            <circle cx="100" cy="20" r="11" fill={accent} />
-                            <rect x="16" y="84" width="18" height="36" rx="9" fill={accent} />
-                            <rect x="166" y="84" width="18" height="36" rx="9" fill={accent} />
+                            <circle className="r-ant" cx="100" cy="20" r="11" fill={accent} />
+                            <rect className="r-ear" x="16" y="84" width="18" height="36" rx="9" fill={accent} />
+                            <rect className="r-ear r" x="166" y="84" width="18" height="36" rx="9" fill={accent} />
                             <rect x="28" y="40" width="144" height="122" rx="30" fill={`url(#${id}-hg)`} />
                             <rect x="42" y="56" width="116" height="92" rx="20" fill={`url(#${id}-sg)`} />
                         </>
@@ -143,18 +143,14 @@ const RobotAsesor = ({ gesture = 'esperando', variant = 'cabecera', size = 40, a
                     </g>
                 </g>
 
-                {/* Extras de cada gesto: mano que saluda, puntos de pensar, brillos y signo de duda. */}
-                {mini ? (
+                {/* Extras de cada gesto: mano que saluda (solo en el botón), puntos de pensar, brillos y signo de duda.
+                    En la cabecera el saludo es con la cara: ojos felices, cabeza que se inclina, antena y orejas que se mueven. */}
+                {mini && (
                     // En el botón la mano es más grande y lleva contorno oscuro:
                     // sin él se pierde contra el borde naranja del círculo.
                     <g className="r-extra x-mano" fill={accent} stroke="#0f1a2e" strokeWidth="8">
                         <rect x="166" y="74" width="26" height="58" rx="13" />
                         <circle cx="179" cy="62" r="22" />
-                    </g>
-                ) : (
-                    <g className="r-extra x-mano">
-                        <rect x="182" y="98" width="14" height="36" rx="7" fill={accent} />
-                        <circle cx="189" cy="94" r="10" fill={accent} />
                     </g>
                 )}
                 <g className="r-extra x-puntos" fill="currentColor">

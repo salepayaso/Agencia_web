@@ -8,7 +8,6 @@
 /* Ojos y extras: solo se ve el juego que corresponde al gesto. */
 .robot .r-eyes, .robot .r-extra { display: none; }
 .robot.g-esperando .e-normal,
-.robot.g-saludo .e-normal,
 .robot.g-pensando .e-pensando,
 .robot.g-contento .e-feliz,
 .robot.g-confundido .e-confundido,
@@ -23,14 +22,22 @@
 .robot.g-esperando .r-body { animation: robot-float 3s ease-in-out infinite; }
 @keyframes robot-float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
 
-.robot.g-saludo .r-body { animation: robot-hop 1s ease-in-out infinite; }
-@keyframes robot-hop { 0%, 100% { transform: translateY(0) rotate(0); } 30% { transform: translateY(-8px) rotate(-4deg); } 60% { transform: translateY(0) rotate(3deg); } }
+/* Saludo con la cara: ojos felices, la cabeza se inclina a un lado y al otro,
+   la antena rebota y las orejas se mueven. */
+.robot.g-saludo .e-normal { display: none; }
+.robot.g-saludo .e-feliz { display: inline; }
+.robot.g-saludo .r-body { animation: robot-hello 1.3s ease-in-out infinite; }
+@keyframes robot-hello { 0%, 100% { transform: translateY(0) rotate(0); } 20% { transform: translateY(-10px) rotate(-8deg); } 45% { transform: translateY(0) rotate(0); } 65% { transform: translateY(-10px) rotate(8deg); } 85% { transform: translateY(0) rotate(0); } }
+.robot .r-ant, .robot .r-ear { transform-box: fill-box; transform-origin: center; }
+.robot.g-saludo .r-ant { animation: robot-ant .65s ease-in-out infinite alternate; }
+@keyframes robot-ant { from { transform: translateY(0) scale(1); } to { transform: translateY(-9px) scale(1.25); } }
+.robot.g-saludo .r-ear { animation: robot-ear .32s ease-in-out infinite alternate; }
+.robot.g-saludo .r-ear.r { animation-delay: .16s; }
+@keyframes robot-ear { from { transform: translateY(-5px); } to { transform: translateY(5px); } }
 .robot .x-mano { transform-box: fill-box; transform-origin: 50% 100%; animation: robot-wave .45s ease-in-out infinite alternate; }
 @keyframes robot-wave { from { transform: rotate(-20deg); } to { transform: rotate(20deg); } }
 
 /* Botón del chat: el saludo es más marcado para que se note en tamaño chico. */
-.robot-mini.g-saludo .e-normal { display: none; }
-.robot-mini.g-saludo .e-feliz { display: inline; }
 .robot-mini.g-saludo .r-body { animation: robot-hop-mini .9s ease-in-out infinite; }
 @keyframes robot-hop-mini { 0%, 100% { transform: translateY(0) rotate(0); } 30% { transform: translateY(-14px) rotate(-8deg); } 60% { transform: translateY(0) rotate(6deg); } }
 .robot-mini .x-mano { animation: robot-wave-mini .3s ease-in-out infinite alternate; }
