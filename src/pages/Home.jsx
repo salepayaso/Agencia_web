@@ -53,20 +53,20 @@ const Home = () => (
             <section className="hero gutter">
                 <div className="max">
                     <div>
-                        <span className="eyebrow">Web · Google · Software · Agentes IA</span>
-                        <h1 className="display">Tu negocio,<br />atendido <span>24/7</span>.</h1>
+                        <span className="eyebrow">Páginas web y agentes IA para pymes</span>
+                        <h1 className="display">Tu web con<br />agente <span>IA</span>.</h1>
                         <p className="lede">
-                            Desarrollamos tu presencia digital completa: sitio web, posicionamiento en Google y un asistente con IA que atiende a tus clientes las 24 horas.
+                            <b>Desde $200.000.</b> Creamos la página web de tu negocio con un agente IA que responde dudas y toma los datos de tus clientes las 24 horas. Los primeros 3 meses del agente son gratis.
                         </p>
                         <div className="ctas">
                             <button type="button" className="btn signal" onClick={() => { track('Hero: Preguntale al asesor'); openChat(); }}>
                                 Pregúntale a Faz →
                             </button>
-                            <a className="btn" href="#servicios">Ver servicios</a>
+                            <Link className="btn" to="/servicios">Ver planes</Link>
                         </div>
                         <div className="proof">
-                            <span><b>Dominio, hosting y correos</b> incluidos</span>
-                            <span><b>Agente IA</b> 24/7</span>
+                            <span><b>Dominio y correo</b> incluidos</span>
+                            <span><b>Agente IA</b> 3 meses gratis</span>
                             <span><b>Portal</b> para tu cuenta</span>
                         </div>
                     </div>
