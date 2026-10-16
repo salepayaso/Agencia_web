@@ -119,14 +119,18 @@ const TechBand = () => {
             <canvas ref={canvasRef} aria-hidden="true" />
             <div className="max">
                 <span className="lead">La tecnología <b>con la que trabajamos</b></span>
-                <ul>
-                    {TECH.map((t) => (
-                        <li key={t.name}>
-                            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d={t.d} /></svg>
-                            {t.name}
-                        </li>
+                <div className="rail">
+                    {[false, true].map((dup) => (
+                        <ul key={String(dup)} className={dup ? 'dup' : undefined} aria-hidden={dup || undefined}>
+                            {TECH.map((t) => (
+                                <li key={t.name}>
+                                    <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d={t.d} /></svg>
+                                    {t.name}
+                                </li>
+                            ))}
+                        </ul>
                     ))}
-                </ul>
+                </div>
             </div>
         </section>
     );

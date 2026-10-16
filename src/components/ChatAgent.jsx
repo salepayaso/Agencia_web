@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { OPEN_CHAT_EVENT } from '../lib/chat';
+import { readConsent, onConsentChosen } from '../lib/consent';
 import RobotAsesor from './RobotAsesor';
 
 const WHATSAPP_URL =
@@ -187,6 +188,13 @@ const ChatAgent = () => {
     const [blockedUntil, setBlockedUntil] = useState(readBlock);
     const isBlocked = blockedUntil > Date.now();
 
+    // En el celular el aviso de cookies ocupa la misma esquina que el botón:
+    // mientras no lo responda, el botón no aparece y Faz no saluda ni invita.
+    const [cookieWait, setCookieWait] = useState(
+        () => readConsent() === null && window.matchMedia('(max-width: 639px)').matches
+    );
+    useEffect(() => (cookieWait ? onConsentChosen(() => setCookieWait(false)) : undefined), [cookieWait]);
+
     // ---- Gestos del robot -------------------------------------------------
     // Puntuales (saludo, contento, confundido) duran unos segundos; el resto
     // sale del estado: pensando mientras carga la respuesta, si no, esperando.
@@ -205,7 +213,7 @@ const ChatAgent = () => {
     // Solo se calla si el chat está abierto o si la persona ya dejó sus datos:
     // insistirle a alguien que ya es lead solo molesta.
     useEffect(() => {
-        if (isOpen || visitor || blockedUntil) return;
+        if (isOpen || visitor || blockedUntil || cookieWait) return;
 
         const show = () => {
             setTeaser(TEASERS[teaserIndex.current % TEASERS.length]);
@@ -231,14 +239,14 @@ const ChatAgent = () => {
                 // Ídem.
             }
         };
-    }, [isOpen, visitor, blockedUntil]);
+    }, [isOpen, visitor, blockedUntil, cookieWait]);
 
     // ---- Saludo de bienvenida -------------------------------------------
     // Una sola vez por visita, apenas aparece el botón: llama la atención hacia
     // Faz sin repetirse en cada página.
     const [hello, setHello] = useState(false);
     useEffect(() => {
-        if (isOpen || blockedUntil) return;
+        if (isOpen || blockedUntil || cookieWait) return;
         try {
             if (sessionStorage.getItem(HELLO_KEY)) return;
         } catch {
@@ -259,9 +267,10 @@ const ChatAgent = () => {
             clearTimeout(start);
             clearTimeout(stop);
         };
-        // Solo al montar: si después abre el chat, el saludo ya no importa.
+        // Al montar, o cuando responde el aviso de cookies en el celular. Si
+        // después abre el chat, el saludo ya no importa.
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+    }, [cookieWait]);
 
     const dismissTeaser = useCallback(() => setTeaser(null), []);
 
@@ -538,7 +547,7 @@ const ChatAgent = () => {
     };
 
     return (
-        <div className="fixed bottom-5 right-4 sm:right-6 z-50 flex flex-col items-end gap-4 font-body">
+        <div className={`fixed bottom-5 right-4 sm:right-6 z-50 ${cookieWait && !isOpen ? 'hidden' : 'flex'} flex-col items-end gap-4 font-body`}>
             {/* ---- Panel de chat ---- */}
             <AnimatePresence>
                 {isOpen && (

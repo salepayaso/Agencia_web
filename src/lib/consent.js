@@ -6,6 +6,7 @@ const GTM_ID = 'GTM-K4N4G54W';
 const PROD_HOSTS = ['www.interfaz360.cl', 'interfaz360.cl'];
 const KEY = 'i360-cookies';
 const OPEN_EVENT = 'i360:cookies';
+const CHOSEN_EVENT = 'i360:cookies-chosen';
 
 const GRANTED = { ad_storage: 'granted', ad_user_data: 'granted', ad_personalization: 'granted', analytics_storage: 'granted' };
 const DENIED = { ad_storage: 'denied', ad_user_data: 'denied', ad_personalization: 'denied', analytics_storage: 'denied' };
@@ -59,6 +60,7 @@ export function saveConsent(choice) {
     } catch {
         // Sin localStorage la elección vale solo para esta visita.
     }
+    window.dispatchEvent(new Event(CHOSEN_EVENT));
     if (choice === 'all') {
         loadAnalytics();
     } else {
@@ -66,6 +68,12 @@ export function saveConsent(choice) {
         clearGoogleCookies();
     }
 }
+
+/** Avisa cuando la persona responde el aviso de cookies (el chat espera eso para saludar). */
+export const onConsentChosen = (fn) => {
+    window.addEventListener(CHOSEN_EVENT, fn);
+    return () => window.removeEventListener(CHOSEN_EVENT, fn);
+};
 
 /** Vuelve a mostrar el banner (enlace "Cookies" del pie de página). */
 export const openCookieSettings = () => window.dispatchEvent(new Event(OPEN_EVENT));

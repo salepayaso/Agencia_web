@@ -152,6 +152,18 @@
   .hv .hv-links { display: none; }
   .hv .hv-burger { display: block; }
   .hv .hv-dev { display: none; }
+  /* Los tres paneles comparten alto: se achican Tu web y En Google, y el espacio
+     que sobra en Faz lo toma la franja del robot en vez de quedar en blanco. */
+  .hv .hv-faz { grid-template-rows: 1fr auto; }
+  .hv .hv-robot { width: 150px; }
+  .hv .hv-box { box-shadow: 6px 6px 0 var(--ink); }
+  .hv .hv-browser { box-shadow: 6px 6px 0 var(--ink); }
+  .hv .hv-site { height: 240px; }
+  .hv .hv-web, .hv .hv-g { gap: 10px; }
+  .hv .hv-web .hv-note, .hv .hv-g > .hv-note { display: none; }
+  .hv .hv-map { height: 76px; }
+  .hv .hv-place.dim:last-child { display: none; }
+  .hv .hv-serp { padding: 12px; gap: 10px; }
 }
 
 @media (prefers-reduced-motion: reduce) {

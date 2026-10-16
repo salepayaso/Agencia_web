@@ -22,15 +22,18 @@ const CookieBanner = () => {
         <div
             role="region"
             aria-label="Preferencias de cookies"
-            className="fixed z-[60] bottom-4 left-4 right-4 sm:right-auto sm:max-w-sm bg-paper border-[1.5px] border-ink p-4 font-body shadow-lg"
+            className="fixed z-[60] bottom-0 left-0 right-0 sm:bottom-4 sm:left-4 sm:right-auto sm:max-w-sm bg-paper border-t-[1.5px] sm:border-[1.5px] border-ink px-4 py-3 sm:p-4 font-body shadow-lg"
         >
             <p className="text-sm text-ink font-bold leading-snug">¿Nos dejas medir las visitas?</p>
             <p className="text-xs text-ink-2 leading-snug mt-1.5">
-                Usamos Google Analytics para saber cómo llegas al sitio y mejorar nuestros anuncios. Solo se activa si
-                aceptas; el sitio funciona igual si no.{' '}
+                {/* En el celular va solo lo esencial para que el aviso no tape la página. */}
+                <span className="hidden sm:inline">
+                    Usamos Google Analytics para saber cómo llegas al sitio y mejorar nuestros anuncios.{' '}
+                </span>
+                Solo se activa si aceptas; el sitio funciona igual si no.{' '}
                 <Link to="/privacidad" className="underline hover:text-ink">Más información</Link>
             </p>
-            <div className="flex gap-2 mt-3">
+            <div className="flex gap-2 mt-2.5 sm:mt-3">
                 <button
                     type="button"
                     onClick={() => choose('all')}

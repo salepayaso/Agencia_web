@@ -102,6 +102,7 @@ const Home = () => (
                             </li>
                         ))}
                     </ul>
+                    <p className="swipe-hint" aria-hidden="true">Desliza para ver todos los servicios →</p>
                 </div>
             </section>
 
