@@ -13,8 +13,8 @@ const track = (label) =>
 
 const Services = () => (
     <PageShell
-        title="Servicios y Planes Digitales"
-        description="Página web, tienda online, agente IA, ecosistema Google, software a medida, dominio y correos para pymes en Chile."
+        title="Planes de página web y agente IA"
+        description="Pyme Digital $200.000 o Empresa Digital $350.000. También agente IA, tienda online, software a medida, dominio .cl y correos para tu negocio."
     >
         <PageHead eyebrow="Servicios" title={<>Lo que hacemos<br />por tu <span>negocio</span></>}>
             Desde tu primera página web hasta el sistema que ordena tu operación, con un solo equipo a cargo. ¿Dudas? Faz, nuestro agente IA, te explica qué incluye y cuánto cuesta.

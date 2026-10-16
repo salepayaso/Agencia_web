@@ -28,8 +28,8 @@ const COMPROMISOS = [
 
 const AboutPage = () => (
     <PageShell
-        title="Nosotros"
-        description="Conoce Interfaz 360: primero entendemos tu negocio y después lo construimos. Trato directo, propuesta con precio cerrado y acompañamiento después de la entrega."
+        title="Nosotros, agencia digital en Santiago"
+        description="Somos un equipo en Santiago que crea páginas web, agentes IA y software para pymes. Precio cerrado antes de empezar y soporte después de la entrega."
     >
         <PageHead eyebrow="Nosotros" title={<>Primero entendemos<br />tu negocio. <span>Después</span><br />lo construimos.</>} />
 

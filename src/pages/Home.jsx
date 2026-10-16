@@ -42,8 +42,8 @@ const track = (label) =>
 const Home = () => (
     <div className="tc-page">
         <SEO
-            title="Interfaz360 — Agencia Digital IA en Chile | Web, Software y Agentes IA para Pymes"
-            description="Agencia digital en Chile para pymes. Sitios web, ecosistema Google, software a medida y agentes IA que atienden a tus clientes las 24 horas."
+            title="Páginas web y agentes IA para pymes en Chile"
+            description="Creamos tu página web con un agente IA que atiende a tus clientes 24/7, gratis los primeros 3 meses. Planes desde $200.000 con dominio y correo."
         />
         <Navbar />
         <ChatAgent />

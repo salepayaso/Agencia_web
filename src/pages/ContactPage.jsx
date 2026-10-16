@@ -64,8 +64,8 @@ const ContactPage = () => {
 
     return (
         <PageShell
-            title="Contacto"
-            description="Cuéntanos qué quieres construir. Te respondemos con una propuesta concreta dentro de un día hábil."
+            title="Cotiza tu página web o agente IA"
+            description="Cuéntanos de tu negocio por WhatsApp, chat o formulario. Te respondemos en un día hábil con una propuesta y un precio cerrado, sin compromiso."
         >
             <PageHead eyebrow="Contacto" title={<>Cuéntanos qué<br />quieres <span>construir</span></>}>
                 Te respondemos con una propuesta concreta, no con un folleto. Sin compromiso.
