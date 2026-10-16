@@ -37,7 +37,7 @@ const AboutPage = () => (
             <div className="max two-col">
                 <p>
                     Somos un equipo chileno que diseña, construye y cuida la presencia digital de pymes y emprendedores:
-                    sitios web, Google, sistemas de gestión y asistentes con inteligencia artificial.
+                    páginas web, Google, sistemas de gestión y agentes IA que atienden a tus clientes.
                 </p>
                 <p>
                     Una web o un sistema solo vale la pena si resuelve algo de tu día a día. No vendemos tecnología:

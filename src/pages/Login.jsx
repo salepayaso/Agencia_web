@@ -109,7 +109,7 @@ const Login = () => {
 
                 {mode === 'signup' && (
                     <p className="muted" style={{ margin: 0, fontSize: 15 }}>
-                        Con tu cuenta compras tu dominio o hosting y sigues tus pedidos y solicitudes en un solo lugar.
+                        Con tu cuenta compras tu dominio o tus correos y sigues tus pedidos y solicitudes en un solo lugar.
                     </p>
                 )}
                 {mode === 'forgot' && (

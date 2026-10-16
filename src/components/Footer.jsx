@@ -15,7 +15,7 @@ const Footer = () => (
                     </p>
                 </div>
                 <div>
-                    <h2>Sitio</h2>
+                    <p className="foot-h">Sitio</p>
                     <ul>
                         <li><Link to="/servicios">Servicios</Link></li>
                         <li><Link to="/nosotros">Nosotros</Link></li>
@@ -23,7 +23,7 @@ const Footer = () => (
                     </ul>
                 </div>
                 <div>
-                    <h2>Clientes</h2>
+                    <p className="foot-h">Clientes</p>
                     <ul>
                         <li><Link to="/login">Portal de clientes</Link></li>
                         <li><Link to="/#dominio">Buscar dominio</Link></li>
@@ -31,7 +31,7 @@ const Footer = () => (
                     </ul>
                 </div>
                 <div>
-                    <h2>Síguenos</h2>
+                    <p className="foot-h">Síguenos</p>
                     <ul>
                         <li>
                             <a href="https://www.instagram.com/interfaz360/" target="_blank" rel="noopener noreferrer">

@@ -336,7 +336,7 @@
   &.foot-site, & .foot-site { background: var(--ink); color: var(--mute); padding-block: 56px 40px; font-size: 14px; }
   & .foot-site .max { display: grid; grid-template-columns: 1.4fr 1fr 1fr 1fr; gap: 32px; }
   & .foot-site .brand { font-size: 28px; color: #fff; text-decoration: none; }
-  & .foot-site h2 { margin: 0 0 12px; color: #fff; font-size: 12px; letter-spacing: .14em; text-transform: uppercase; }
+  & .foot-site .foot-h { margin: 0 0 12px; color: #fff; font-size: 12px; letter-spacing: .14em; text-transform: uppercase; }
   & .foot-site ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
   & .foot-site a { text-decoration: none; }
   & .foot-site a:hover { color: #fff; }

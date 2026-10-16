@@ -65,7 +65,7 @@ export const SERVICIOS = [
         id: 'agente',
         title: 'Agente IA 24/7',
         kicker: 'Nuevo',
-        desc: 'Configuramos un asistente con la información de tu negocio: atiende en tu web a cualquier hora, responde dudas, deriva a tu WhatsApp y te envía los datos de cada interesado. 3 meses gratis con tu página.',
+        desc: 'Configuramos un agente IA con la información de tu negocio: atiende en tu web a cualquier hora, responde dudas, deriva a tu WhatsApp y te envía los datos de cada interesado. 3 meses gratis con tu página.',
         includes: [
             'Chat en tu sitio web, disponible las 24 horas',
             'Entrenado con tus productos, precios, horarios y zonas de despacho',
@@ -74,7 +74,7 @@ export const SERVICIOS = [
         ],
         ask: 'Hola, me interesa un agente IA para mi negocio. ¿Cómo funciona?',
         home: {
-            desc: 'Configuramos un asistente con la información de tu negocio: atiende en tu web a cualquier hora, responde dudas, deriva a tu WhatsApp y te envía los datos de cada interesado. Viene 3 meses gratis con tu página.',
+            desc: 'Configuramos un agente IA con la información de tu negocio: atiende en tu web a cualquier hora, responde dudas, deriva a tu WhatsApp y te envía los datos de cada interesado. Viene 3 meses gratis con tu página.',
             ask: '¿Qué hace un agente IA y cómo funcionaría en mi negocio?',
         },
         agente: [
@@ -98,12 +98,12 @@ export const SERVICIOS = [
         includes: [
             'Diseño a medida, rápido en el celular',
             'Formulario de contacto y botón de WhatsApp',
-            'Dominio, hosting y correos el primer año',
+            'Dominio y correo con tu nombre el primer año',
             'Certificado de seguridad (https)',
         ],
         ask: '¿Cuánto cuesta una página web?',
         home: {
-            desc: 'Diseñamos y programamos tu página: secciones, textos, fotos, formulario de contacto y botón de WhatsApp, lista para aparecer en Google. Incluye dominio, hosting y correos el primer año.',
+            desc: 'Diseñamos y programamos tu página: secciones, textos, fotos, formulario de contacto y botón de WhatsApp, lista para aparecer en Google. Incluye dominio y correo el primer año.',
         },
         agente: ['Se vende como Plan Pyme Digital (landing page) o Empresa Digital (ver los planes).'],
     },
@@ -186,7 +186,7 @@ export const PLANES = [
             'Dominio .cl y 1 correo con el nombre de tu empresa el primer año',
             'Perfil en Google y Maps + SEO local',
             'Botón de WhatsApp',
-            'Asistente IA 3 meses gratis',
+            'Agente IA 3 meses gratis',
             'Políticas de privacidad y aviso de IA (Ley 21.719)',
             'Portal de clientes para tu cuenta',
             'Certificado de seguridad',
@@ -213,7 +213,7 @@ export const PLANES = [
             'Perfil en Google y Maps + SEO local',
             'Analytics, Tag Manager y Search Console, listo para Google Ads',
             'Botón de WhatsApp',
-            'Asistente IA 3 meses gratis',
+            'Agente IA 3 meses gratis',
             'Políticas de privacidad y aviso de IA (Ley 21.719)',
             'Portal de clientes para tu cuenta',
             'Certificado de seguridad',
