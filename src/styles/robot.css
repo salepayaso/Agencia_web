@@ -28,6 +28,14 @@
 .robot .x-mano { transform-box: fill-box; transform-origin: 50% 100%; animation: robot-wave .45s ease-in-out infinite alternate; }
 @keyframes robot-wave { from { transform: rotate(-20deg); } to { transform: rotate(20deg); } }
 
+/* Botón del chat: el saludo es más marcado para que se note en tamaño chico. */
+.robot-mini.g-saludo .e-normal { display: none; }
+.robot-mini.g-saludo .e-feliz { display: inline; }
+.robot-mini.g-saludo .r-body { animation: robot-hop-mini .9s ease-in-out infinite; }
+@keyframes robot-hop-mini { 0%, 100% { transform: translateY(0) rotate(0); } 30% { transform: translateY(-14px) rotate(-8deg); } 60% { transform: translateY(0) rotate(6deg); } }
+.robot-mini .x-mano { animation: robot-wave-mini .3s ease-in-out infinite alternate; }
+@keyframes robot-wave-mini { from { transform: rotate(-30deg); } to { transform: rotate(25deg); } }
+
 .robot.g-pensando .r-body { animation: robot-tilt 2.4s ease-in-out infinite; }
 @keyframes robot-tilt { 0%, 100% { transform: rotate(0); } 50% { transform: rotate(-4deg); } }
 .robot .x-puntos > * { animation: robot-dot 1.2s infinite; }

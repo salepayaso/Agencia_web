@@ -69,7 +69,7 @@ const RobotAsesor = ({ gesture = 'esperando', variant = 'cabecera', size = 40, a
             width={size}
             height={size}
             aria-hidden="true"
-            className={`robot g-${gesture}${following ? ' is-following' : ''} ${className}`}
+            className={`robot g-${gesture}${mini ? ' robot-mini' : ''}${following ? ' is-following' : ''} ${className}`}
         >
             <defs>
                 <linearGradient id={`${id}-hg`} x1="0" y1="0" x2="1" y2="1">
@@ -144,10 +144,19 @@ const RobotAsesor = ({ gesture = 'esperando', variant = 'cabecera', size = 40, a
                 </g>
 
                 {/* Extras de cada gesto: mano que saluda, puntos de pensar, brillos y signo de duda. */}
-                <g className="r-extra x-mano">
-                    <rect x="182" y="98" width="14" height="36" rx="7" fill={accent} />
-                    <circle cx="189" cy="94" r="10" fill={accent} />
-                </g>
+                {mini ? (
+                    // En el botón la mano es más grande y lleva contorno oscuro:
+                    // sin él se pierde contra el borde naranja del círculo.
+                    <g className="r-extra x-mano" fill={accent} stroke="#0f1a2e" strokeWidth="8">
+                        <rect x="166" y="74" width="26" height="58" rx="13" />
+                        <circle cx="179" cy="62" r="22" />
+                    </g>
+                ) : (
+                    <g className="r-extra x-mano">
+                        <rect x="182" y="98" width="14" height="36" rx="7" fill={accent} />
+                        <circle cx="189" cy="94" r="10" fill={accent} />
+                    </g>
+                )}
                 <g className="r-extra x-puntos" fill="currentColor">
                     <circle cx="150" cy="30" r="7" />
                     <circle cx="168" cy="18" r="8" />

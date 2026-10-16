@@ -148,6 +148,8 @@ const Markdown = ({ text }) => {
 
 // Cuánto dura un gesto puntual del robot antes de volver a esperar o pensar.
 const GESTURE_MS = { saludo: 2600, contento: 3500, confundido: 3000 };
+// El saludo de bienvenida dura más: es lo primero que ve la persona.
+const HELLO_MS = 3800;
 
 
 const ChatAgent = () => {
@@ -251,8 +253,8 @@ const ChatAgent = () => {
             } catch {
                 // Ídem.
             }
-        }, 1200);
-        const stop = setTimeout(() => setHello(false), 1200 + GESTURE_MS.saludo);
+        }, 1500);
+        const stop = setTimeout(() => setHello(false), 1500 + HELLO_MS);
         return () => {
             clearTimeout(start);
             clearTimeout(stop);
@@ -796,16 +798,20 @@ const ChatAgent = () => {
                 ) : (
                     // Saluda al entrar por primera vez y cuando aparece el globo de invitación.
                     // Cara grande y con borde naranja para que se distinga sobre el fondo oscuro.
-                    <span className="w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-paper text-ink flex items-center justify-center ring-2 ring-[#e8471c]">
+                    // Durante la bienvenida el círculo crece y suelta un pulso naranja.
+                    <span className={`relative w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-paper text-ink flex items-center justify-center ring-2 ring-[#e8471c] transition-transform duration-300 ${hello ? 'scale-110' : ''}`}>
+                        {hello && (
+                            <span className="absolute inset-0 rounded-full bg-[#e8471c] opacity-60 animate-ping motion-reduce:hidden" aria-hidden="true" />
+                        )}
                         <RobotAsesor
                             variant="boton"
                             size={40}
-                            className="w-[38px] h-[38px] sm:w-[42px] sm:h-[42px]"
+                            className="relative w-[38px] h-[38px] sm:w-[42px] sm:h-[42px]"
                             gesture={isBlocked ? 'confundido' : teaser || hello ? 'saludo' : 'esperando'}
                         />
                     </span>
                 )}
-                <span className="hidden sm:inline">{isOpen ? 'Cerrar' : 'Faz'}</span>
+                <span className="hidden sm:inline">{isOpen ? 'Cerrar' : hello ? '¡Hola!' : 'Faz'}</span>
                 {!isOpen && !isBlocked && (
                     <span className="hidden sm:block w-2 h-2 rounded-full bg-[#8fe0a8] shadow-[0_0_0_3px_rgba(143,224,168,.25)]" />
                 )}
