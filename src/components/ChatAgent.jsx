@@ -26,6 +26,7 @@ const TEASERS = [
 ];
 
 const TEASER_INDEX_KEY = 'if360_teaser_index';
+const HELLO_KEY = 'if360_hello';
 const VISITOR_KEY = 'if360_visitor';
 const CHAT_KEY = 'if360_chat';
 const BLOCK_KEY = 'if360_blocked';
@@ -229,6 +230,36 @@ const ChatAgent = () => {
             }
         };
     }, [isOpen, visitor, blockedUntil]);
+
+    // ---- Saludo de bienvenida -------------------------------------------
+    // Una sola vez por visita, apenas aparece el botón: llama la atención hacia
+    // Faz sin repetirse en cada página.
+    const [hello, setHello] = useState(false);
+    useEffect(() => {
+        if (isOpen || blockedUntil) return;
+        try {
+            if (sessionStorage.getItem(HELLO_KEY)) return;
+        } catch {
+            // Sin sessionStorage saluda en cada página. No es grave.
+        }
+        // La marca se guarda al saludar y no antes, para que el doble montaje
+        // del modo estricto de React no se coma el saludo en desarrollo.
+        const start = setTimeout(() => {
+            setHello(true);
+            try {
+                sessionStorage.setItem(HELLO_KEY, '1');
+            } catch {
+                // Ídem.
+            }
+        }, 1200);
+        const stop = setTimeout(() => setHello(false), 1200 + GESTURE_MS.saludo);
+        return () => {
+            clearTimeout(start);
+            clearTimeout(stop);
+        };
+        // Solo al montar: si después abre el chat, el saludo ya no importa.
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     const dismissTeaser = useCallback(() => setTeaser(null), []);
 
@@ -751,7 +782,7 @@ const ChatAgent = () => {
                           ? 'Cerrar chat'
                           : 'Abrir el chat con Faz'
                 }
-                className="flex items-center gap-2.5 bg-ink text-white border-[1.5px] border-ink shadow-[5px_5px_0_#e8471c] hover:shadow-[5px_5px_0_#0f1a2e] hover:bg-[#1d2b45] p-3 sm:py-2.5 sm:pl-3 sm:pr-4 font-bold text-[15px] transition-shadow disabled:cursor-not-allowed"
+                className="flex items-center gap-2.5 bg-ink text-white border-[1.5px] border-ink shadow-[5px_5px_0_#e8471c] hover:shadow-[5px_5px_0_#0f1a2e] hover:bg-[#1d2b45] p-2 sm:py-2 sm:pl-2 sm:pr-4 font-bold text-base transition-shadow disabled:cursor-not-allowed"
                 initial={{ opacity: 0, y: 12 }}
                 // La opacidad va acá y no en una clase: framer escribe el estilo
                 // en línea y le gana a cualquier `disabled:opacity-*` de Tailwind.
@@ -759,16 +790,18 @@ const ChatAgent = () => {
                 transition={{ type: 'spring', stiffness: 260, damping: 20 }}
             >
                 {isOpen ? (
-                    <svg viewBox="0 0 24 24" className="w-8 h-8" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" className="w-11 h-11 sm:w-12 sm:h-12 p-1.5" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" aria-hidden="true">
                         <path d="M6 6l12 12M18 6L6 18" />
                     </svg>
                 ) : (
-                    // Saluda cuando aparece el globo de invitación.
-                    <span className="w-8 h-8 rounded-full bg-paper text-ink flex items-center justify-center">
+                    // Saluda al entrar por primera vez y cuando aparece el globo de invitación.
+                    // Cara grande y con borde naranja para que se distinga sobre el fondo oscuro.
+                    <span className="w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-paper text-ink flex items-center justify-center ring-2 ring-[#e8471c]">
                         <RobotAsesor
                             variant="boton"
-                            size={28}
-                            gesture={isBlocked ? 'confundido' : teaser ? 'saludo' : 'esperando'}
+                            size={40}
+                            className="w-[38px] h-[38px] sm:w-[42px] sm:h-[42px]"
+                            gesture={isBlocked ? 'confundido' : teaser || hello ? 'saludo' : 'esperando'}
                         />
                     </span>
                 )}
