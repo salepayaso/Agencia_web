@@ -71,7 +71,7 @@ async function pagarCotizacion(req, res) {
         return { status: 500, error: 'No pudimos iniciar el pago. Intenta de nuevo.' };
     });
     if (inicio.error) return res.status(inicio.status).json({ error: inicio.error });
-    const { payment, amount } = inicio;
+    const { payment, amount, row } = inicio;
 
     try {
         // C360 = cotización; I360 = pedido del portal. session_id "c<id>" vuelve en el commit.
@@ -80,7 +80,8 @@ async function pagarCotizacion(req, res) {
             buyOrder,
             sessionId: `c${payment.id}`,
             amount,
-            returnUrl: urlDeVuelta(req.headers.origin, '/api/webpay/retorno'),
+            // c = la cotización: si vence el plazo, Transbank vuelve sin token y así sabemos a dónde volver.
+            returnUrl: urlDeVuelta(req.headers.origin, `/api/webpay/retorno?c=${row.token}`),
         });
         await updatePendingPayment(payment.id, { buy_order: buyOrder, webpay_token: trx.token });
         return res.status(200).json({ url: trx.url, token: trx.token });

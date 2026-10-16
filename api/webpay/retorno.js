@@ -2,10 +2,13 @@
 // se cursa el cobro (commit). Webpay no tiene webhook: si no hacemos el commit,
 // Transbank reversa la transacción sola.
 //
-// Transbank llega por POST (o GET) con uno de tres formatos:
-//   token_ws                → terminó de pagar → commit
-//   TBK_TOKEN (+ orden)     → apretó "Anular compra"
-//   token_ws + TBK_TOKEN    → se le venció el plazo del formulario
+// Transbank llega por POST (o GET) con uno de cuatro formatos:
+//   token_ws                        → terminó de pagar (aprobado o rechazado) → commit
+//   TBK_TOKEN (+ orden)             → apretó "Anular compra"
+//   token_ws + TBK_TOKEN (+ orden)  → error en el formulario y "volver al sitio"
+//   solo TBK_ORDEN_COMPRA + sesión  → se le venció el plazo (4 min en producción)
+// En el último no hay token y la orden puede venir inventada: no se toca la base,
+// solo se muestra "sin cobro". El pedido queda como "Pago sin completar".
 // Después mandamos al cliente a su portal con el resultado.
 //
 // Los pagos de cotizaciones (buy_order C360-…) están en quote_payments y vuelven a
@@ -23,12 +26,21 @@ import {
 } from '../_lib/quotePayments.js';
 
 const volver = volverAlPortal;
+const validToken = (t) => typeof t === 'string' && /^[a-f0-9]{64}$/.test(t);
 
 // Vercel ya parsea el formulario en req.body; el querystring cubre la llegada por GET.
 const campos = (req) => ({ ...(req.query || {}), ...(typeof req.body === 'object' && req.body ? req.body : {}) });
 
 export default async function handler(req, res) {
-    const { token_ws: tokenWs, TBK_TOKEN: tbkToken } = campos(req);
+    const { token_ws: tokenWs, TBK_TOKEN: tbkToken, TBK_ORDEN_COMPRA: orden, c: cotizacion } = campos(req);
+
+    // Plazo vencido: nunca se cobró. La cotización vuelve por el token de su URL de vuelta.
+    if (!tokenWs && !tbkToken) {
+        if (validToken(cotizacion)) return volverACotizacion(res, cotizacion, 'anulado');
+        const pedido = /^I360-(\d+)$/.exec(String(orden || ''))?.[1];
+        if (!orden) console.error('[webpay/retorno] llegada sin token ni orden');
+        return volver(res, orden ? 'anulado' : 'error', pedido);
+    }
 
     try {
         // Si la tabla de pagos de cotizaciones falla, el pedido del portal sigue su camino.
@@ -42,16 +54,11 @@ export default async function handler(req, res) {
                 await updatePendingOrder(order.id, {
                     status: 'cancelado',
                     admin_note: tokenWs
-                        ? 'Se venció el plazo para pagar en Webpay. No se hizo ningún cobro.'
+                        ? 'El pago en Webpay no se completó. No se hizo ningún cobro.'
                         : 'Anulaste el pago en Webpay. No se hizo ningún cobro.',
                 });
             }
             return volver(res, 'anulado', order?.id);
-        }
-
-        if (!tokenWs) {
-            console.error('[webpay/retorno] llegada sin token');
-            return volver(res, 'error');
         }
 
         // Recarga de esta página: el commit ya se hizo y repetirlo da error en Transbank.
